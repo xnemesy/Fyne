@@ -1,45 +1,45 @@
 import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
-/**
- * Local database model for user category overrides.
- * This is how the system "learns" from manual user input.
- */
 @collection
 class CategoryOverride {
   Id id = Isar.autoIncrement;
 
   @Index(unique: true)
-  late String keyword; // e.g. "ESSELUNGA"
+  late String keyword; 
   
   late String categoryUuid;
-  late String encryptedCategoryName;
+  late String decryptedCategoryName;
 }
 
-/**
- * Categorization Engine: Rules + ML + Local Learning
- * Operates strictly on-device with decrypted data.
- */
 class CategorizationService {
   final Isar isar;
   final _uuid = Uuid();
 
-  // Rule-based dictionary (Default fallback)
+  // Expanded Rule-based dictionary
   final Map<String, String> _staticRules = {
     'AMAZON': 'Shopping',
     'ESSELUNGA': 'Spesa',
     'CARREFOUR': 'Spesa',
+    'LIDL': 'Spesa',
+    'COOP': 'Spesa',
     'NETFLIX': 'Intrattenimento',
     'SPOTIFY': 'Intrattenimento',
+    'DISNEY': 'Intrattenimento',
     'SHELL': 'Trasporti',
     'ENI': 'Trasporti',
+    'UBER': 'Trasporti',
     'ZARA': 'Abbigliamento',
+    'H&M': 'Abbigliamento',
+    'REVOLUT': 'Trasferimenti',
+    'PAYPAL': 'Shopping',
+    'APPLE.COM': 'Servizi Digitali',
   };
 
   CategorizationService(this.isar);
 
   /**
-   * Scans decrypted transaction description to find the best category.
+   * Scans decrypted transaction description to find the best category UUID.
    */
   Future<String> categorize(String description) async {
     final cleanDesc = description.toUpperCase();
@@ -47,47 +47,42 @@ class CategorizationService {
     // 1. Check Local Learning (User Overrides)
     final userOverride = await isar.categoryOverrides
         .filter()
-        .keywordEqualTo(cleanDesc)
+        .keywordContains(cleanDesc)
         .findFirst();
     if (userOverride != null) {
       return userOverride.categoryUuid;
     }
 
-    // 2. Rule-based Engine
+    // 2. Comprehensive Rule-based Engine
     for (var entry in _staticRules.entries) {
       if (cleanDesc.contains(entry.key)) {
-        // In a real flow, we'd map 'Shopping' to its anonymous UUID
-        return _getUuidForCategory(entry.value);
+        return _getDeterministicUuid(entry.value);
       }
     }
 
-    // 3. Local ML Classifier (NLP)
-    // Placeholder: tflite_flutter implementation
-    // var prediction = await _runTFLiteInference(cleanDesc);
-    // if (prediction.confidence > 0.8) return prediction.categoryUuid;
-
-    // 4. Fallback (General)
-    return _getUuidForCategory('Altro');
+    // 3. Fallback
+    return _getDeterministicUuid('Altro');
   }
 
   /**
-   * "Learn" from user manual categorization.
+   * Deterministic UUID for static categories to maintain cross-device consistency
+   * without a centralized clear-text registry.
    */
-  Future<void> learn(String keyword, String categoryUuid, String encryptedName) async {
+  String _getDeterministicUuid(String name) {
+    return _uuid.v5(Uuid.NAMESPACE_URL, "fyne.app/category/${name.toLowerCase()}");
+  }
+
+  /**
+   * Persist a manual change to learn for the future.
+   */
+  Future<void> learn(String keyword, String categoryUuid, String decryptedName) async {
     final override = CategoryOverride()
       ..keyword = keyword.toUpperCase()
       ..categoryUuid = categoryUuid
-      ..encryptedCategoryName = encryptedName;
+      ..decryptedCategoryName = decryptedName;
     
     await isar.writeTxn(() async {
       await isar.categoryOverrides.put(override);
     });
-  }
-
-  // Helper to ensure consistency between anonymous UUIDs and Category names
-  String _getUuidForCategory(String name) {
-    // In a real app, this would lookup a local vault of [UUID -> Encrypted Name]
-    // For this demonstration, we use deterministic UUIDs based on the name strings
-    return name.toLowerCase().hashCode.toString(); 
   }
 }

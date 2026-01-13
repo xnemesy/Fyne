@@ -42,6 +42,21 @@ router.post('/connect', verifyToken, async (req, res) => {
 });
 
 /**
+ * @route GET /api/banking/fetch-raw/:accountId
+ * @desc Proxy route to fetch raw transactions from the provider WITHOUT saving.
+ * Used for client-side categorization and encryption.
+ */
+router.get('/fetch-raw/:accountId', verifyToken, async (req, res) => {
+    const { accountId } = req.params;
+    try {
+        const transactions = await bankingProvider.getTransactions(accountId);
+        res.json(transactions);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
  * @route POST /api/banking/sync-results
  * @desc Save transactions that have been categorized and encrypted by the client.
  */
