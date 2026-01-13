@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+dist/
+build/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+ui-debug.log
+firebase-export-*/
+
+# Secrets & Env
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+service-account.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project Specific
+infrastructure/secrets/
+backend/.env
