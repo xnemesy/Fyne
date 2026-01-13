@@ -42,46 +42,70 @@ router.post('/connect', verifyToken, async (req, res) => {
 });
 
 /**
- * @route GET /api/banking/sync/:accountId
- * @desc Fetch, normalize, encrypt and save transactions
+ * @route POST /api/banking/sync-results
+ * @desc Save transactions that have been categorized and encrypted by the client.
  */
-router.get('/sync/:accountId', verifyToken, async (req, res) => {
-    const { accountId } = req.params;
-    const masterKey = process.env.ENCRYPTION_MASTER_KEY; // Should come from client in a real zero-knowledge flow
+router.post('/sync-results', verifyToken, async (req, res) => {
+    const { accountId, transactions } = req.body;
 
-    if (!masterKey) {
-        return res.status(500).json({ error: 'Server encryption key not configured' });
+    if (!accountId || !transactions) {
+        return res.status(400).json({ error: 'accountId and transactions are required' });
     }
 
     try {
         await db.ensureUser(req.user.uid);
 
-        const transactions = await bankingProvider.getTransactions(accountId);
-
-        // Normalize, Encrypt
-        const processedTransactions = transactions.map(tx => {
-            // Encrypt sensitive fields (description and counterPartyName)
-            const encryptedDescription = encrypt(tx.description, masterKey);
-            const encryptedCounterParty = encrypt(tx.counterPartyName, masterKey);
-
-            return {
-                ...tx,
-                description: encryptedDescription,
-                counterPartyName: encryptedCounterParty,
-                isEncrypted: true
-            };
-        });
-
-        // Persistence in PostgreSQL
-        await db.saveTransactions(req.user.uid, accountId, processedTransactions);
+        // The client sends transactions with:
+        // - amount (clear)
+        // - description (encrypted)
+        // - counterParty (encrypted)
+        // - categoryUuid (anonymous UUID)
+        await db.saveTransactions(req.user.uid, accountId, transactions);
 
         res.json({
-            message: `Synced and encrypted ${processedTransactions.length} transactions`,
-            count: processedTransactions.length
+            message: `Successfully saved ${transactions.length} private transactions and triggered budget updates.`,
+            status: 'success'
         });
-
     } catch (error) {
-        console.error('Sync Error:', error);
+        console.error('Save Sync Results Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * @route POST /api/budgets
+ * @desc Create an anonymous budget
+ */
+router.post('/budgets', verifyToken, async (req, res) => {
+    const { categoryUuid, encryptedName, limitAmount } = req.body;
+
+    try {
+        await db.query(
+            `INSERT INTO budgets (user_id, category_uuid, encrypted_category_name, limit_amount)
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (user_id, category_uuid) DO UPDATE SET
+             encrypted_category_name = EXCLUDED.encrypted_category_name,
+             limit_amount = EXCLUDED.limit_amount`,
+            [req.user.uid, categoryUuid, encryptedName, limitAmount]
+        );
+        res.json({ message: 'Budget created/updated anonymously' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/budgets
+ * @desc Get current budgets status
+ */
+router.get('/budgets', verifyToken, async (req, res) => {
+    try {
+        const result = await db.query(
+            'SELECT category_uuid, encrypted_category_name, limit_amount, current_spent FROM budgets WHERE user_id = $1',
+            [req.user.uid]
+        );
+        res.json(result.rows);
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });

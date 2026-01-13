@@ -43,27 +43,24 @@ module.exports = {
     saveTransactions: async (userUid, accountId, transactions) => {
         const query = `
         INSERT INTO transactions (
-          account_id, user_uid, external_id, amount, currency, 
-          description, counter_party, booking_date, status, is_encrypted
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        ON CONFLICT (account_id, external_id) DO UPDATE SET
-          amount = EXCLUDED.amount,
-          status = EXCLUDED.status,
-          description = EXCLUDED.description
+          account_id, user_uid, amount, currency, 
+          encrypted_description, encrypted_counter_party, category_uuid, 
+          booking_date, external_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (account_id, external_id) DO NOTHING
       `;
 
         for (const tx of transactions) {
             await pool.query(query, [
                 accountId,
                 userUid,
-                tx.externalId,
                 tx.amount,
                 tx.currency,
                 tx.description,
                 tx.counterPartyName,
+                tx.categoryUuid,
                 tx.bookingDate,
-                tx.status,
-                tx.isEncrypted
+                tx.externalId
             ]);
         }
     },
