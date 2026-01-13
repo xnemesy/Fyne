@@ -1,0 +1,38 @@
+name: fyne_frontend
+description: A new Flutter project for Fyne Banking.
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase
+  firebase_core: ^2.21.0
+  firebase_auth: ^4.12.1
+  
+  # Networking
+  dio: ^5.3.3
+  
+  # State Management
+  flutter_riverpod: ^2.4.2
+  riverpod_annotation: ^2.3.1
+  
+  # Encryption (Zero-Knowledge)
+  cryptography: ^2.5.0
+  
+  # UI
+  google_fonts: ^6.1.0
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.6
+  riverpod_generator: ^2.3.2
+
+flutter:
+  uses-material-design: true

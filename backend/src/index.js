@@ -7,9 +7,13 @@ const port = process.env.PORT || 8080;
 
 const { verifyToken } = require('./middleware/auth');
 const db = require('./utils/db');
+const bankingRouter = require('./routes/banking');
 
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/api/banking', bankingRouter);
 
 app.get('/', (req, res) => {
   res.json({
@@ -40,4 +44,6 @@ app.get('/health/db', async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+  // Initialize Schema on startup
+  db.initSchema().catch(console.error);
 });
