@@ -17,54 +17,125 @@ module.exports = {
      * Initializes the database schema
      */
     initSchema: async () => {
-        const schemaPath = path.join(__dirname, '../models/schema.sql');
-        const sql = fs.readFileSync(schemaPath, 'utf8');
         try {
-            // 1. Ensure extensions
-            await pool.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
+            console.log('--- Starting Database Migration/Initialization ---');
 
-            // 2. Run main schema (CREATE TABLE IF NOT EXISTS)
-            await pool.query(sql);
-
-            // 3. Robust Column Verification for 'users' table
-            const userColumns = [
-                { name: 'fcm_token', type: 'TEXT' },
-                { name: 'public_key', type: 'TEXT' },
-                { name: 'user_id', type: 'UUID DEFAULT gen_random_uuid()' } // User requested user_id UUID
-            ];
-
-            for (const col of userColumns) {
-                await pool.query(`
-                    DO $$ 
-                    BEGIN 
-                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                                      WHERE table_name='users' AND column_name='${col.name}') THEN
-                            ALTER TABLE users ADD COLUMN ${col.name} ${col.type};
-                        END IF;
-                    END $$;
-                `);
+            // 1. Ensure extensions for UUID generation
+            try {
+                await pool.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
+                console.log('✅ pgcrypto extension verified');
+            } catch (e) {
+                console.warn('⚠️ Could not ensure pgcrypto (might lack superuser), continuing...', e.message);
             }
 
-            // 4. Verification for 'accounts' table (ensure sync with new expectations)
-            const accountColumns = [
-                { name: 'provider_id', type: 'VARCHAR(50)' }
+            // 2. Users table (Uniform ID: uid VARCHAR 128 as PK)
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS users (
+                    uid VARCHAR(128) PRIMARY KEY,
+                    fcm_token TEXT,
+                    public_key TEXT,
+                    email TEXT,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            console.log('✅ Users table verified');
+
+            // 3. Banking Connections table
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS banking_connections (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    user_uid VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
+                    provider VARCHAR(50),
+                    provider_requisition_id TEXT UNIQUE,
+                    provider_account_id TEXT,
+                    status TEXT,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            console.log('✅ Banking Connections table verified');
+
+            // 4. Accounts table
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS accounts (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    user_id VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
+                    encrypted_name TEXT NOT NULL,
+                    encrypted_balance TEXT NOT NULL,
+                    currency VARCHAR(3) NOT NULL,
+                    type VARCHAR(20) DEFAULT 'checking',
+                    provider_id VARCHAR(50),
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            console.log('✅ Accounts table verified');
+
+            // 5. Transactions table verified
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS transactions (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
+                    user_id VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
+                    amount NUMERIC(15, 2) NOT NULL,
+                    currency VARCHAR(3) NOT NULL,
+                    encrypted_description TEXT NOT NULL,
+                    encrypted_counter_party TEXT,
+                    category_uuid UUID NOT NULL,
+                    booking_date DATE NOT NULL,
+                    external_id VARCHAR(255),
+                    UNIQUE(account_id, external_id)
+                )
+            `);
+
+            const txColumns = [
+                { name: 'user_id', type: 'VARCHAR(128) REFERENCES users(uid)' },
+                { name: 'encrypted_description', type: 'TEXT' },
+                { name: 'encrypted_counter_party', type: 'TEXT' },
+                { name: 'category_uuid', type: 'UUID' }
             ];
 
-            for (const col of accountColumns) {
-                await pool.query(`
-                    DO $$ 
-                    BEGIN 
-                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                                      WHERE table_name='accounts' AND column_name='${col.name}') THEN
-                            ALTER TABLE accounts ADD COLUMN ${col.name} ${col.type};
-                        END IF;
-                    END $$;
-                `);
+            for (const col of txColumns) {
+                try {
+                    const checkCol = await pool.query(
+                        "SELECT 1 FROM information_schema.columns WHERE table_name='transactions' AND column_name=$1",
+                        [col.name]
+                    );
+                    if (checkCol.rows.length === 0) {
+                        // If user_uid exists but user_id doesn't, rename it
+                        if (col.name === 'user_id') {
+                            const checkUid = await pool.query("SELECT 1 FROM information_schema.columns WHERE table_name='transactions' AND column_name='user_uid'");
+                            if (checkUid.rows.length > 0) {
+                                await pool.query('ALTER TABLE transactions RENAME COLUMN user_uid TO user_id');
+                                console.log('✅ Renamed user_uid to user_id in transactions');
+                                continue;
+                            }
+                        }
+                        await pool.query(`ALTER TABLE transactions ADD COLUMN ${col.name} ${col.type}`);
+                        console.log(`✅ Added column ${col.name} to transactions`);
+                    }
+                } catch (e) {
+                    console.error(`❌ Error verifying column ${col.name} in transactions:`, e.message);
+                }
             }
 
-            console.log('✅ Database schema and all columns verified');
+            // 6. Budgets table
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS budgets (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    user_id VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
+                    category_uuid UUID NOT NULL,
+                    encrypted_category_name TEXT NOT NULL,
+                    limit_amount NUMERIC(15, 2) NOT NULL,
+                    current_spent NUMERIC(15, 2) DEFAULT 0,
+                    period VARCHAR(20) DEFAULT 'MONTHLY',
+                    UNIQUE(user_id, category_uuid)
+                )
+            `);
+            console.log('✅ Budgets table verified');
+
+            console.log('--- Database Migration Completed ---');
         } catch (err) {
-            console.error('❌ Error during robust schema initialization:', err);
+            console.error('❌ CRITICAL DB MIGRATION ERROR:', err.message);
+            throw err;
         }
     },
 

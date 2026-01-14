@@ -12,16 +12,16 @@ async function processMockTransactions(userUid, accountId, transactions) {
     const result = await db.query('SELECT public_key, fcm_token FROM users WHERE uid = $1', [userUid]);
     const user = result.rows[0];
 
-    if (!user || !user.public_key) {
-        throw new Error('User not found or no public key. Ensure you have registered your public key from the app.');
+    if (!user) {
+        throw new Error('User not found in database.');
     }
 
-    // 2. Encrypt and Normalize
+    // 2. Encrypt and Normalize (Skip encryption if no public key)
     const normalized = transactions.map(tx => ({
         amount: tx.amount,
         currency: tx.currency || 'EUR',
-        description: encryptWithPublicKey(tx.description, user.public_key),
-        counterPartyName: encryptWithPublicKey(tx.counterParty || 'Unknown', user.public_key),
+        description: user && user.public_key ? encryptWithPublicKey(tx.description, user.public_key) : tx.description,
+        counterPartyName: user && user.public_key ? encryptWithPublicKey(tx.counterParty || 'Unknown', user.public_key) : (tx.counterParty || 'Unknown'),
         categoryUuid: tx.categoryUuid || '550e8400-e29b-41d4-a716-446655440000',
         bookingDate: tx.date || new Date().toISOString().split('T')[0],
         externalId: tx.externalId || `mock_${Date.now()}_${Math.random()}`
@@ -39,17 +39,26 @@ async function processMockTransactions(userUid, accountId, transactions) {
                 body: `Hai speso ${Math.abs(tx.amount)}€ presso ${tx.description}`
             };
 
-            const encryptedPayload = encryptWithPublicKey(
-                JSON.stringify(payloadData),
-                user.public_key
-            );
+            if (user.public_key) {
+                const encryptedPayload = encryptWithPublicKey(
+                    JSON.stringify(payloadData),
+                    user.public_key
+                );
 
-            await sendPushNotification(
-                user.fcm_token,
-                'Fyne Security',
-                'Nuovo movimento rilevato (Cifrato)',
-                { encrypted_payload: encryptedPayload }
-            );
+                await sendPushNotification(
+                    user.fcm_token,
+                    'Fyne Security',
+                    'Nuovo movimento rilevato (Cifrato)',
+                    { encrypted_payload: encryptedPayload }
+                );
+            } else {
+                await sendPushNotification(
+                    user.fcm_token,
+                    payloadData.title,
+                    payloadData.body,
+                    { type: payloadData.type }
+                );
+            }
         }
     }
     return normalized.length;
@@ -106,6 +115,34 @@ router.post('/seed-demo', async (req, res) => {
     } catch (error) {
         console.error('Seed Demo Error:', error.message);
         res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/debug/:uid', async (req, res) => {
+    try {
+        const user = await db.query('SELECT uid, public_key, fcm_token FROM users WHERE uid = $1', [req.params.uid]);
+        const accounts = await db.query('SELECT id, encrypted_name FROM accounts WHERE user_id = $1', [req.params.uid]);
+        const txCols = await db.query("SELECT column_name FROM information_schema.columns WHERE table_name='transactions'");
+        const accCols = await db.query("SELECT column_name FROM information_schema.columns WHERE table_name='accounts'");
+        res.json({
+            user: user.rows[0],
+            accounts: accounts.rows,
+            transaction_columns: txCols.rows.map(r => r.column_name),
+            account_columns: accCols.rows.map(r => r.column_name)
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.get('/reset-schema', async (req, res) => {
+    try {
+        await db.query('DROP TABLE IF EXISTS transactions CASCADE');
+        await db.query('DROP TABLE IF EXISTS budgets CASCADE');
+        await db.initSchema();
+        res.json({ message: 'Schema reset successfully' });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
 });
 

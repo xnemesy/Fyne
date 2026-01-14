@@ -135,7 +135,11 @@ router.post('/fcm-token', verifyToken, async (req, res) => {
         res.json({ message: 'FCM token updated' });
     } catch (error) {
         console.error('FCM Token Update Error:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            error: 'Database Error',
+            details: error.message,
+            db_error: error.hint || error.detail || error.message
+        });
     }
 });
 
