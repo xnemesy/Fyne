@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
     encrypted_name TEXT NOT NULL,       -- Base64 AES-256
+    encrypted_balance TEXT NOT NULL,    -- Base64 AES-256
     currency VARCHAR(3) NOT NULL,
     provider_id VARCHAR(50), 
-    balance NUMERIC(15, 2) NOT NULL,    -- Amount in clear for server-side math (but purpose is hidden)
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

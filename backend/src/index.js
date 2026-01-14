@@ -8,12 +8,14 @@ const port = process.env.PORT || 8080;
 const { verifyToken } = require('./middleware/auth');
 const db = require('./utils/db');
 const bankingRouter = require('./routes/banking');
+const accountsRouter = require('./routes/accounts');
 
 app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use('/api/banking', bankingRouter);
+app.use('/api/accounts', accountsRouter);
 
 app.get('/', (req, res) => {
   res.json({

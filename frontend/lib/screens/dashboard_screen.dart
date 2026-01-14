@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/budget_card.dart';
+import 'wallet_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -56,6 +57,18 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const WalletScreen()),
+                  );
+                },
+                icon: const Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
+              ),
+              const SizedBox(width: 15),
+            ],
           ),
 
           // Budget List
