@@ -43,7 +43,7 @@ module.exports = {
     saveTransactions: async (userUid, accountId, transactions) => {
         const query = `
         INSERT INTO transactions (
-          account_id, user_uid, amount, currency, 
+          account_id, user_id, amount, currency, 
           encrypted_description, encrypted_counter_party, category_uuid, 
           booking_date, external_id
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
