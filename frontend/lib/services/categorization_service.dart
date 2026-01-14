@@ -1,6 +1,8 @@
 import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
+part 'categorization_service.g.dart';
+
 @collection
 class CategoryOverride {
   Id id = Isar.autoIncrement;
