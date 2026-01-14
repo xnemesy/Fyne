@@ -1,91 +1,163 @@
-import 'package:isar/isar.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:typed_data';
 
-part 'categorization_service.g.dart';
+class Category {
+  final String id;
+  final String name;
+  final bool isHealthFocus;
 
-@collection
-class CategoryOverride {
-  Id id = Isar.autoIncrement;
-
-  @Index(unique: true)
-  late String keyword; 
-  
-  late String categoryUuid;
-  late String decryptedCategoryName;
+  Category({required this.id, required this.name, this.isHealthFocus = false});
 }
 
 class CategorizationService {
-  final Isar isar;
-  final _uuid = Uuid();
+  final _uuid = const Uuid();
+  Interpreter? _interpreter;
+  bool _isModelLoaded = false;
 
-  // Editorial Rule-based dictionary
-  final Map<String, String> _staticRules = {
-    'AMAZON': 'Shopping',
-    'ESSELUNGA': 'Alimentari',
-    'CARREFOUR': 'Alimentari',
-    'LIDL': 'Alimentari',
-    'COOP': 'Alimentari',
-    'NETFLIX': 'Sottoscrizioni',
-    'SPOTIFY': 'Sottoscrizioni',
-    'DISNEY': 'Sottoscrizioni',
-    'SHELL': 'Mobilità',
-    'ENI': 'Mobilità',
-    'UBER': 'Mobilità',
-    'ZARA': 'Stile',
-    'H&M': 'Stile',
-    'REVOLUT': 'Trasferimenti',
-    'PAYPAL': 'Shopping',
-    'APPLE.COM': 'Digital',
-    'SUSHI': 'Alimentari',
-  };
+  // Categories Mapping (Order must match Model output indices)
+  final List<String> _labelOrder = [
+    'Alimentari',
+    'Wellness',
+    'Shopping',
+    'Trasporti',
+    'Abbonamenti',
+    'Vizi',
+    'Fast Food',
+    'Altro'
+  ];
 
-  CategorizationService(this.isar);
+  late final Map<String, Category> _categoryMap;
 
-  /**
-   * Scans decrypted transaction description to find the best category UUID.
-   */
-  Future<String> categorize(String description) async {
-    final cleanDesc = description.toUpperCase();
+  CategorizationService() {
+    _categoryMap = {
+      for (var name in _labelOrder)
+        _uuid.v5(Uuid.NAMESPACE_URL, name): Category(
+          id: _uuid.v5(Uuid.NAMESPACE_URL, name),
+          name: name,
+          isHealthFocus: name == 'Wellness',
+        )
+    };
+    _loadModel();
+  }
 
-    // 1. Check Local Learning (User Overrides)
-    final userOverride = await isar.categoryOverrides
-        .filter()
-        .keywordContains(cleanDesc)
-        .findFirst();
-    if (userOverride != null) {
-      return userOverride.categoryUuid;
+  Future<void> _loadModel() async {
+    try {
+      _interpreter = await Interpreter.fromAsset('assets/models/category_model.tflite');
+      _isModelLoaded = true;
+      print("✅ TFLite Model loaded successfully");
+    } catch (e) {
+      print("⚠️ TFLite Model load failed, using keyword fallback: $e");
     }
+  }
 
-    // 2. Editorial Rule-based Engine
-    for (var entry in _staticRules.entries) {
-      if (cleanDesc.contains(entry.key)) {
-        return _getDeterministicUuid(entry.value);
+  String getCategoryId(String name) {
+    return _uuid.v5(Uuid.NAMESPACE_URL, name);
+  }
+
+  Future<Category> categorize(String description) async {
+    final desc = description.toLowerCase();
+
+    // 1. Try TFLite Inference if loaded
+    if (_isModelLoaded && _interpreter != null) {
+      try {
+        final result = _runInference(desc);
+        final prediction = result['label'] as String;
+        final confidence = result['confidence'] as double;
+
+        if (confidence >= 0.75) {
+          print("🤖 TFLite Match: $prediction ($confidence)");
+          return _getByName(prediction);
+        }
+      } catch (e) {
+        print("🤖 TFLite Inference Error: $e");
       }
     }
 
-    // 3. Fallback
-    return _getDeterministicUuid('Altro');
+    // 2. Keyword Fallback (Confidence < 75% or Model fail)
+    return _keywordCategorize(desc);
   }
 
-  /**
-   * Deterministic UUID for static categories to maintain cross-device consistency
-   * without a centralized clear-text registry.
-   */
-  String _getDeterministicUuid(String name) {
-    return _uuid.v5(Uuid.NAMESPACE_URL, "fyne.app/category/${name.toLowerCase()}");
+  Map<String, dynamic> _runInference(String text) {
+    // Simple preprocessing: char-level or dummy tokenization for the placeholder
+    // In a real scenario, this would match the training preprocessing
+    var input = _preprocess(text);
+    var output = List<double>.filled(_labelOrder.length, 0).reshape([1, _labelOrder.length]);
+
+    _interpreter!.run(input, output);
+
+    List<double> probabilities = List<double>.from(output[0]);
+    int maxIndex = 0;
+    double maxProb = 0;
+
+    for (int i = 0; i < probabilities.length; i++) {
+      if (probabilities[i] > maxProb) {
+        maxProb = probabilities[i];
+        maxIndex = i;
+      }
+    }
+
+    return {
+      'label': _labelOrder[maxIndex],
+      'confidence': maxProb
+    };
   }
 
-  /**
-   * Persist a manual change to learn for the future.
-   */
-  Future<void> learn(String keyword, String categoryUuid, String decryptedName) async {
-    final override = CategoryOverride()
-      ..keyword = keyword.toUpperCase()
-      ..categoryUuid = categoryUuid
-      ..decryptedCategoryName = decryptedName;
-    
-    await isar.writeTxn(() async {
-      await isar.categoryOverrides.put(override);
-    });
+  List<dynamic> _preprocess(String text) {
+    // Basic text to tensor conversion (Placeholder logic)
+    // Most TFLite text models expect a fixed-size sequence of ints
+    List<double> tensor = List.filled(50, 0.0);
+    for (int i = 0; i < text.length && i < 50; i++) {
+      tensor[i] = text.codeUnitAt(i).toDouble();
+    }
+    return [tensor];
+  }
+
+  Category _keywordCategorize(String desc) {
+    // 1. Alimentari
+    if (_matches(desc, ['esselunga', 'lidl', 'carrefour', 'coop', 'conad', 'pam', 'eurospin', 'supermercato', 'spesa'])) {
+      return _getByName('Alimentari');
+    }
+
+    // 2. Wellness (Health-Focus)
+    if (_matches(desc, ['virgin active', 'mcfit', 'palestra', 'gym', 'farmacia', 'parafarmacia', 'myprotein', 'decathlon', 'centro medico', 'nutrizionista', 'salute', 'sport'])) {
+      return _getByName('Wellness');
+    }
+
+    // 3. Fast Food
+    if (_matches(desc, ['mcdonald', 'burger king', 'kfc', 'poke', 'sushi', 'pizza', 'takeaway'])) {
+      return _getByName('Fast Food');
+    }
+
+    // 4. Shopping
+    if (_matches(desc, ['amazon', 'zalando', 'ebay', 'temu', 'shein', 'ikea'])) {
+      return _getByName('Shopping');
+    }
+
+    // 5. Trasporti
+    if (_matches(desc, ['eni', 'shell', 'q8', 'benzina', 'carburante', 'trenitalia', 'italo', 'uber', 'taxi', 'atm', 'mobility'])) {
+      return _getByName('Trasporti');
+    }
+
+    // 6. Abbonamenti
+    if (_matches(desc, ['netflix', 'spotify', 'disney', 'dazn', 'prime video', 'apple.com/bill'])) {
+      return _getByName('Abbonamenti');
+    }
+
+    // 7. Vizi
+    if (_matches(desc, ['tabacchi', 'sigarette', 'scommesse', 'casino'])) {
+      return _getByName('Vizi');
+    }
+
+    return _getByName('Altro');
+  }
+
+  bool _matches(String text, List<String> keywords) {
+    return keywords.any((k) => text.contains(k.toLowerCase()));
+  }
+
+  Category _getByName(String name) {
+    final id = getCategoryId(name);
+    return _categoryMap[id] ?? _categoryMap[getCategoryId('Altro')]!;
   }
 }

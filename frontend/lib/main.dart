@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cryptography/cryptography.dart';
 import 'dart:convert';
 import 'providers/budget_provider.dart';
+import 'providers/sync_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,6 +88,7 @@ class InitializationWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(syncProvider);
     // Inject a demo Master Key if not present (to allow testing encryption)
     // In production, this would be derived from the mnemonic after a password check.
     Future.microtask(() async {

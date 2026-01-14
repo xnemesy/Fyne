@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/budget.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
+import 'transaction_provider.dart';
 
 // Service providers
 final apiServiceProvider = Provider((ref) => ApiService());
@@ -52,6 +53,35 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
     state = await AsyncValue.guard(() => _fetchAndDecryptBudgets());
   }
 }
+
+final totalMonthlyBudgetProvider = StateProvider<double>((ref) => 2500.0); // Example budget
+
+final dailyAllowanceProvider = Provider<double>((ref) {
+  final transactions = ref.watch(transactionsProvider).value ?? [];
+  final budgets = ref.watch(budgetsProvider).value ?? [];
+  final stateBudget = ref.watch(totalMonthlyBudgetProvider);
+  
+  // Use sum of budgets if defined, else fallback to totalMonthlyBudgetProvider
+  final totalBudget = budgets.isEmpty 
+      ? stateBudget 
+      : budgets.fold(0.0, (sum, b) => sum + b.limitAmount);
+  
+  // Calculate total spent this month
+  final now = DateTime.now();
+  final firstOfMonth = DateTime(now.year, now.month, 1);
+  final spentThisMonth = transactions
+      .where((tx) => tx.bookingDate.isAfter(firstOfMonth))
+      .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+  
+  final remainingBudget = totalBudget - spentThisMonth;
+  
+  // Days remaining in month
+  final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
+  final daysRemaining = lastDayOfMonth - now.day + 1;
+  
+  if (daysRemaining <= 0) return remainingBudget;
+  return remainingBudget / daysRemaining;
+});
 
 final budgetsProvider = AsyncNotifierProvider<BudgetNotifier, List<Budget>>(() {
   return BudgetNotifier();

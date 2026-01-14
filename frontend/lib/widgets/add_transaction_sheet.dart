@@ -207,26 +207,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _suggestCategory(String val) async {
-    final isar = ref.read(isarProvider).value;
-    if (isar == null) return;
+    final categorizer = ref.read(categorizationServiceProvider);
     
-    final catService = ref.read(categorizationServiceProvider(isar));
-    final budgets = ref.read(budgetsProvider).value ?? [];
+    final category = await categorizer.categorize(val);
     
-    final uuid = await catService.categorize(val);
-    
-    // Find name for UI feedback
-    String name = "Altro";
-    for (var b in budgets) {
-      if (b.categoryUuid == uuid) {
-        name = b.decryptedCategoryName ?? "Sconosciuta";
-        break;
-      }
-    }
-
     setState(() { 
-      _suggestedCategoryUuid = uuid; 
-      _suggestedCategoryName = name;
+      _suggestedCategoryUuid = category.id; 
+      _suggestedCategoryName = category.name.toUpperCase();
     });
   }
 

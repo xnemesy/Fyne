@@ -5,12 +5,14 @@ class TransactionModel {
   final String currency;
   final String encryptedDescription;
   final String? encryptedCounterParty;
-  final String categoryUuid;
+  String categoryUuid;
   final DateTime bookingDate;
   final String? externalId;
 
   String? decryptedDescription;
   String? decryptedCounterParty;
+  String? categoryName;
+  bool isHealthFocus;
 
   TransactionModel({
     required this.id,
@@ -24,6 +26,8 @@ class TransactionModel {
     this.externalId,
     this.decryptedDescription,
     this.decryptedCounterParty,
+    this.categoryName,
+    this.isHealthFocus = false,
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {

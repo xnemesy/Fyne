@@ -1,14 +1,14 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/transaction.dart';
-import '../services/api_service.dart';
-import '../services/crypto_service.dart';
-import 'budget_provider.dart'; // sharing common providers like api/crypto
+import 'budget_provider.dart';
 import 'account_provider.dart';
+import '../services/categorization_service.dart';
+
+final categorizationServiceProvider = Provider((ref) => CategorizationService());
 
 final transactionsProvider = FutureProvider<List<TransactionModel>>((ref) async {
   final api = ref.read(apiServiceProvider);
   final crypto = ref.read(cryptoServiceProvider);
   final masterKey = ref.read(masterKeyProvider);
+  final categorizer = ref.read(categorizationServiceProvider);
 
   if (masterKey == null) return [];
 
@@ -36,6 +36,13 @@ final transactionsProvider = FutureProvider<List<TransactionModel>>((ref) async 
       } catch (e2) {
         tx.decryptedDescription = "Dato Cifrato";
       }
+    }
+    // 3. Local Intelligence: Categorize based on decrypted description
+    if (tx.decryptedDescription != null) {
+      final category = await categorizer.categorize(tx.decryptedDescription!);
+      tx.categoryUuid = category.id;
+      tx.categoryName = category.name; // Keep local for UI
+      tx.isHealthFocus = category.isHealthFocus;
     }
     
     transactions.add(tx);

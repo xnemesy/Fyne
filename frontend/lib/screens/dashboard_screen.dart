@@ -11,6 +11,8 @@ import 'wallet_screen.dart';
 import '../providers/notification_scheduler.dart';
 import '../providers/budget_overrun_handler.dart';
 import '../widgets/budget_transfer_sheet.dart';
+import '../widgets/daily_allowance_widget.dart';
+import '../widgets/health_alert_widget.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -88,9 +90,15 @@ class DashboardScreen extends ConsumerWidget {
             ],
           ),
 
-          // Daily Allowance Indicator
+          // Daily Allowance Indicator (Intelligence Widget)
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            sliver: SliverToBoxAdapter(
+              child: DailyAllowanceWidget(),
+            ),
+          ),
           const SliverToBoxAdapter(
-            child: DailyIndicator(),
+            child: HealthAlertWidget(),
           ),
 
           // Budget List (Bento Grid)
