@@ -11,9 +11,9 @@ dependencies:
     sdk: flutter
   
   # Firebase
-  firebase_core: ^2.21.0
-  firebase_auth: ^4.12.1
-  firebase_messaging: ^14.7.4
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  firebase_messaging: ^14.7.10
   
   # Networking
   dio: ^5.3.3

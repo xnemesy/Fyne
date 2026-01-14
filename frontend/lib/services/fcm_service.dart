@@ -82,8 +82,11 @@ class FcmService {
 
   Future<void> _registerToken(String token) async {
     try {
+      final user = FirebaseMessaging.instance; // Not used but keeps context
+      final currentUser = await _api.dio.options.headers['Authorization']; // Just to check what's going on
+      
       await _api.post('/api/banking/fcm-token', data: {'fcmToken': token});
-      print("FCM Token registered successfully");
+      print("FCM Token registered successfully for user: ${token.substring(0, 5)}...");
     } catch (e) {
       print("Error registering FCM token: $e");
     }

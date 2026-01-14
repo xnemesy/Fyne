@@ -5,10 +5,33 @@ import 'screens/dashboard_screen.dart';
 import 'services/notification_service.dart';
 import 'services/fcm_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cryptography/cryptography.dart';
+import 'dart:convert';
+import 'providers/budget_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  
+  try {
+    await Firebase.initializeApp();
+    print("Firebase initialized successfully");
+    
+    // Auto-login for Demo/Sandbox purposes
+    final auth = FirebaseAuth.instance;
+    if (auth.currentUser == null) {
+      print("Attempting anonymous sign-in...");
+      final credentials = await auth.signInAnonymously();
+      print("Login success! UID: ${credentials.user?.uid}");
+    } else {
+      print("User already logged in: ${auth.currentUser?.uid}");
+    }
+  } catch (e) {
+    print("‼️ Firebase Initialization/Login Error: $e");
+    // We continue so the UI can at least show something, 
+    // but the backend calls might fail 401.
+  }
+
   await NotificationService().init();
   await FcmService().init();
   
@@ -53,7 +76,28 @@ class FyneApp extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
       ),
-      home: const DashboardScreen(),
+      home: const InitializationWrapper(child: DashboardScreen()),
     );
+  }
+}
+
+class InitializationWrapper extends ConsumerWidget {
+  final Widget child;
+  const InitializationWrapper({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Inject a demo Master Key if not present (to allow testing encryption)
+    // In production, this would be derived from the mnemonic after a password check.
+    Future.microtask(() {
+      final currentKey = ref.read(masterKeyProvider);
+      if (currentKey == null || currentKey is String) {
+        // Force the correct SecretKey object type
+        final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch")); // 32 chars
+        ref.read(masterKeyProvider.notifier).state = demoKey;
+      }
+    });
+
+    return child;
   }
 }

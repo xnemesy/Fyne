@@ -130,9 +130,11 @@ router.post('/public-key', verifyToken, async (req, res) => {
 router.post('/fcm-token', verifyToken, async (req, res) => {
     const { fcmToken } = req.body;
     try {
+        await db.ensureUser(req.user.uid);
         await db.updateFcmToken(req.user.uid, fcmToken);
         res.json({ message: 'FCM token updated' });
     } catch (error) {
+        console.error('FCM Token Update Error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
