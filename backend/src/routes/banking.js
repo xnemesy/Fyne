@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
 const GoCardlessAdapter = require('../services/banking/GoCardlessAdapter');
-const { encrypt } = require('../utils/crypto');
+const { encrypt, encryptWithPublicKey } = require('../utils/crypto');
 const db = require('../utils/db');
 
 const bankingProvider = new GoCardlessAdapter();
@@ -110,18 +110,78 @@ router.post('/budgets', verifyToken, async (req, res) => {
 });
 
 /**
- * @route GET /api/budgets
- * @desc Get current budgets status
+ * @route POST /api/banking/public-key
+ * @desc Register user's public key for backend-to-client encryption
  */
-router.get('/budgets', verifyToken, async (req, res) => {
+router.post('/public-key', verifyToken, async (req, res) => {
+    const { publicKey } = req.body;
     try {
-        const result = await db.query(
-            'SELECT category_uuid, encrypted_category_name, limit_amount, current_spent FROM budgets WHERE user_id = $1',
-            [req.user.uid]
-        );
-        res.json(result.rows);
+        await db.updatePublicKey(req.user.uid, publicKey);
+        res.json({ message: 'Public key updated' });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * @route POST /api/banking/fcm-token
+ * @desc Register user's FCM token for push notifications
+ */
+router.post('/fcm-token', verifyToken, async (req, res) => {
+    const { fcmToken } = req.body;
+    try {
+        await db.updateFcmToken(req.user.uid, fcmToken);
+        res.json({ message: 'FCM token updated' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * @route POST /api/banking/webhook
+ * @desc Webhook handler for GoCardless/Nordigen
+ */
+router.post('/webhook', async (req, res) => {
+    const { requisition_id, status } = req.body;
+    console.log(`[Webhook] Requisition ${requisition_id} status: ${status}`);
+
+    try {
+        // 1. Get user info by requisition
+        const userInfo = await db.getUserByRequisition(requisition_id);
+        if (!userInfo || !userInfo.public_key) {
+            console.log(`[Webhook] User not found or no public key for requisition ${requisition_id}`);
+            return res.status(200).send(); // Always 200 to Apple/GoCardless
+        }
+
+        // 2. If status is LN (Linked), fetch accounts and transactions
+        if (status === 'LN') {
+            // Need to fetch account IDs if not already known
+            const requisitionData = await bankingProvider.getRequisition(requisition_id);
+            const accountIds = requisitionData.accounts || [];
+
+            for (const accountId of accountIds) {
+                await db.updateConnection(requisition_id, accountId, 'LINKED');
+
+                // Fetch transactions
+                const rawTransactions = await bankingProvider.getTransactions(accountId);
+
+                // 3. Encrypt and Normalize
+                const encryptedTransactions = rawTransactions.map(tx => ({
+                    ...tx,
+                    description: encryptWithPublicKey(tx.description, userInfo.public_key),
+                    counterPartyName: encryptWithPublicKey(tx.counterPartyName, userInfo.public_key),
+                    categoryUuid: '550e8400-e29b-41d4-a716-446655440000' // Default uncategorized
+                }));
+
+                // 4. Save to DB
+                await db.saveTransactions(userInfo.uid, accountId, encryptedTransactions);
+            }
+        }
+
+        res.status(200).send();
+    } catch (error) {
+        console.error('[Webhook Error]', error);
+        res.status(200).send(); // Don't block provider
     }
 });
 

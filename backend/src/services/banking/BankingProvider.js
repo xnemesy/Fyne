@@ -16,6 +16,10 @@ class BankingProvider {
         throw new Error('Method getAuthLink() must be implemented');
     }
 
+    async getRequisition(requisitionId) {
+        throw new Error('Method getRequisition() must be implemented');
+    }
+
     /**
      * Fetches the list of accounts.
      * @param {string} token

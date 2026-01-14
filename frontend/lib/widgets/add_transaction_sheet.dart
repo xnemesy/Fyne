@@ -10,6 +10,9 @@ import '../models/account.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../services/ocr_service.dart';
+import 'package:intl/intl.dart';
+
 class AddTransactionSheet extends ConsumerStatefulWidget {
   const AddTransactionSheet({super.key});
 
@@ -20,10 +23,30 @@ class AddTransactionSheet extends ConsumerStatefulWidget {
 class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _ocrService = OcrService();
   Account? _selectedAccount;
   String? _suggestedCategoryUuid;
   String _suggestedCategoryName = "Seleziona Categoria";
   bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _ocrService.dispose();
+    super.dispose();
+  }
+
+  Future<void> _scanReceipt() async {
+    final result = await _ocrService.scanReceipt();
+    if (result != null) {
+      if (result.amount != null) {
+        _amountController.text = result.amount!.toStringAsFixed(2);
+      }
+      if (result.date != null) {
+        _descriptionController.text = "Scontrino ${DateFormat('dd/MM').format(result.date!)}";
+        _suggestCategory(_descriptionController.text);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +81,18 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   color: const Color(0xFF1A1A1A),
                 ),
               ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(LucideIcons.x, color: Color(0xFF1A1A1A), size: 20),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: _scanReceipt,
+                    icon: const Icon(LucideIcons.camera, color: Color(0xFF4A6741), size: 22),
+                    tooltip: "Scansiona scontrino",
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(LucideIcons.x, color: Color(0xFF1A1A1A), size: 20),
+                  ),
+                ],
               ),
             ],
           ),

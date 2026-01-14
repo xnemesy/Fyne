@@ -65,5 +65,49 @@ module.exports = {
         }
     },
 
+    /**
+     * Updates user's public key for backend encryption
+     */
+    updatePublicKey: async (uid, publicKey) => {
+        await pool.query(
+            'UPDATE users SET public_key = $1 WHERE uid = $2',
+            [publicKey, uid]
+        );
+    },
+
+    /**
+     * Gets user and connection info by requisition ID (for webhooks)
+     */
+    getUserByRequisition: async (requisitionId) => {
+        const result = await pool.query(
+            `SELECT u.uid, u.public_key, c.provider_account_id 
+             FROM users u 
+             JOIN banking_connections c ON u.uid = c.user_uid 
+             WHERE c.provider_requisition_id = $1`,
+            [requisitionId]
+        );
+        return result.rows[0];
+    },
+
+    /**
+     * Updates connection status and account ID
+     */
+    updateConnection: async (requisitionId, accountId, status) => {
+        await pool.query(
+            'UPDATE banking_connections SET provider_account_id = $1, status = $2 WHERE provider_requisition_id = $3',
+            [accountId, status, requisitionId]
+        );
+    },
+
+    /**
+     * Updates user's FCM token
+     */
+    updateFcmToken: async (uid, fcmToken) => {
+        await pool.query(
+            'UPDATE users SET fcm_token = $1 WHERE uid = $2',
+            [fcmToken, uid]
+        );
+    },
+
     pool
 };

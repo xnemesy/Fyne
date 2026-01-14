@@ -33,4 +33,23 @@ function decrypt(text, masterKey) {
     return decrypted.toString();
 }
 
-module.exports = { encrypt, decrypt };
+/**
+ * Encrypts data using a public key (RSA)
+ * @param {string} text - The text to encrypt
+ * @param {string} publicKey - The PEM formatted public key
+ * @returns {string} - Base64 encoded encrypted text
+ */
+function encryptWithPublicKey(text, publicKey) {
+    const buffer = Buffer.from(text, 'utf8');
+    const encrypted = crypto.publicEncrypt(
+        {
+            key: publicKey,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+            oaepHash: 'sha256',
+        },
+        buffer
+    );
+    return encrypted.toString('base64');
+}
+
+module.exports = { encrypt, decrypt, encryptWithPublicKey };

@@ -4,9 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/budget_card.dart';
 import '../widgets/add_transaction_sheet.dart';
+import '../widgets/daily_indicator.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'insights_screen.dart';
 import 'wallet_screen.dart';
+import '../providers/notification_scheduler.dart';
+import '../providers/budget_overrun_handler.dart';
+import '../widgets/budget_transfer_sheet.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -14,6 +18,8 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetsAsync = ref.watch(budgetsProvider);
+    ref.watch(notificationSchedulerProvider);
+    ref.watch(budgetOverrunHandlerProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBF9),
@@ -56,6 +62,18 @@ class DashboardScreen extends ConsumerWidget {
             actions: [
               IconButton(
                 onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const BudgetTransferSheet(),
+                  );
+                },
+                icon: const Icon(LucideIcons.arrowLeftRight, color: Color(0xFF4A6741), size: 20),
+                tooltip: "Trasferisci budget",
+              ),
+              IconButton(
+                onPressed: () {
                   _navigateTo(context, const InsightsScreen());
                 },
                 icon: const Icon(LucideIcons.barChart2, color: Color(0xFF1A1A1A), size: 22),
@@ -68,6 +86,11 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 15),
             ],
+          ),
+
+          // Daily Allowance Indicator
+          const SliverToBoxAdapter(
+            child: DailyIndicator(),
           ),
 
           // Budget List (Bento Grid)

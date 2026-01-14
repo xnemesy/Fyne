@@ -6,6 +6,9 @@ import '../models/account.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'add_account_screen.dart';
+import '../widgets/crypto_account_card.dart';
+
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
 
@@ -29,6 +32,20 @@ class WalletScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
         error: (err, stack) => Center(child: Text("Errore: $err", style: const TextStyle(color: Color(0xFFD63031)))),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddAccountScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF4A6741),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        label: Text("AGGIUNGI CONTO", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
+        icon: const Icon(LucideIcons.plus, size: 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
     );
   }
 
@@ -38,12 +55,22 @@ class WalletScreen extends ConsumerWidget {
       itemCount: accounts.length,
       itemBuilder: (context, index) {
         final account = accounts[index];
+        if (account.type == AccountType.crypto) {
+          return CryptoAccountCard(account: account);
+        }
         return _buildBentoCard(context, account);
       },
     );
   }
 
   Widget _buildBentoCard(BuildContext context, Account account) {
+    IconData typeIcon = LucideIcons.landmark;
+    if (account.type == AccountType.credit) typeIcon = LucideIcons.creditCard;
+    if (account.type == AccountType.savings) typeIcon = LucideIcons.piggyBank;
+    if (account.type == AccountType.cash) typeIcon = LucideIcons.wallet;
+    if (account.type == AccountType.investment) typeIcon = LucideIcons.trendingUp;
+    if (account.type == AccountType.loan) typeIcon = LucideIcons.handCoins;
+
     return Container(
       padding: const EdgeInsets.all(24),
       margin: const EdgeInsets.only(bottom: 24),
@@ -72,7 +99,7 @@ class WalletScreen extends ConsumerWidget {
                   color: const Color(0xFF1A1A1A),
                 ),
               ),
-              const Icon(LucideIcons.landmark, color: Color(0xFF4A6741), size: 20),
+              Icon(typeIcon, color: const Color(0xFF4A6741), size: 20),
             ],
           ),
           const SizedBox(height: 40),
@@ -98,7 +125,7 @@ class WalletScreen extends ConsumerWidget {
           Row(
             children: [
               Text(
-                "ID CONTO: **** ${account.id.substring(account.id.length - 4)}",
+                "ID CONTO: **** ${account.id.length > 4 ? account.id.substring(account.id.length - 4) : '....'}",
                 style: GoogleFonts.inter(
                   color: const Color(0xFF1A1A1A).withOpacity(0.2),
                   fontSize: 11,
@@ -134,18 +161,12 @@ class WalletScreen extends ConsumerWidget {
             "Il tuo wallet è vuoto",
             style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
           ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A6741),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
-            child: Text("COLLEGA ISTITUTO", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
+          const SizedBox(height: 16),
+          Text(
+            "Aggiungi un conto manuale o crypto per iniziare.",
+            style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
           ),
+          const SizedBox(height: 32),
         ],
       ),
     );

@@ -76,6 +76,20 @@ class GoCardlessAdapter extends BankingProvider {
         };
     }
 
+    async getRequisition(requisitionId) {
+        if (!this.token) await this.authenticate();
+        try {
+            const response = await axios.get(
+                `${this.baseUrl}/requisitions/${requisitionId}/`,
+                { headers: { Authorization: `Bearer ${this.token}` } }
+            );
+            return response.data;
+        } catch (error) {
+            console.error('GoCardless Requisition Info Error:', error.response?.data || error.message);
+            throw new Error('Failed to fetch requisition info');
+        }
+    }
+
     async getTransactions(accountId) {
         if (!this.token) await this.authenticate();
 

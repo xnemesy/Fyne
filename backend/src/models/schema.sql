@@ -3,6 +3,19 @@
 -- 1. Users table
 CREATE TABLE IF NOT EXISTS users (
     uid VARCHAR(128) PRIMARY KEY,
+    public_key TEXT,                   -- For backend encryption of webhooks
+    fcm_token TEXT,                    -- For push notifications
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1.1 Banking Connections
+CREATE TABLE IF NOT EXISTS banking_connections (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_uid VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
+    provider VARCHAR(50) NOT NULL,
+    provider_requisition_id VARCHAR(255) UNIQUE,
+    provider_account_id VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'CREATED',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -13,6 +26,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     encrypted_name TEXT NOT NULL,       -- Base64 AES-256
     encrypted_balance TEXT NOT NULL,    -- Base64 AES-256
     currency VARCHAR(3) NOT NULL,
+    type VARCHAR(20) DEFAULT 'checking',
     provider_id VARCHAR(50), 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
