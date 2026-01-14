@@ -88,12 +88,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           TextField(
             controller: _descriptionController,
             onChanged: (val) async {
-              // Real-time categorization
-              // Note: categorizationService is usually provided via ref as well
-              // For this demo, we assume a provider or local instance
-              // final catService = ref.read(categorizationProvider);
-              // final uuid = await catService.categorize(val);
-              // setState(() { _suggestedCategoryUuid = uuid; });
+              _suggestCategory(val);
             },
             decoration: InputDecoration(
               labelText: "Descrizione",
@@ -107,6 +102,12 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               prefixIcon: const Icon(Icons.edit, color: Colors.cyanAccent),
             ),
           ),
+          if (_suggestedCategoryUuid != null)
+             Padding(
+               padding: const EdgeInsets.only(top: 8, left: 4),
+               child: Text("💡 Suggerimento: $_suggestedCategoryName", 
+                          style: const TextStyle(color: Colors.cyanAccent, fontSize: 12)),
+             ),
           const SizedBox(height: 15),
 
           // Account Selector
@@ -163,6 +164,27 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     );
   }
 
+  Future<void> _suggestCategory(String val) async {
+    final catService = ref.read(categorizationServiceProvider);
+    final budgets = ref.read(budgetsProvider).value ?? [];
+    
+    final uuid = await catService.categorize(val);
+    
+    // Find name for UI feedback
+    String name = "Altro";
+    for (var b in budgets) {
+      if (b.categoryUuid == uuid) {
+        name = b.decryptedCategoryName ?? "Sconosciuta";
+        break;
+      }
+    }
+
+    setState(() { 
+      _suggestedCategoryUuid = uuid; 
+      _suggestedCategoryName = name;
+    });
+  }
+
   Future<void> _saveTransaction(BuildContext context) async {
     if (_amountController.text.isEmpty) return;
 
@@ -172,18 +194,22 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       final crypto = ref.read(cryptoServiceProvider);
       final api = ref.read(apiServiceProvider);
       final masterKey = ref.read(masterKeyProvider);
+      final accounts = ref.read(accountsProvider).value ?? [];
 
       if (masterKey == null) throw Exception("Master key not found");
 
       // 1. Encrypt locally
       final encryptedDesc = await crypto.encrypt(_descriptionController.text, masterKey);
       
-      // 2. Mock category UUID for demo (in real app, use categorizationService)
-      final categoryUuid = "550e8400-e29b-41d4-a716-446655440000"; 
+      // 2. Use suggested category or fallback
+      final categoryUuid = _suggestedCategoryUuid ?? "550e8400-e29b-41d4-a716-446655440000"; 
+      
+      // 3. Get proper account ID
+      final accId = _selectedAccount?.id ?? (accounts.isNotEmpty ? accounts.first.id : "none");
 
-      // 3. Send to backend
+      // 4. Send to backend
       await api.post('/api/transactions/manual', data: {
-        'accountId': _selectedAccount?.id ?? "default_acc",
+        'accountId': accId,
         'amount': double.parse(_amountController.text),
         'currency': 'EUR',
         'encryptedDescription': encryptedDesc,
@@ -191,7 +217,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         'date': DateTime.now().toIso8601String(),
       });
 
-      // 4. Update UI local state (Optmistic update or refresh)
+      // 5. Update UI 
       ref.invalidate(accountsProvider);
       ref.invalidate(budgetsProvider);
 

@@ -17,7 +17,10 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // In production, we'd watch an InsightsProvider that uses the AnalyticsService
+    // For now, we connect to existing providers
     final accountsAsync = ref.watch(accountsProvider);
+    final budgetsAsync = ref.watch(budgetsProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1A),
@@ -29,7 +32,11 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
             pinned: true,
             backgroundColor: const Color(0xFF0F0F1A),
             flexibleSpace: FlexibleSpaceBar(
-              background: _buildNetWorthChart(),
+              background: accountsAsync.when(
+                data: (accounts) => _buildNetWorthChart(accounts),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const Center(child: Icon(Icons.error, color: Colors.white24)),
+              ),
             ),
             title: Text("Financial Insights", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
           ),
@@ -43,7 +50,11 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                   const SizedBox(height: 25),
                   _buildBurnRateSection(),
                   const SizedBox(height: 30),
-                  _buildTopCategoriesSection(),
+                  budgetsAsync.when(
+                    data: (budgets) => _buildTopCategoriesSection(budgets),
+                    loading: () => const LinearProgressIndicator(),
+                    error: (_, __) => const Text("Impossibile caricare categorie"),
+                  ),
                 ],
               ),
             ),
@@ -53,7 +64,13 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     );
   }
 
-  Widget _buildNetWorthChart() {
+  Widget _buildNetWorthChart(List<Account> accounts) {
+    // Calculate total net worth dynamically
+    double netWorth = 0;
+    for (var acc in accounts) {
+      netWorth += double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
+    }
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
       decoration: BoxDecoration(
@@ -63,122 +80,68 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
           colors: [Colors.cyanAccent.withOpacity(0.1), Colors.transparent],
         ),
       ),
-      child: LineChart(
-        LineChartData(
-          gridData: const FlGridData(show: false),
-          titlesData: const FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            LineChartBarData(
-              spots: const [
-                FlSpot(0, 10000),
-                FlSpot(1, 10200),
-                FlSpot(2, 10100),
-                FlSpot(3, 10500),
-                FlSpot(4, 10800),
-                FlSpot(5, 11000),
-                FlSpot(6, 11500),
-              ],
-              isCurved: true,
-              color: Colors.cyanAccent,
-              barWidth: 4,
-              dotData: const FlDotData(show: false),
-              belowArea: BarAreaData(
-                show: true,
-                color: Colors.cyanAccent.withOpacity(0.1),
+      child: Column(
+        children: [
+          Text(
+            "${netWorth.toStringAsFixed(2)} €",
+            style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                gridData: const FlGridData(show: false),
+                titlesData: const FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: _generateDynamicSpots(netWorth), // Dynamic based on real data
+                    isCurved: true,
+                    color: Colors.cyanAccent,
+                    barWidth: 4,
+                    dotData: const FlDotData(show: false),
+                    belowArea: BarAreaData(
+                      show: true,
+                      color: Colors.cyanAccent.withOpacity(0.1),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggleHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          "Spese per Categoria",
-          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        _buildGlassToggle(),
-      ],
-    );
-  }
-
-  Widget _buildGlassToggle() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          _toggleBtn("Corrente", !_showPreviousWeek),
-          _toggleBtn("Precedente", _showPreviousWeek),
+          ),
         ],
       ),
     );
   }
 
-  Widget _toggleBtn(String label, bool active) {
-    return GestureDetector(
-      onTap: () => setState(() => _showPreviousWeek = !active ? !_showPreviousWeek : _showPreviousWeek),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: active ? Colors.cyanAccent.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: active ? Colors.cyanAccent : Colors.white.withOpacity(0.5),
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
+  List<FlSpot> _generateDynamicSpots(double current) {
+    // In production this would come from a history table. 
+    // Mocking the trend slightly but using the REAL current value as endpoint.
+    return [
+      FlSpot(0, current * 0.95),
+      FlSpot(1, current * 0.96),
+      FlSpot(2, current * 0.94),
+      FlSpot(3, current * 0.97),
+      FlSpot(4, current * 0.98),
+      FlSpot(5, current * 0.99),
+      FlSpot(6, current),
+    ];
   }
 
-  Widget _buildBurnRateSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2C).withOpacity(0.8),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Burn Rate Giornaliero", style: TextStyle(color: Colors.white54, fontSize: 13)),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Text("42.50 €", style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(width: 10),
-              const Icon(Icons.arrow_downward, color: Colors.greenAccent, size: 20),
-              const Text("-5%", style: TextStyle(color: Colors.greenAccent, fontSize: 14)),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Text("Basato sulla media delle ultime 2 settimane", style: TextStyle(color: Colors.white24, fontSize: 11)),
-        ],
-      ),
-    );
-  }
+  Widget _buildTopCategoriesSection(List<Budget> budgets) {
+    // Sort budgets by usage to show 'Top Categories'
+    final sortedBudgets = List<Budget>.from(budgets)
+      ..sort((a, b) => b.currentSpent.compareTo(a.currentSpent));
 
-  Widget _buildTopCategoriesSection() {
     return Column(
-      children: [
-        _categoryRow("Shopping", "450 €", 0.6, Colors.orangeAccent),
-        _categoryRow("Cibo", "280 €", 0.4, Colors.redAccent),
-        _categoryRow("Trasporti", "120 €", 0.2, Colors.blueAccent),
-      ],
+      children: sortedBudgets.take(5).map((budget) {
+        return _categoryRow(
+          budget.decryptedCategoryName ?? "Sconosciuta",
+          "${budget.currentSpent.toStringAsFixed(0)} €",
+          budget.progress,
+          budget.isOverBudget ? Colors.redAccent : Colors.cyanAccent,
+        );
+      }).toList(),
     );
   }
 
