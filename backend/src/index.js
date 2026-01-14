@@ -9,6 +9,7 @@ const { verifyToken } = require('./middleware/auth');
 const db = require('./utils/db');
 const bankingRouter = require('./routes/banking');
 const accountsRouter = require('./routes/accounts');
+const transactionsRouter = require('./routes/transactions');
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/api/banking', bankingRouter);
 app.use('/api/accounts', accountsRouter);
+app.use('/api/transactions', transactionsRouter);
 
 app.get('/', (req, res) => {
   res.json({

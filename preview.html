@@ -110,6 +110,60 @@
             color: var(--accent-cyan);
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .bottom-sheet {
+            width: 100%;
+            max-width: 500px;
+            background: #161621;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .bottom-sheet.open {
+            transform: translateY(0);
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-cyan);
+            color: black;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2);
+            z-index: 900;
+        }
+
+        .amount-display {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--accent-cyan);
+            margin-bottom: 30px;
+        }
+
         .container {
             width: 100%;
             max-width: 500px;
@@ -345,7 +399,114 @@
         </div>
     </div>
 
+    <!-- FAB -->
+    <div class="fab" onclick="toggleModal(true)">
+        <span>+</span> Transazione
+    </div>
+
+    <!-- Add Transaction Sheet -->
+    <div class="modal-overlay" id="modal-overlay" onclick="toggleModal(false)">
+        <div class="bottom-sheet" id="bottom-sheet" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;">Nuova Transazione</h3>
+                <span style="cursor: pointer; color: var(--text-dim)" onclick="toggleModal(false)">✕</span>
+            </div>
+
+            <div class="amount-display" id="sheet-amount-display">0.00 €</div>
+
+            <input type="number" id="sheet-amount-input" placeholder="0.00" oninput="updateAmountDisplay(this.value)"
+                style="text-align: center; font-size: 24px;">
+
+            <input type="text" id="sheet-desc-input" placeholder="Descrizione (es. Starbucks)"
+                oninput="handleSmartSearch(this.value)">
+
+            <div id="smart-category"
+                style="margin-bottom: 15px; font-size: 14px; color: var(--accent-cyan); display: none;">
+                💡 Suggerimento: <span id="suggested-cat">Cibo & Bevande</span>
+            </div>
+
+            <select
+                style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); color: white; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+                <option>Conto Principale</option>
+                <option>Risparmi (Vault)</option>
+            </select>
+
+            <button onclick="saveManualTransaction()">SALVA CIFRATA</button>
+        </div>
+    </div>
+
     <script>
+        function toggleView(view) {
+            const budgetView = document.getElementById('view-budgets');
+            const walletView = document.getElementById('view-wallet');
+            const title = document.getElementById('view-title');
+            const tabBudgets = document.getElementById('tab-budgets');
+            const tabWallet = document.getElementById('tab-wallet');
+
+            if (view === 'budgets') {
+                budgetView.style.display = 'block';
+                walletView.style.display = 'none';
+                title.innerText = 'I tuoi Budget';
+                tabBudgets.classList.add('active');
+                tabWallet.classList.remove('active');
+            } else {
+                budgetView.style.display = 'none';
+                walletView.style.display = 'block';
+                title.innerText = 'Il tuo Wallet';
+                tabBudgets.classList.remove('active');
+                tabWallet.classList.add('active');
+            }
+        }
+
+        function toggleModal(isOpen) {
+            const overlay = document.getElementById('modal-overlay');
+            const sheet = document.getElementById('bottom-sheet');
+            if (isOpen) {
+                overlay.style.display = 'flex';
+                setTimeout(() => sheet.classList.add('open'), 10);
+            } else {
+                sheet.classList.remove('open');
+                setTimeout(() => overlay.style.display = 'none', 300);
+            }
+        }
+
+        function updateAmountDisplay(val) {
+            document.getElementById('sheet-amount-display').innerText = (val || "0.00") + " €";
+        }
+
+        function handleSmartSearch(val) {
+            const suggestion = document.getElementById('smart-category');
+            const catText = document.getElementById('suggested-cat');
+
+            const lowVal = val.toLowerCase();
+            if (lowVal.includes('starbucks') || lowVal.includes('caffè') || lowVal.includes('pasto')) {
+                suggestion.style.display = 'block';
+                catText.innerText = 'Cibo & Bevande';
+            } else if (lowVal.includes('amazon') || lowVal.includes('ebay')) {
+                suggestion.style.display = 'block';
+                catText.innerText = 'Shopping';
+            } else {
+                suggestion.style.display = 'none';
+            }
+        }
+
+        function saveManualTransaction() {
+            const amount = document.getElementById('sheet-amount-input').value;
+            const desc = document.getElementById('sheet-desc-input').value;
+
+            if (!amount) return;
+
+            // Update main view
+            simulateAdd(desc, amount);
+            toggleModal(false);
+        }
+
+        function simulateAdd(desc, amount) {
+            document.getElementById('desc-input').value = desc;
+            document.getElementById('amount-input').value = amount;
+            simulateSync();
+        }
+
         function simulateSync() {
             const desc = document.getElementById('desc-input').value;
             const amount = parseFloat(document.getElementById('amount-input').value);
@@ -354,46 +515,45 @@
             if (!desc || isNaN(amount)) return;
 
             log.style.display = 'block';
-            log.innerHTML = "> Iniziando Sync Bancario (Sandbox)...<br>";
+            log.innerHTML = "> Iniziando Prova di Cifratura Locale...<br>";
 
             setTimeout(() => {
                 let category = "Altro";
                 let targetCard = "val-spesa";
                 let targetBar = "bar-spesa";
 
-                if (desc.toUpperCase().includes('AMAZON')) {
+                if (desc.toUpperCase().includes('AMAZON') || desc.toUpperCase().includes('EBAY')) {
                     category = "Shopping";
                     targetCard = "val-shopping";
                     targetBar = "bar-shopping";
-                } else if (desc.toUpperCase().includes('ESSELUNGA')) {
+                } else if (desc.toUpperCase().includes('ESSELUNGA') || desc.toUpperCase().includes('STARBUCKS')) {
                     category = "Spesa";
                     targetCard = "val-spesa";
                     targetBar = "bar-spesa";
                 }
 
                 log.innerHTML += `> Transazione rilevata: "${desc}"<br>`;
-                log.innerHTML += `> Categorizzazione On-Device: <span style="color:white">[${category}]</span><br>`;
+                log.innerHTML += `> Suggerimento Smart Category: <span style="color:white">[${category}]</span><br>`;
 
-                // Simulate Client-Side Encryption
                 const encrypted = btoa("AES256_" + Math.random().toString(36).substring(7));
-                log.innerHTML += `> Cifratura locale (MasterKey): <span style="color:white">${encrypted}</span><br>`;
-                log.innerHTML += `> <span style="color:cyan">Invio dati ciechi al server... OK</span><br>`;
+                log.innerHTML += `> <span style="color:yellow">Cifratura AES-256 completata:</span> ${encrypted}<br>`;
+                log.innerHTML += `> <span style="color:cyan">Sync budget (Importo in chiaro): OK</span><br>`;
 
-                // Update UI Mock
                 const valEl = document.getElementById(targetCard);
                 const currentVal = parseFloat(valEl.innerText);
                 const newVal = currentVal + amount;
                 valEl.innerText = newVal.toFixed(2) + " €";
 
-                // Update Progress bar based on limit (hardcoded for mock)
                 const limit = targetCard.includes('shopping') ? 200 : 500;
                 const newWidth = Math.min((newVal / limit) * 100, 100);
                 document.getElementById(targetBar).style.width = newWidth + "%";
-
                 if (newWidth > 90) document.getElementById(targetBar).style.background = '#FF4B4B';
 
                 document.getElementById('desc-input').value = "";
                 document.getElementById('amount-input').value = "";
+                document.getElementById('sheet-amount-input').value = "";
+                document.getElementById('sheet-desc-input').value = "";
+                document.getElementById('sheet-amount-display').innerText = "0.00 €";
             }, 800);
         }
     </script>

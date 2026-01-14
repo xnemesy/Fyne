@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/budget_card.dart';
+import '../widgets/add_transaction_sheet.dart';
 import 'wallet_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -103,6 +104,20 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const AddTransactionSheet(),
+          );
+        },
+        backgroundColor: Colors.cyanAccent,
+        foregroundColor: Colors.black,
+        icon: const Icon(Icons.add),
+        label: Text("Transazione", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
       ),
     );
   }
