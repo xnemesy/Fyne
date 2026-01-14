@@ -16,24 +16,24 @@ class CategorizationService {
   final Isar isar;
   final _uuid = Uuid();
 
-  // Expanded Rule-based dictionary
+  // Editorial Rule-based dictionary
   final Map<String, String> _staticRules = {
     'AMAZON': 'Shopping',
-    'ESSELUNGA': 'Spesa',
-    'CARREFOUR': 'Spesa',
-    'LIDL': 'Spesa',
-    'COOP': 'Spesa',
-    'NETFLIX': 'Intrattenimento',
-    'SPOTIFY': 'Intrattenimento',
-    'DISNEY': 'Intrattenimento',
-    'SHELL': 'Trasporti',
-    'ENI': 'Trasporti',
-    'UBER': 'Trasporti',
-    'ZARA': 'Abbigliamento',
-    'H&M': 'Abbigliamento',
+    'ESSELUNGA': 'Alimentari',
+    'CARREFOUR': 'Alimentari',
+    'LIDL': 'Alimentari',
+    'COOP': 'Alimentari',
+    'NETFLIX': 'Sottoscrizioni',
+    'SPOTIFY': 'Sottoscrizioni',
+    'DISNEY': 'Sottoscrizioni',
+    'SHELL': 'Mobilità',
+    'ENI': 'Mobilità',
+    'UBER': 'Mobilità',
+    'ZARA': 'Stile',
+    'H&M': 'Stile',
     'REVOLUT': 'Trasferimenti',
     'PAYPAL': 'Shopping',
-    'APPLE.COM': 'Servizi Digitali',
+    'APPLE.COM': 'Digital',
   };
 
   CategorizationService(this.isar);
@@ -53,7 +53,7 @@ class CategorizationService {
       return userOverride.categoryUuid;
     }
 
-    // 2. Comprehensive Rule-based Engine
+    // 2. Editorial Rule-based Engine
     for (var entry in _staticRules.entries) {
       if (cleanDesc.contains(entry.key)) {
         return _getDeterministicUuid(entry.value);

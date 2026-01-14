@@ -22,7 +22,7 @@ app.use('/api/transactions', transactionsRouter);
 app.get('/', (req, res) => {
   res.json({
     message: 'Banking Abstraction Layer is running',
-    version: '1.0.0',
+    version: '11.0.0',
     status: 'healthy'
   });
 });
