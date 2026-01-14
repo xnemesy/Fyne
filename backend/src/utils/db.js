@@ -54,6 +54,26 @@ module.exports = {
             `);
             console.log('✅ Banking Connections table verified');
 
+            const connColumns = [
+                { name: 'refresh_token', type: 'TEXT' },
+                { name: 'access_token', type: 'TEXT' }
+            ];
+
+            for (const col of connColumns) {
+                try {
+                    const checkCol = await pool.query(
+                        "SELECT 1 FROM information_schema.columns WHERE table_name='banking_connections' AND column_name=$1",
+                        [col.name]
+                    );
+                    if (checkCol.rows.length === 0) {
+                        await pool.query(`ALTER TABLE banking_connections ADD COLUMN ${col.name} ${col.type}`);
+                        console.log(`✅ Added column ${col.name} to banking_connections`);
+                    }
+                } catch (e) {
+                    console.error(`❌ Error verifying column ${col.name} in banking_connections:`, e.message);
+                }
+            }
+
             // 4. Accounts table
             await pool.query(`
                 CREATE TABLE IF NOT EXISTS accounts (
@@ -150,6 +170,17 @@ module.exports = {
     },
 
     /**
+     * Save an account
+     */
+    saveAccount: async (userUid, { encryptedName, encryptedBalance, providerId }) => {
+        const result = await pool.query(
+            'INSERT INTO accounts (user_id, encrypted_name, encrypted_balance, provider_id) VALUES ($1, $2, $3, $4) RETURNING id',
+            [userUid, encryptedName, encryptedBalance, providerId]
+        );
+        return result.rows[0].id;
+    },
+
+    /**
      * Bulk save normalized and encrypted transactions
      */
     saveTransactions: async (userUid, accountId, transactions) => {
@@ -192,7 +223,7 @@ module.exports = {
      */
     getUserByRequisition: async (requisitionId) => {
         const result = await pool.query(
-            `SELECT u.uid, u.public_key, c.provider_account_id 
+            `SELECT u.uid, u.public_key, c.provider 
              FROM users u 
              JOIN banking_connections c ON u.uid = c.user_uid 
              WHERE c.provider_requisition_id = $1`,
@@ -219,6 +250,20 @@ module.exports = {
             'UPDATE users SET fcm_token = $1 WHERE uid = $2',
             [fcmToken, uid]
         );
+    },
+
+    /**
+     * Gets user and connection info by user UID
+     */
+    getUserBankSession: async (userUid) => {
+        const result = await pool.query(
+            `SELECT u.uid, u.public_key, u.fcm_token, c.refresh_token, c.provider 
+             FROM users u 
+             JOIN banking_connections c ON u.uid = c.user_uid 
+             WHERE u.uid = $1`,
+            [userUid]
+        );
+        return result.rows[0];
     },
 
     pool

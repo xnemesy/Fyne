@@ -21,12 +21,21 @@ final transactionsProvider = FutureProvider<List<TransactionModel>>((ref) async 
     
     // Decrypt on the fly
     try {
+      // 1. Try AES (Master Key) - used for manual entries
       tx.decryptedDescription = await crypto.decrypt(tx.encryptedDescription, masterKey);
       if (tx.encryptedCounterParty != null) {
         tx.decryptedCounterParty = await crypto.decrypt(tx.encryptedCounterParty!, masterKey);
       }
     } catch (e) {
-      tx.decryptedDescription = "Dato Cifrato";
+      try {
+        // 2. Try RSA (Private Key) - used for banking syncs
+        tx.decryptedDescription = await crypto.decryptWithPrivateKey(tx.encryptedDescription);
+        if (tx.encryptedCounterParty != null) {
+          tx.decryptedCounterParty = await crypto.decryptWithPrivateKey(tx.encryptedCounterParty!);
+        }
+      } catch (e2) {
+        tx.decryptedDescription = "Dato Cifrato";
+      }
     }
     
     transactions.add(tx);

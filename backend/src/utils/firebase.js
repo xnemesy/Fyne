@@ -9,5 +9,29 @@ if (!admin.apps.length) {
 }
 
 const auth = admin.auth();
+const messaging = admin.messaging();
 
-module.exports = { auth };
+async function notifyUser(fcmToken, data) {
+    if (!fcmToken) return;
+    try {
+        await messaging.send({
+            token: fcmToken,
+            data: data,
+            notification: {
+                title: 'Aggiornamento Bancario',
+                body: 'Nuove transazioni sincronizzate in modo sicuro.'
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        contentAvailable: true // For silent sync
+                    }
+                }
+            }
+        });
+    } catch (e) {
+        console.error('Error sending FCM notification:', e.message);
+    }
+}
+
+module.exports = { auth, notifyUser };

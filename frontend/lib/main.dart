@@ -89,12 +89,23 @@ class InitializationWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Inject a demo Master Key if not present (to allow testing encryption)
     // In production, this would be derived from the mnemonic after a password check.
-    Future.microtask(() {
+    Future.microtask(() async {
+      // 1. Inject Master Key (Demo)
       final currentKey = ref.read(masterKeyProvider);
       if (currentKey == null || currentKey is String) {
-        // Force the correct SecretKey object type
-        final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch")); // 32 chars
+        final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch"));
         ref.read(masterKeyProvider.notifier).state = demoKey;
+      }
+
+      // 2. Register Public Key for Webhooks/Backend sync
+      try {
+        final crypto = ref.read(cryptoServiceProvider);
+        final api = ref.read(apiServiceProvider);
+        final publicKey = await crypto.getOrGeneratePublicKey();
+        await api.post('/api/banking/public-key', data: {'publicKey': publicKey});
+        print("✅ Public Key registered successfully");
+      } catch (e) {
+        print("❌ Error registering public key: $e");
       }
     });
 

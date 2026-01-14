@@ -22,11 +22,18 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
 
     for (var account in accounts) {
       try {
+        // 1. Try AES (Manual accounts)
         account.decryptedName = await crypto.decrypt(account.encryptedName, masterKey);
         account.decryptedBalance = await crypto.decrypt(account.encryptedBalance, masterKey);
       } catch (e) {
-        account.decryptedName = "Account Criptato";
-        account.decryptedBalance = "0.00";
+        try {
+          // 2. Try RSA (Synced accounts)
+          account.decryptedName = await crypto.decryptWithPrivateKey(account.encryptedName);
+          account.decryptedBalance = await crypto.decryptWithPrivateKey(account.encryptedBalance);
+        } catch (e2) {
+          account.decryptedName = "Account Criptato";
+          account.decryptedBalance = "0.00";
+        }
       }
     }
 

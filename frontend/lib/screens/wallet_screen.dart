@@ -27,8 +27,8 @@ class WalletScreen extends ConsumerWidget {
       ),
       body: accountsAsync.when(
         data: (accounts) => accounts.isEmpty 
-            ? _buildEmptyState(context)
-            : _buildAccountList(accounts),
+            ? _buildEmptyState(context, ref)
+            : _buildAccountList(context, accounts, ref),
         loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
         error: (err, stack) => Center(child: Text("Errore: $err", style: const TextStyle(color: Color(0xFFD63031)))),
       ),
@@ -49,17 +49,21 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAccountList(List<Account> accounts) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      itemCount: accounts.length,
-      itemBuilder: (context, index) {
-        final account = accounts[index];
-        if (account.type == AccountType.crypto) {
-          return CryptoAccountCard(account: account);
-        }
-        return _buildBentoCard(context, account);
-      },
+  Widget _buildAccountList(BuildContext context, List<Account> accounts, WidgetRef ref) {
+    return RefreshIndicator(
+      color: const Color(0xFF4A6741),
+      onRefresh: () => ref.read(accountsProvider.notifier).refresh(),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        itemCount: accounts.length,
+        itemBuilder: (context, index) {
+          final account = accounts[index];
+          if (account.type == AccountType.crypto) {
+            return CryptoAccountCard(account: account);
+          }
+          return _buildBentoCard(context, account);
+        },
+      ),
     );
   }
 
@@ -150,23 +154,32 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
+    return RefreshIndicator(
+      onRefresh: () => ref.read(accountsProvider.notifier).refresh(),
+      color: const Color(0xFF4A6741),
+      child: ListView(
         children: [
-          Icon(LucideIcons.wallet, size: 64, color: const Color(0xFF1A1A1A).withOpacity(0.05)),
-          const SizedBox(height: 24),
-          Text(
-            "Il tuo wallet è vuoto",
-            style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.wallet, size: 64, color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+                const SizedBox(height: 24),
+                Text(
+                  "Il tuo wallet è vuoto",
+                  style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Aggiungi un conto manuale o crypto per iniziare.",
+                  style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            "Aggiungi un conto manuale o crypto per iniziare.",
-            style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
-          ),
-          const SizedBox(height: 32),
         ],
       ),
     );

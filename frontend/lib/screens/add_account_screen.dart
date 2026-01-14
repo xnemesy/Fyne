@@ -6,6 +6,7 @@ import '../models/account.dart';
 import '../providers/account_provider.dart';
 import '../providers/budget_provider.dart'; // sharing common providers
 import '../services/crypto_service.dart';
+import 'bank_selection_screen.dart';
 
 class AddAccountScreen extends ConsumerStatefulWidget {
   const AddAccountScreen({super.key});
@@ -64,7 +65,78 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   Widget _buildTypeSelection() {
     return ListView(
       padding: const EdgeInsets.all(24),
-      children: AccountType.values.map((type) {
+      children: [
+        // Automatic Banking Option
+        Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BankSelectionScreen()),
+              );
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4A6741), Color(0xFF2D3436)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4A6741).withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(LucideIcons.zap, color: Colors.white, size: 24),
+                  ),
+                  const SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Connessione Automatica",
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        "Collega la tua banca reale",
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  const Icon(LucideIcons.chevronRight, color: Colors.white, size: 18),
+                ],
+              ),
+            ),
+          ),
+        ),
+        
+        _buildInputLabel("O AGGIUNGI MANUALMENTE"),
+        const SizedBox(height: 8),
+
+        ...AccountType.values.map((type) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: InkWell(

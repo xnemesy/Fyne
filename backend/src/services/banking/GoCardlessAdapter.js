@@ -108,6 +108,20 @@ class GoCardlessAdapter extends BankingProvider {
             throw new Error('Failed to fetch transactions from GoCardless');
         }
     }
+
+    async getInstitutions(country = 'IT') {
+        if (!this.token) await this.authenticate();
+        try {
+            const response = await axios.get(
+                `${this.baseUrl}/institutions/?country=${country}`,
+                { headers: { Authorization: `Bearer ${this.token}` } }
+            );
+            return response.data;
+        } catch (error) {
+            console.error('GoCardless Institutions Error:', error.message);
+            throw new Error('Failed to fetch institutions from GoCardless');
+        }
+    }
 }
 
 module.exports = GoCardlessAdapter;

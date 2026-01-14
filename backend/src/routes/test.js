@@ -146,4 +146,55 @@ router.get('/reset-schema', async (req, res) => {
     }
 });
 
+router.get('/simulate-auth', (req, res) => {
+    const { req: requisitionId, redirect } = req.query;
+    res.send(`
+        <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #000; color: white; margin: 0; padding: 20px; text-align: center; }
+                    .card { background: #1a1a1a; padding: 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); max-width: 400px; width: 100%; border: 1px solid #333; }
+                    .logo { font-size: 40px; margin-bottom: 20px; }
+                    h2 { margin: 0 0 10px 0; font-size: 24px; }
+                    p { color: #888; margin-bottom: 30px; line-height: 1.5; }
+                    .btn { background: #4A6741; color: white; padding: 16px 32px; border-radius: 14px; text-decoration: none; font-weight: bold; display: inline-block; transition: transform 0.2s; }
+                    .btn:active { transform: scale(0.95); }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="logo">⚡️</div>
+                    <h2>Fyne Sandbox Bank</h2>
+                    <p>Questa è una simulazione sicura. Autorizzando, permetterai a Fyne di importare i tuoi movimenti (fittizi) in modo cifrato.</p>
+                    <button id="authBtn" class="btn">AUTORIZZA E CONTINUA</button>
+                </div>
+
+                <script>
+                    document.getElementById('authBtn').onclick = function() {
+                        this.innerText = 'Sincronizzazione...';
+                        this.disabled = true;
+                        
+                        // 1. Trigger the Webhook locally to simulate the bank's callback
+                        fetch('/api/banking/webhook', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                requisition_id: '${requisitionId}',
+                                status: 'LN'
+                            })
+                        }).then(() => {
+                            // 2. Redirect back to the app
+                            window.location.href = '${redirect}';
+                        }).catch(err => {
+                            alert('Errore di connessione: ' + err);
+                            window.location.href = '${redirect}';
+                        });
+                    };
+                </script>
+            </body>
+        </html>
+    `);
+});
+
 module.exports = router;

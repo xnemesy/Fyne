@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
+import 'package:crypton/crypton.dart';
 
 /**
  * Service to handle Client-Side Encryption (Zero-Knowledge).
@@ -42,6 +43,25 @@ class CryptoService {
 
     // Combine nonce + cipherText + MAC for storage
     return base64.encode(secretBox.concatenation());
+  }
+
+  /// RSA Key Management for Backend-to-Client encryption
+  RSAPrivateKey? _rsaPrivateKey;
+
+  Future<String> getOrGeneratePublicKey() async {
+    // In a real app, read from SecureStorage
+    if (_rsaPrivateKey == null) {
+      final keyPair = RSAKeypair.fromRandom();
+      _rsaPrivateKey = keyPair.privateKey;
+      return keyPair.publicKey.toString();
+    }
+    return _rsaPrivateKey!.publicKey.toString();
+  }
+
+  /// Decrypts a Base64 string encrypted with our Public Key by the backend.
+  Future<String> decryptWithPrivateKey(String base64Data) async {
+    if (_rsaPrivateKey == null) throw Exception("RSA Private Key not initialized");
+    return _rsaPrivateKey!.decrypt(base64Data);
   }
 
   /// Decrypts a Base64 string using a derived key.
