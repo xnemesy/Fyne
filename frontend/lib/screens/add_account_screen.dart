@@ -25,7 +25,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
     AccountType.checking: LucideIcons.landmark,
     AccountType.credit: LucideIcons.creditCard,
     AccountType.savings: LucideIcons.piggyBank,
-    AccountType.loan: LucideIcons.handCoins,
+    AccountType.loan: LucideIcons.coins,
     AccountType.cash: LucideIcons.wallet,
     AccountType.investment: LucideIcons.trendingUp,
     AccountType.crypto: LucideIcons.coins,

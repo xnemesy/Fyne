@@ -8,14 +8,14 @@ const db = require('../utils/db');
  * @desc Create a manual transaction (encrypted payload + anonymous category)
  */
 router.post('/manual', verifyToken, async (req, res) => {
-  const { 
-    accountId, 
-    amount, 
-    currency, 
-    encryptedDescription, 
-    encryptedCounterParty, 
+  const {
+    accountId,
+    amount,
+    currency,
+    encryptedDescription,
+    encryptedCounterParty,
     categoryUuid,
-    date 
+    date
   } = req.body;
 
   if (!accountId || !amount || !categoryUuid) {
@@ -24,7 +24,7 @@ router.post('/manual', verifyToken, async (req, res) => {
 
   try {
     await db.ensureUser(req.user.uid);
-    
+
     // We use a custom insert for manual transactions to handle the specific fields
     const query = `
       INSERT INTO transactions (
@@ -50,12 +50,28 @@ router.post('/manual', verifyToken, async (req, res) => {
       externalId
     ]);
 
-    res.json({ 
-      id: result.rows[0].id, 
-      message: 'Transaction saved and budgets updated via trigger' 
+    res.json({
+      id: result.rows[0].id,
+      message: 'Transaction saved and budgets updated via trigger'
     });
   } catch (error) {
     console.error('Manual Transaction Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * @route GET /api/transactions
+ * @desc Get all transactions for the user
+ */
+router.get('/', verifyToken, async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, account_id, amount, currency, encrypted_description, encrypted_counter_party, category_uuid, booking_date, external_id FROM transactions WHERE user_id = $1 ORDER BY booking_date DESC',
+      [req.user.uid]
+    );
+    res.json(result.rows);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });

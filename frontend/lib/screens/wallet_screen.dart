@@ -69,7 +69,7 @@ class WalletScreen extends ConsumerWidget {
     if (account.type == AccountType.savings) typeIcon = LucideIcons.piggyBank;
     if (account.type == AccountType.cash) typeIcon = LucideIcons.wallet;
     if (account.type == AccountType.investment) typeIcon = LucideIcons.trendingUp;
-    if (account.type == AccountType.loan) typeIcon = LucideIcons.handCoins;
+    if (account.type == AccountType.loan) typeIcon = LucideIcons.coins;
 
     return Container(
       padding: const EdgeInsets.all(24),

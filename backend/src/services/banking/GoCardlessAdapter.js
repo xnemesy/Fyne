@@ -7,7 +7,7 @@ const BankingProvider = require('./BankingProvider');
 class GoCardlessAdapter extends BankingProvider {
     constructor(config = {}) {
         super(config);
-        this.baseUrl = 'https://bankaccountdata.gocardless.com/api/v2';
+        this.baseUrl = process.env.GOCARDLESS_SANDBOX_URL || 'https://bankaccountdata.gocardless.com/api/v2';
         this.secretId = process.env.GOCARDLESS_SECRET_ID;
         this.secretKey = process.env.GOCARDLESS_SECRET_KEY;
         this.token = null;

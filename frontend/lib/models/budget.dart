@@ -3,6 +3,7 @@
  * Includes both encrypted fields (from server) and decrypted fields (local only).
  */
 class Budget {
+  final String id;
   final String categoryUuid;
   final String encryptedCategoryName;
   final double limitAmount;
@@ -10,6 +11,7 @@ class Budget {
   String? decryptedCategoryName; // Populated only after decryption
 
   Budget({
+    required this.id,
     required this.categoryUuid,
     required this.encryptedCategoryName,
     required this.limitAmount,
@@ -19,6 +21,7 @@ class Budget {
 
   factory Budget.fromJson(Map<String, dynamic> json) {
     return Budget(
+      id: json['id'],
       categoryUuid: json['category_uuid'],
       encryptedCategoryName: json['encrypted_category_name'],
       limitAmount: (json['limit_amount'] as num).toDouble(),

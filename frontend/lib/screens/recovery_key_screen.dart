@@ -28,7 +28,7 @@ class _RecoveryKeyScreenState extends State<RecoveryKeyScreen> {
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) => pw.Column(
-          cross: pw.CrossAxisAlignment.start,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text('Fyne - Master Recovery Key', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 20),
@@ -83,9 +83,11 @@ class _RecoveryKeyScreenState extends State<RecoveryKeyScreen> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white.withOpacity(0.1)),
                     ),
-                    center: Text(
-                      "${index + 1}. ${_words[index]}",
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    child: Center(
+                      child: Text(
+                        "${index + 1}. ${_words[index]}",
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
                     ),
                   );
                 },
