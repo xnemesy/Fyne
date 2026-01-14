@@ -6,6 +6,7 @@ import '../widgets/budget_card.dart';
 import '../widgets/add_transaction_sheet.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'insights_screen.dart';
+import 'wallet_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});

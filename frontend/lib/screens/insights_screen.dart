@@ -98,7 +98,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                 borderData: FlBorderData(show: false),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (_) => const Color(0xFF1A1A1A),
+                    tooltipBgColor: const Color(0xFF1A1A1A),
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(
@@ -118,7 +118,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                     barWidth: 2,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
-                    belowArea: BarAreaData(
+                    belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,

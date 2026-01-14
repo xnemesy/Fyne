@@ -38,7 +38,7 @@ class FyneApp extends StatelessWidget {
           bodyLarge: GoogleFonts.inter(color: const Color(0xFF1A1A1A)),
           bodyMedium: GoogleFonts.inter(color: const Color(0xFF2D3436)),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: const Color(0xFFFFFFFF),
           elevation: 0,
           margin: const EdgeInsets.only(bottom: 20),

@@ -5,6 +5,7 @@ import '../providers/account_provider.dart';
 import '../providers/budget_provider.dart';
 import '../services/categorization_service.dart';
 import '../services/crypto_service.dart';
+import '../providers/isar_provider.dart';
 import '../models/account.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
@@ -101,7 +102,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 borderRadius: BorderRadius.circular(16),
                 borderSide: const BorderSide(color: Color(0xFF4A6741)),
               ),
-              prefixIcon: const Icon(LucideIcons.penLine, color: Color(0xFF4A6741), size: 18),
+              prefixIcon: const Icon(LucideIcons.pencil, color: Color(0xFF4A6741), size: 18),
             ),
           ),
           if (_suggestedCategoryUuid != null)
@@ -174,7 +175,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _suggestCategory(String val) async {
-    final catService = ref.read(categorizationServiceProvider);
+    final isar = ref.read(isarProvider).value;
+    if (isar == null) return;
+    
+    final catService = ref.read(categorizationServiceProvider(isar));
     final budgets = ref.read(budgetsProvider).value ?? [];
     
     final uuid = await catService.categorize(val);

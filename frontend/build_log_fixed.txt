@@ -1,0 +1,109 @@
+Warning: Building for device with codesigning disabled. You will have to manually codesign before deploying to device.
+Archiving app.fyne.ios...
+Running Xcode build...                                          
+Xcode archive done.                                         36,8s
+Failed to build iOS app
+Error output from Xcode build:
+↳
+    ** ARCHIVE FAILED **
+
+
+Xcode's output:
+↳
+    Writing result bundle at path:
+    	/var/folders/sq/b94520gn0txfvvg5jddh3y0h0000gn/T/flutter_tools.zcGA0W/flutter_ios_build_temp_dir0GLKaE/temporary_xcresult_bundle
+
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/printing-5.14.2/ios/Classes/PrintJob.swift:269:70: warning: 'keyWindow' was deprecated in iOS 13.0: Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes
+                let controller: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
+                                                                         ^
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/printing-5.14.2/ios/Classes/PrintJob.swift:273:30: warning: 'keyWindow' was deprecated in iOS 13.0: Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes
+            UIApplication.shared.keyWindow?.rootViewController?.present(activityViewController, animated: true)
+                                 ^
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/printing-5.14.2/ios/Classes/PrintJob.swift:356:74: warning: 'keyWindow' was deprecated in iOS 13.0: Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes
+                let viewController: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
+                                                                             ^
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/FirebaseCoreInternal/FirebaseCore/Internal/Sources/HeartbeatLogging/HeartbeatsPayload.swift:20:24: warning: using '@_implementationOnly' without enabling library evolution for 'FirebaseCoreInternal' may lead to instability during execution
+      @_implementationOnly import GoogleUtilities
+                           ^
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/share_plus-7.2.2/ios/Classes/FPPSharePlusPlugin.m:10:44: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+       10 | static UIViewController *RootViewController() {
+          |                                            ^
+          |                                             void
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/share_plus-7.2.2/ios/Classes/FPPSharePlusPlugin.m:25:46: warning: 'keyWindow' is deprecated: first deprecated in iOS 13.0 - Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes [-Wdeprecated-declarations]
+       25 |     return [UIApplication sharedApplication].keyWindow.rootViewController;
+          |                                              ^
+    In module 'UIKit' imported from /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Target Support Files/share_plus/share_plus-prefix.pch:2:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:108:51: note: 'keyWindow' has been explicitly marked deprecated here
+      108 | @property(nullable, nonatomic,readonly) UIWindow *keyWindow API_DEPRECATED("Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes", ios(2.0, 13.0)) API_UNAVAILABLE(visionos, watchos);
+          |                                                   ^
+    2 warnings generated.
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/TensorFlowLiteSwift/tensorflow/lite/swift/Sources/Model.swift:50:29: warning: 'withUnsafeBytes' is deprecated: use `withUnsafeBytes<R>(_: (UnsafeRawBufferPointer) throws -> R) rethrows -> R` instead
+        self.cModel = modelData.withUnsafeBytes { TfLiteModelCreate($0, modelData.count) }
+                                ^
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:113:72: warning: sending 'FLTFirebaseAuthPlugin *__strong' to parameter of incompatible type 'id<FLTFirebasePlugin> _Nonnull'
+      113 |     [[FLTFirebasePluginRegistry sharedInstance] registerFirebasePlugin:self];
+          |                                                                        ^~~~
+    In module 'firebase_core' imported from /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:7:
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_core-2.32.0/ios/Classes/FLTFirebasePluginRegistry.h:23:64: note: passing argument to parameter 'firebasePlugin' here
+       23 | - (void)registerFirebasePlugin:(id<FLTFirebasePlugin> _Nonnull)firebasePlugin;
+          |                                                                ^
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:319:11: warning: unused variable 'errorCode' [-Wunused-variable]
+      319 |       int errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random);
+          |           ^~~~~~~~~
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:747:45: warning: 'keyWindow' is deprecated: first deprecated in iOS 13.0 - Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes [-Wdeprecated-declarations]
+      747 |   return [[UIApplication sharedApplication] keyWindow];
+          |                                             ^
+    In module 'UIKit' imported from /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Target Support Files/firebase_auth/firebase_auth-prefix.pch:2:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:108:51: note: property 'keyWindow' is declared deprecated here
+      108 | @property(nullable, nonatomic,readonly) UIWindow *keyWindow API_DEPRECATED("Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes", ios(2.0, 13.0)) API_UNAVAILABLE(visionos, watchos);
+          |                                                   ^
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIApplication.h:108:51: note: 'keyWindow' has been explicitly marked deprecated here
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:1051:9: warning: 'fetchSignInMethodsForEmail:completion:' is deprecated: This method is deprecated and will be removed in a future release. This method returns an empty list when Email Enumeration Protection is enabled. [-Wdeprecated-declarations]
+     1051 |   [auth fetchSignInMethodsForEmail:email
+          |         ^
+    In module 'FirebaseAuth' imported from /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Headers/Public/Firebase/Firebase.h:34:
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/FirebaseAuth/FirebaseAuth/Sources/Public/FirebaseAuth/FIRAuth.h:399:5: note: 'fetchSignInMethodsForEmail:completion:' has been explicitly marked deprecated here
+      399 |     DEPRECATED_MSG_ATTRIBUTE(
+          |     ^
+    In module '_DarwinFoundation1' imported from /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:6:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/AvailabilityMacros.h:152:64: note: expanded from macro 'DEPRECATED_MSG_ATTRIBUTE'
+      152 |             #define DEPRECATED_MSG_ATTRIBUTE(s) __attribute__((deprecated(s)))
+          |                                                                ^
+    /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:1762:16: warning: 'updateEmail:completion:' is deprecated: This method is deprecated and will be removed in a future release. Use sendEmailVerification(beforeUpdatingEmail email: String) instead. [-Wdeprecated-declarations]
+     1762 |   [currentUser updateEmail:newEmail
+          |                ^
+    In module 'FirebaseAuth' imported from /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Headers/Public/Firebase/Firebase.h:34:
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/FirebaseAuth/FirebaseAuth/Sources/Public/FirebaseAuth/FIRUser.h:165:48: note: 'updateEmail:completion:' has been explicitly marked deprecated here
+      165 |     NS_SWIFT_NAME(updateEmail(to:completion:)) DEPRECATED_MSG_ATTRIBUTE(
+          |                                                ^
+    In module '_DarwinFoundation1' imported from /Users/roccosantonastasio/.pub-cache/hosted/pub.dev/firebase_auth-4.16.0/ios/Classes/FLTFirebaseAuthPlugin.m:6:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/AvailabilityMacros.h:152:64: note: expanded from macro 'DEPRECATED_MSG_ATTRIBUTE'
+      152 |             #define DEPRECATED_MSG_ATTRIBUTE(s) __attribute__((deprecated(s)))
+          |                                                                ^
+    5 warnings generated.
+    No file or variants found for asset: assets/models/category_model.tflite.
+
+    Target release_ios_bundle_flutter_assets failed: Exception: Failed to bundle asset files.
+    Failed to package /Users/roccosantonastasio/Desktop/Github/Fyne/frontend.
+    Command PhaseScriptExecution failed with a nonzero exit code
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'TensorFlowLiteC' from project 'Pods')
+    note: Run script build phase 'Thin Binary' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Runner' from project 'Runner')
+    note: Run script build phase 'Run Script' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Runner' from project 'Runner')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'TensorFlowLiteSwift' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'RecaptchaInterop' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'PromisesObjC-FBLPromises_Privacy' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'PromisesObjC' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'GoogleUtilities-GoogleUtilities_Privacy' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'GoogleUtilities' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'GTMSessionFetcher-GTMSessionFetcher_Core_Privacy' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'GTMSessionFetcher' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseCoreInternal-FirebaseCoreInternal_Privacy' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseCoreInternal' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseCore-FirebaseCore_Privacy' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseCore' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseAuth-FirebaseAuth_Privacy' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseAuth' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'FirebaseAppCheckInterop' from project 'Pods')
+    /Users/roccosantonastasio/Desktop/Github/Fyne/frontend/ios/Pods/Pods.xcodeproj: warning: The iOS deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 26.2.99. (in target 'Firebase' from project 'Pods')
+
+Encountered error while archiving for device.
