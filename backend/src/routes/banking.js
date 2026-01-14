@@ -82,7 +82,7 @@ router.post('/sync-results', verifyToken, async (req, res) => {
             status: 'success'
         });
     } catch (error) {
-        console.error('Save Sync Results Error:', error);
+        console.error('Save Sync Results Error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
@@ -180,7 +180,7 @@ router.post('/webhook', async (req, res) => {
 
         res.status(200).send();
     } catch (error) {
-        console.error('[Webhook Error]', error);
+        console.error('[Webhook Error]', error.message);
         res.status(200).send(); // Don't block provider
     }
 });

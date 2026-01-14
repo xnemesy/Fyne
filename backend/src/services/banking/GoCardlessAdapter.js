@@ -25,7 +25,7 @@ class GoCardlessAdapter extends BankingProvider {
             this.token = response.data.access;
             return this.token;
         } catch (error) {
-            console.error('GoCardless Authentication Error:', error.response?.data || error.message);
+            console.error('GoCardless Authentication Error:', error.message);
             throw new Error('Failed to authenticate with GoCardless');
         }
     }
@@ -54,7 +54,7 @@ class GoCardlessAdapter extends BankingProvider {
                 link: response.data.link,
             };
         } catch (error) {
-            console.error('GoCardless Requisition Error:', error.response?.data || error.message);
+            console.error('GoCardless Requisition Error:', error.message);
             throw new Error('Failed to create GoCardless requisition');
         }
     }
@@ -85,7 +85,7 @@ class GoCardlessAdapter extends BankingProvider {
             );
             return response.data;
         } catch (error) {
-            console.error('GoCardless Requisition Info Error:', error.response?.data || error.message);
+            console.error('GoCardless Requisition Info Error:', error.message);
             throw new Error('Failed to fetch requisition info');
         }
     }
@@ -104,7 +104,7 @@ class GoCardlessAdapter extends BankingProvider {
 
             return [...booked, ...pending].map(tx => this.normalizeTransaction(tx));
         } catch (error) {
-            console.error('GoCardless Transactions Error:', error.response?.data || error.message);
+            console.error('GoCardless Transactions Error:', error.message);
             throw new Error('Failed to fetch transactions from GoCardless');
         }
     }

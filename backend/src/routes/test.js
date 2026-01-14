@@ -73,7 +73,7 @@ router.post('/mock-webhook', async (req, res) => {
             status: 'success'
         });
     } catch (error) {
-        console.error('Mock Webhook Error:', error);
+        console.error('Mock Webhook Error:', error.message);
         res.status(error.message.includes('not found') ? 404 : 500).json({ error: error.message });
     }
 });
@@ -104,7 +104,7 @@ router.post('/seed-demo', async (req, res) => {
             status: 'success'
         });
     } catch (error) {
-        console.error('Seed Demo Error:', error);
+        console.error('Seed Demo Error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });

@@ -22,7 +22,7 @@ function initFirebase() {
             console.warn('⚠️ Firebase Admin SDK key not found. Push notifications will be mocked.');
         }
     } catch (error) {
-        console.error('❌ Firebase Admin Initialization Error:', error);
+        console.error('❌ Firebase Admin Initialization Error:', error.message);
     }
 }
 
@@ -55,10 +55,10 @@ async function sendPushNotification(fcmToken, title, body, data = {}) {
 
     try {
         const response = await admin.messaging().send(message);
-        console.log('Successfully sent message:', response);
+        console.log('Successfully sent message');
         return { success: true, messageId: response };
     } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('Error sending message:', error.message);
         return { success: false, error: error.message };
     }
 }
