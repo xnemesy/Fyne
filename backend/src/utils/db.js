@@ -20,10 +20,51 @@ module.exports = {
         const schemaPath = path.join(__dirname, '../models/schema.sql');
         const sql = fs.readFileSync(schemaPath, 'utf8');
         try {
+            // 1. Ensure extensions
+            await pool.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
+
+            // 2. Run main schema (CREATE TABLE IF NOT EXISTS)
             await pool.query(sql);
-            console.log('✅ Database schema initialized');
+
+            // 3. Robust Column Verification for 'users' table
+            const userColumns = [
+                { name: 'fcm_token', type: 'TEXT' },
+                { name: 'public_key', type: 'TEXT' },
+                { name: 'user_id', type: 'UUID DEFAULT gen_random_uuid()' } // User requested user_id UUID
+            ];
+
+            for (const col of userColumns) {
+                await pool.query(`
+                    DO $$ 
+                    BEGIN 
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                      WHERE table_name='users' AND column_name='${col.name}') THEN
+                            ALTER TABLE users ADD COLUMN ${col.name} ${col.type};
+                        END IF;
+                    END $$;
+                `);
+            }
+
+            // 4. Verification for 'accounts' table (ensure sync with new expectations)
+            const accountColumns = [
+                { name: 'provider_id', type: 'VARCHAR(50)' }
+            ];
+
+            for (const col of accountColumns) {
+                await pool.query(`
+                    DO $$ 
+                    BEGIN 
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                      WHERE table_name='accounts' AND column_name='${col.name}') THEN
+                            ALTER TABLE accounts ADD COLUMN ${col.name} ${col.type};
+                        END IF;
+                    END $$;
+                `);
+            }
+
+            console.log('✅ Database schema and all columns verified');
         } catch (err) {
-            console.error('❌ Error initializing schema:', err);
+            console.error('❌ Error during robust schema initialization:', err);
         }
     },
 
