@@ -34,6 +34,7 @@ class CategorizationService {
     'REVOLUT': 'Trasferimenti',
     'PAYPAL': 'Shopping',
     'APPLE.COM': 'Digital',
+    'SUSHI': 'Alimentari',
   };
 
   CategorizationService(this.isar);

@@ -418,7 +418,7 @@
                     <div
                         style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: 600;">
                         <span>Cibo & Bevande</span>
-                        <span>280 €</span>
+                        <span id="insights-cibo-val">280 €</span>
                     </div>
                     <div class="progress-container">
                         <div class="progress-bar" style="width: 40%; background: var(--primary)"></div>
@@ -621,9 +621,9 @@
             const catText = document.getElementById('suggested-cat');
 
             const lowVal = val.toLowerCase();
-            if (lowVal.includes('starbucks') || lowVal.includes('caffè') || lowVal.includes('pasto')) {
+            if (lowVal.includes('starbucks') || lowVal.includes('caffè') || lowVal.includes('pasto') || lowVal.includes('sushi')) {
                 suggestion.style.display = 'block';
-                catText.innerText = 'Cibo & Bevande';
+                catText.innerText = 'Alimentari';
             } else if (lowVal.includes('amazon') || lowVal.includes('ebay')) {
                 suggestion.style.display = 'block';
                 catText.innerText = 'Shopping';
@@ -668,18 +668,26 @@
                     category = "Shopping";
                     targetCard = "val-shopping";
                     targetBar = "bar-shopping";
-                } else if (desc.toUpperCase().includes('ESSELUNGA') || desc.toUpperCase().includes('STARBUCKS')) {
-                    category = "Spesa";
+                } else if (desc.toUpperCase().includes('ESSELUNGA') || desc.toUpperCase().includes('STARBUCKS') || desc.toUpperCase().includes('SUSHI')) {
+                    category = "Alimentari";
                     targetCard = "val-spesa";
                     targetBar = "bar-spesa";
+
+                    // Update Insights "Cibo & Bevande" as well
+                    const insightsCibo = document.getElementById('insights-cibo-val');
+                    if (insightsCibo) {
+                        const currentInsightsVal = parseInt(insightsCibo.innerText);
+                        const newInsightsVal = currentInsightsVal + amount;
+                        insightsCibo.innerText = newInsightsVal + " €";
+                    }
                 }
 
                 log.innerHTML += `> Transazione rilevata: "${desc}"<br>`;
-                log.innerHTML += `> Suggerimento Smart Category: <span style="color:white">[${category}]</span><br>`;
+                log.innerHTML += `> Suggerimento Smart Category: <span style="color:var(--primary)">[${category}]</span><br>`;
 
-                const encrypted = btoa("AES256_" + Math.random().toString(36).substring(7));
-                log.innerHTML += `> <span style="color:yellow">Cifratura AES-256 completata:</span> ${encrypted}<br>`;
-                log.innerHTML += `> <span style="color:cyan">Sync budget (Importo in chiaro): OK</span><br>`;
+                const encrypted = btoa("AES256_" + Math.random().toString(36).substring(7)).substring(0, 16);
+                log.innerHTML += `> <span style="color:var(--primary)">Cifratura AES-256 (Local):</span> ${encrypted}...<br>`;
+                log.innerHTML += `> <span style="color:var(--primary)">Sync budget (Importo in chiaro): OK</span><br>`;
 
                 const valEl = document.getElementById(targetCard);
                 const currentVal = parseFloat(valEl.innerText);
@@ -689,7 +697,7 @@
                 const limit = targetCard.includes('shopping') ? 200 : 500;
                 const newWidth = Math.min((newVal / limit) * 100, 100);
                 document.getElementById(targetBar).style.width = newWidth + "%";
-                if (newWidth > 90) document.getElementById(targetBar).style.background = '#FF4B4B';
+                if (newWidth > 90) document.getElementById(targetBar).style.background = 'var(--danger)';
 
                 document.getElementById('desc-input').value = "";
                 document.getElementById('amount-input').value = "";
