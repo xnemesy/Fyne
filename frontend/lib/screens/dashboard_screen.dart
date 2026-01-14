@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/budget_card.dart';
 import '../widgets/add_transaction_sheet.dart';
-import 'wallet_screen.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'insights_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -14,89 +15,85 @@ class DashboardScreen extends ConsumerWidget {
     final budgetsAsync = ref.watch(budgetsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1A),
+      backgroundColor: const Color(0xFFFBFBF9),
       body: CustomScrollView(
         slivers: [
-          // Premium Header
+          // Minimalist Editorial Header
           SliverAppBar(
-            expandedHeight: 220,
+            expandedHeight: 200,
             floating: false,
             pinned: true,
-            backgroundColor: const Color(0xFF0F0F1A),
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            backgroundColor: const Color(0xFFFBFBF9),
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2E2E48), Color(0xFF0F0F1A)],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(25, 100, 25, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Ciao Rocco,",
-                        style: GoogleFonts.outfit(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 18,
-                        ),
+              background: Padding(
+                padding: const EdgeInsets.fromLTRB(25, 100, 25, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Bentornato,",
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        "I tuoi Budget",
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "La tua situazione",
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontSize: 32,
+                        letterSpacing: -1,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
             actions: [
               IconButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const WalletScreen()),
-                  );
+                  _navigateTo(context, const InsightsScreen());
                 },
-                icon: const Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
+                icon: const Icon(LucideIcons.barChart2, color: Color(0xFF1A1A1A), size: 22),
+              ),
+              IconButton(
+                onPressed: () {
+                  _navigateTo(context, const WalletScreen());
+                },
+                icon: const Icon(LucideIcons.wallet, color: Color(0xFF1A1A1A), size: 22),
               ),
               const SizedBox(width: 15),
             ],
           ),
 
-          // Budget List
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: budgetsAsync.when(
-                data: (budgets) => budgets.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: budgets.length,
-                        itemBuilder: (context, index) {
-                          return BudgetCard(budget: budgets[index]);
-                        },
+          // Budget List (Bento Grid)
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            sliver: budgetsAsync.when(
+              data: (budgets) => budgets.isEmpty
+                  ? SliverToBoxAdapter(child: _buildEmptyState(context))
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => BudgetCard(budget: budgets[index]),
+                        childCount: budgets.length,
                       ),
-                loading: () => const Center(
+                    ),
+              loading: () => const SliverToBoxAdapter(
+                child: Center(
                   child: Padding(
                     padding: EdgeInsets.all(50),
-                    child: CircularProgressIndicator(color: Colors.cyanAccent),
+                    child: CircularProgressIndicator(color: Color(0xFF4A6741)),
                   ),
                 ),
-                error: (err, stack) => Center(
+              ),
+              error: (err, stack) => SliverToBoxAdapter(
+                child: Center(
                   child: Text(
-                    "Errore nel caricamento: $err",
-                    style: const TextStyle(color: Colors.redAccent),
+                    "Impossibile caricare i dati",
+                    style: TextStyle(color: Colors.red.shade800),
                   ),
                 ),
               ),
@@ -114,36 +111,50 @@ class DashboardScreen extends ConsumerWidget {
             builder: (context) => const AddTransactionSheet(),
           );
         },
-        backgroundColor: Colors.cyanAccent,
-        foregroundColor: Colors.black,
-        icon: const Icon(Icons.add),
-        label: Text("Transazione", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        elevation: 0,
+        highlightElevation: 0,
+        backgroundColor: const Color(0xFF4A6741),
+        foregroundColor: Colors.white,
+        icon: const Icon(LucideIcons.plus, size: 20),
+        label: Text("NUOVA SPESA", style: GoogleFonts.inter(fontWeight: FontWeight.w700, letterSpacing: 1, fontSize: 13)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 50),
-        Icon(Icons.account_balance_wallet_outlined, 
-             size: 80, color: Colors.white.withOpacity(0.1)),
-        const SizedBox(height: 20),
+        Icon(LucideIcons.fileSearch, size: 64, color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+        const SizedBox(height: 24),
         Text(
-          "Nessun budget impostato",
-          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+          "Nessuna attività rilevata",
+          style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
         ),
-        const SizedBox(height: 10),
-        ElevatedButton(
+        const SizedBox(height: 16),
+        TextButton(
           onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.cyanAccent.withOpacity(0.1),
-            foregroundColor: Colors.cyanAccent,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text("Crea il primo budget"),
+          child: Text("Configura Budget", style: GoogleFonts.inter(color: const Color(0xFF4A6741), fontWeight: FontWeight.bold)),
         ),
       ],
     );
   }
+}
 }

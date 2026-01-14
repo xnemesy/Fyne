@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/account_provider.dart';
 import '../models/account.dart';
 
+import 'package:lucide_icons/lucide_icons.dart';
+
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
 
@@ -12,129 +14,107 @@ class WalletScreen extends ConsumerWidget {
     final accountsAsync = ref.watch(accountsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1A),
+      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(
-        title: Text("Il mio Wallet", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        title: Text("Il mio Portafoglio", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
       ),
       body: accountsAsync.when(
         data: (accounts) => accounts.isEmpty 
             ? _buildEmptyState(context)
             : _buildAccountList(accounts),
-        loading: () => const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
-        error: (err, stack) => Center(child: Text("Errore: $err")),
+        loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+        error: (err, stack) => Center(child: Text("Errore: $err", style: const TextStyle(color: Color(0xFFD63031)))),
       ),
     );
   }
 
   Widget _buildAccountList(List<Account> accounts) {
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       itemCount: accounts.length,
       itemBuilder: (context, index) {
         final account = accounts[index];
-        return _buildCreditCard(account);
+        return _buildBentoCard(context, account);
       },
     );
   }
 
-  Widget _buildCreditCard(Account account) {
+  Widget _buildBentoCard(BuildContext context, Account account) {
     return Container(
-      height: 200,
-      margin: const EdgeInsets.only(bottom: 25),
-      padding: const EdgeInsets.all(25),
+      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacity(0.15),
-            Colors.white.withOpacity(0.05),
-          ],
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Glass reflection effect
-          Positioned(
-            top: -50,
-            right: -50,
-            child: Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.cyanAccent.withOpacity(0.05),
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    account.decryptedName ?? "Conto",
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const Icon(Icons.credit_card, color: Colors.white, size: 28),
-                ],
+              Text(
+                account.decryptedName ?? "Conto Bancario",
+                style: GoogleFonts.lora(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1A1A1A),
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Saldo Totale",
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
-                      fontSize: 12,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    "${account.decryptedBalance ?? "0.00"} ${account.currency}",
-                    style: GoogleFonts.outfit(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              const Icon(LucideIcons.landmark, color: Color(0xFF4A6741), size: 20),
+            ],
+          ),
+          const SizedBox(height: 40),
+          Text(
+            "SALDO DISPONIBILE",
+            style: GoogleFonts.inter(
+              letterSpacing: 2,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "${account.decryptedBalance ?? "0.00"} ${account.currency}",
+            style: GoogleFonts.lora(
+              fontSize: 34,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1A1A1A),
+            ),
+          ),
+          const SizedBox(height: 30),
+          Row(
+            children: [
+              Text(
+                "ID CONTO: **** ${account.id.substring(account.id.length - 4)}",
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF1A1A1A).withOpacity(0.2),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "**** **** **** 2026",
-                    style: GoogleFonts.outfit(
-                      color: Colors.white.withOpacity(0.4),
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  if (account.providerId != null)
-                    Image.network(
-                      "https://img.icons8.com/color/48/bank-central.png",
-                      width: 24,
-                      opacity: const AlwaysStoppedAnimation(0.6),
-                    ),
-                ],
+              const Spacer(),
+              const Icon(LucideIcons.checkCircle2, color: Color(0xFF4A6741), size: 14),
+              const SizedBox(width: 4),
+              Text(
+                "Sincronizzato",
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF4A6741),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -148,22 +128,27 @@ class WalletScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.account_balance_wallet_outlined, size: 80, color: Colors.white.withOpacity(0.1)),
-          const SizedBox(height: 20),
-          Text("Nessun conto collegato", style: TextStyle(color: Colors.white.withOpacity(0.4))),
-          const SizedBox(height: 30),
+          Icon(LucideIcons.wallet, size: 64, color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+          const SizedBox(height: 24),
+          Text(
+            "Il tuo wallet è vuoto",
+            style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+          ),
+          const SizedBox(height: 32),
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.cyanAccent,
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              backgroundColor: const Color(0xFF4A6741),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            child: const Text("Collega la tua Banca", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text("COLLEGA ISTITUTO", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
           ),
         ],
       ),
     );
   }
+}
 }

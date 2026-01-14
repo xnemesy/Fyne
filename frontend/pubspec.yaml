@@ -41,6 +41,7 @@ dependencies:
   fl_chart: ^0.66.0
   google_fonts: ^6.1.0
   cupertino_icons: ^1.0.6
+  lucide_icons: ^0.320.0
 
   # Biometrics & Export
   local_auth: ^2.1.6

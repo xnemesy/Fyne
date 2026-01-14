@@ -5,23 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fyne - Zero Knowledge Dashboard Preview</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0F0F1A;
-            --card-color: rgba(30, 30, 44, 0.8);
-            --accent-cyan: #00F2FF;
-            --accent-orange: #FF8A00;
-            --accent-red: #FF4B4B;
-            --text-main: #FFFFFF;
-            --text-dim: rgba(255, 255, 255, 0.6);
+            --bg-paper: #FBFBF9;
+            --surface: #FFFFFF;
+            --text-main: #1A1A1A;
+            --text-muted: #2D3436;
+            --primary: #4A6741;
+            /* Deep Sage Green */
+            --danger: #D63031;
+            /* Terracotta */
+            --radius: 32px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-paper);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
@@ -29,107 +34,113 @@
             min-height: 100vh;
         }
 
+        h1,
+        h2,
+        h3,
+        .serif {
+            font-family: 'Lora', serif;
+        }
+
         .header {
             width: 100%;
             max-width: 500px;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #2E2E48 0%, #0F0F1A 100%);
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
+            padding: 60px 24px 30px;
+            background: var(--bg-paper);
             box-sizing: border-box;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-end;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
+            letter-spacing: -1.5px;
+            font-family: 'Lora', serif;
         }
 
         .header p {
-            margin: 5px 0 0;
-            color: var(--text-dim);
-            font-size: 18px;
+            margin: 0 0 4px 0;
+            color: var(--text-muted);
+            opacity: 0.5;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .bento-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            transition: transform 0.3s ease;
         }
 
         .wallet-card {
-            height: 180px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            border-radius: 28px;
-            padding: 25px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
             box-sizing: border-box;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.02);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .wallet-card:hover {
-            transform: scale(1.02);
-        }
-
-        .wallet-card::after {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+            min-height: 200px;
         }
 
         .wallet-balance {
-            font-size: 34px;
+            font-size: 38px;
             font-weight: 700;
-            margin: 10px 0;
+            margin: 4px 0 20px 0;
+            font-family: 'Lora', serif;
+            letter-spacing: -1px;
         }
 
         .view-toggle {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            overflow-x: auto;
-            padding-bottom: 5px;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding: 4px;
+            background: #F2F2F0;
+            border-radius: 16px;
+            width: fit-content;
         }
 
         .tab {
             font-weight: 600;
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--text-muted);
+            opacity: 0.4;
         }
 
         .tab.active {
-            background: rgba(0, 242, 255, 0.1);
-            color: var(--accent-cyan);
-            border-color: rgba(0, 242, 255, 0.3);
+            background: #FFFFFF;
+            color: var(--text-main);
+            opacity: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .chart-container {
-            height: 200px;
+            height: 220px;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             position: relative;
         }
 
-        .line-chart {
-            width: 100%;
-            height: 100%;
+        .line-chart path {
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
-            animation: draw 2s forwards ease-out;
+            animation: draw 2.5s forwards cubic-bezier(0.445, 0.05, 0.55, 0.95);
         }
 
         @keyframes draw {
@@ -141,11 +152,12 @@
         .insight-stat {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            margin-bottom: 15px;
+            gap: 20px;
+            padding: 24px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
         }
 
         .modal-overlay {
@@ -154,7 +166,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(26, 26, 26, 0.1);
+            backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: flex-end;
@@ -164,13 +177,14 @@
         .bottom-sheet {
             width: 100%;
             max-width: 500px;
-            background: #161621;
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
-            padding: 30px 20px;
+            background: var(--bg-paper);
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+            padding: 40px 30px;
             box-sizing: border-box;
             transform: translateY(100%);
-            transition: transform 0.3s ease-out;
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.05);
         }
 
         .bottom-sheet.open {
@@ -179,150 +193,166 @@
 
         .fab {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             right: 30px;
-            background: var(--accent-cyan);
-            color: black;
-            padding: 15px 25px;
-            border-radius: 30px;
+            background: var(--primary);
+            color: white;
+            padding: 18px 28px;
+            border-radius: 20px;
             font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(74, 103, 65, 0.2);
             z-index: 900;
+            text-transform: uppercase;
         }
 
         .amount-display {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 700;
             text-align: center;
-            color: var(--accent-cyan);
-            margin-bottom: 30px;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            font-family: 'Lora', serif;
+            letter-spacing: -2px;
         }
 
         .container {
             width: 100%;
             max-width: 500px;
-            padding: 20px;
+            padding: 0 24px;
             box-sizing: border-box;
         }
 
         .status-badge {
-            background: rgba(0, 242, 255, 0.1);
-            color: var(--accent-cyan);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 20px;
-            border: 1px solid rgba(0, 242, 255, 0.3);
-        }
-
-        .card {
-            background: var(--card-color);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: transparent;
+            color: var(--primary);
+            padding: 0;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 24px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            align-items: baseline;
+            margin-bottom: 24px;
         }
 
         .card-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Lora', serif;
         }
 
         .card-limit {
-            color: var(--text-dim);
-            font-size: 14px;
+            color: var(--text-muted);
+            opacity: 0.4;
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .progress-container {
             width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
+            height: 6px;
+            background: #F2F2F0;
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .progress-bar {
             height: 100%;
-            background: var(--accent-cyan);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
         .stat-label {
-            color: var(--text-dim);
-            font-size: 12px;
+            color: var(--text-muted);
+            opacity: 0.3;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: block;
+            margin-bottom: 4px;
         }
 
         .stat-value {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 16px;
         }
 
         .sync-demo {
-            border: 1px dashed rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 20px;
-            margin-top: 20px;
+            margin-top: 40px;
+            padding: 30px;
+            background: #FFFFFF;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white;
+            padding: 16px;
+            background: #FBFBF9;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            color: var(--text-main);
             box-sizing: border-box;
-            margin-bottom: 15px;
-            font-family: 'Outfit';
+            margin-bottom: 16px;
+            font-family: 'Inter';
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
         }
 
         button {
             width: 100%;
-            padding: 15px;
-            background: var(--accent-cyan);
+            padding: 18px;
+            background: var(--primary);
             border: none;
-            border-radius: 12px;
-            color: #000;
+            border-radius: 16px;
+            color: #FFF;
             font-weight: 700;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 13px;
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
+            background: #3D5536;
         }
 
         .encryption-log {
             font-family: monospace;
-            font-size: 10px;
-            color: #00FF41;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 15px;
+            font-size: 11px;
+            color: var(--primary);
+            background: #FBFBF9;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
             display: none;
+            line-height: 1.6;
+            border: 1px solid rgba(74, 103, 65, 0.1);
         }
     </style>
 </head>
@@ -331,97 +361,100 @@
 
     <div class="header">
         <div>
-            <p>Ciao Rocco,</p>
+            <p>Bentornato Rocco,</p>
             <h1 id="view-title">I tuoi Budget</h1>
         </div>
-        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50%; cursor: pointer;"
+        <div style="background: #FFF; padding: 12px; border-radius: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"
             onclick="toggleView('wallet')">
-            💳
+            💼
         </div>
     </div>
 
     <div class="container">
         <div class="view-toggle">
-            <div id="tab-budgets" class="tab active" onclick="toggleView('budgets')">Budget</div>
-            <div id="tab-wallet" class="tab" onclick="toggleView('wallet')">Wallet</div>
-            <div id="tab-insights" class="tab" onclick="toggleView('insights')">Insights</div>
+            <div id="tab-budgets" class="tab active" onclick="toggleView('budgets')">Situazione</div>
+            <div id="tab-wallet" class="tab" onclick="toggleView('wallet')">Conti</div>
+            <div id="tab-insights" class="tab" onclick="toggleView('insights')">Resoconto</div>
         </div>
 
-        <div class="status-badge" id="zk-badge">🛡️ Zero-Knowledge Mode Active</div>
+        <div class="status-badge" id="zk-badge">
+            <span style="font-size: 14px;">●</span> CIFRATURA ATTIVA
+        </div>
 
         <!-- Insights View -->
         <div id="view-insights" style="display: none;">
             <div class="chart-container">
                 <svg class="line-chart" viewBox="0 0 400 200">
-                    <path d="M0,180 Q100,160 200,140 T400,100" fill="none" stroke="var(--accent-cyan)"
-                        stroke-width="4" />
-                    <path d="M0,180 Q100,160 200,140 T400,100 L400,200 L0,200 Z" fill="rgba(0, 242, 255, 0.05)" />
+                    <path d="M0,180 Q100,170 200,150 T400,120" fill="none" stroke="var(--primary)" stroke-width="2.5" />
+                    <path d="M0,180 Q100,170 200,150 T400,120 L400,200 L0,200 Z" fill="rgba(74, 103, 65, 0.05)" />
                 </svg>
                 <div
-                    style="position: absolute; top:0; left:0; width:100%; text-align: center; color: var(--text-dim); font-size: 12px;">
-                    Net Worth (Ultimi 7gg)</div>
+                    style="position: absolute; bottom:0; left:0; width:100%; text-align: center; color: var(--primary); font-size: 10px; letter-spacing: 2px; font-weight: 700;">
+                    ANDAMENTO PATRIMONIO</div>
             </div>
 
             <div class="insight-stat">
-                <div style="font-size: 24px;">🔥</div>
+                <div style="font-size: 24px; color: var(--primary)">◎</div>
                 <div>
-                    <div style="font-size: 12px; color: var(--text-dim);">Daily Burn Rate</div>
-                    <div style="font-size: 18px; font-weight: 700;">42.50 € <span
-                            style="font-size: 12px; color: #00FF41;">(-5%)</span></div>
+                    <div class="stat-label">Daily Burn Rate</div>
+                    <div style="font-size: 24px; font-weight: 700; font-family: 'Lora'">42.50 € <span
+                            style="font-size: 14px; color: var(--primary); font-family: 'Inter'">(-5%)</span></div>
                 </div>
             </div>
 
-            <div class="card">
-                <h4 style="margin: 0 0 15px 0;">Top Spese (Decriptate)</h4>
-                <div style="margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px;">
+            <div class="bento-card">
+                <h4 style="margin: 0 0 24px 0; font-family: 'Lora'; font-size: 20px;">Top Categorie</h4>
+                <div style="margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: 600;">
                         <span>Shopping</span>
                         <span>450 €</span>
                     </div>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 80%; background: var(--accent-orange)"></div>
+                        <div class="progress-bar" style="width: 80%; background: var(--primary)"></div>
                     </div>
                 </div>
                 <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: 600;">
                         <span>Cibo & Bevande</span>
                         <span>280 €</span>
                     </div>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: 40%; background: var(--accent-red)"></div>
+                        <div class="progress-bar" style="width: 40%; background: var(--primary)"></div>
                     </div>
                 </div>
             </div>
 
             <button onclick="simulateExport()"
-                style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1)">
-                📂 Esporta Report CSV (FaceID)
+                style="background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-bottom: 40px;">
+                Esporta Report (FaceID)
             </button>
         </div>
 
         <!-- Budget View -->
         <div id="view-budgets">
-            <div class="card" id="card-spesa">
+            <div class="bento-card" id="card-spesa">
                 <div class="card-header">
-                    <div class="card-title">Spesa</div>
+                    <div class="card-title">Alimentari</div>
                     <div class="card-limit">Limit: 500 €</div>
                 </div>
                 <div class="progress-container">
                     <div class="progress-bar" id="bar-spesa" style="width: 65%;"></div>
                 </div>
-                <div class="card-footer">
+                <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <span class="stat-label">Spesi</span>
+                        <span class="stat-label">Utilizzati</span>
                         <span class="stat-value" id="val-spesa">325.00 €</span>
                     </div>
                     <div style="text-align: right;">
-                        <span class="stat-label">Rimanenti</span>
+                        <span class="stat-label">Disponibili</span>
                         <span class="stat-value">175.00 €</span>
                     </div>
                 </div>
             </div>
 
-            <div class="card" id="card-shopping">
+            <div class="bento-card" id="card-shopping">
                 <div class="card-header">
                     <div class="card-title">Shopping</div>
                     <div class="card-limit">Limit: 200 €</div>
@@ -429,13 +462,13 @@
                 <div class="progress-container">
                     <div class="progress-bar" id="bar-shopping" style="width: 20%;"></div>
                 </div>
-                <div class="card-footer">
+                <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <span class="stat-label">Spesi</span>
+                        <span class="stat-label">Utilizzati</span>
                         <span class="stat-value" id="val-shopping">40.00 €</span>
                     </div>
                     <div style="text-align: right;">
-                        <span class="stat-label">Rimanenti</span>
+                        <span class="stat-label">Disponibili</span>
                         <span class="stat-value">160.00 €</span>
                     </div>
                 </div>
@@ -448,42 +481,45 @@
                 <div>
                     <div class="card-header">
                         <div class="card-title">Conto Principale</div>
-                        <div>💳</div>
+                        <div style="opacity: 0.3">◈</div>
                     </div>
-                    <div class="stat-label">Saldo Totale</div>
+                    <div class="stat-label">Saldo Attuale</div>
                     <div class="wallet-balance" id="balance-main">2.450,00 €</div>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                    <span style="color: rgba(255,255,255,0.4); letter-spacing: 2px; font-size: 14px;">**** 2026</span>
-                    <span style="font-weight: 600;">Main Bank</span>
+                    <span
+                        style="color: var(--text-muted); opacity: 0.2; letter-spacing: 2px; font-size: 12px; font-weight: 700;">ID:
+                        2026-FYNE</span>
+                    <span style="font-weight: 700; color: var(--primary); font-size: 14px;">Main Bank</span>
                 </div>
             </div>
 
-            <div class="wallet-card"
-                style="background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(0, 242, 255, 0.05));">
+            <div class="wallet-card">
                 <div>
                     <div class="card-header">
                         <div class="card-title">Risparmi (Vault)</div>
-                        <div style="color: var(--accent-cyan)">💎</div>
+                        <div style="color: var(--primary)">✧</div>
                     </div>
-                    <div class="stat-label">Saldo Accumulato</div>
+                    <div class="stat-label">Accumulato</div>
                     <div class="wallet-balance" id="balance-savings">12.800,00 €</div>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                    <span style="color: rgba(255,255,255,0.4); letter-spacing: 2px; font-size: 14px;">SECURE
+                    <span
+                        style="color: var(--text-muted); opacity: 0.2; letter-spacing: 2px; font-size: 12px; font-weight: 700;">ENCRYPTED
                         VAULT</span>
-                    <span style="font-weight: 600; color: var(--accent-cyan)">Fyne</span>
+                    <span style="font-weight: 700; color: var(--primary); font-size: 14px;">Fyne Security</span>
                 </div>
             </div>
         </div>
 
         <div class="sync-demo">
-            <h3 style="margin-top:0">Simulatore Sync Intelligente</h3>
-            <p style="font-size: 12px; color: var(--text-dim)">Inserisci una transazione fittizia per vedere la
-                categorizzazione e cifratura locale in azione.</p>
-            <input type="text" id="desc-input" placeholder="Es: Amazon.com Payment">
+            <h3 style="margin: 0 0 12px 0; font-family: 'Lora'; font-size: 20px;">Simulazione Sync</h3>
+            <p style="font-size: 13px; color: var(--text-muted); opacity: 0.6; margin-bottom: 24px; line-height: 1.5;">
+                Simula una transazione bancaria per osservare la categorizzazione in tempo reale e la cifratura locale
+                dei dati sensibili.</p>
+            <input type="text" id="desc-input" placeholder="Esercente (es. Amazon)">
             <input type="number" id="amount-input" placeholder="Importo (€)">
-            <button onclick="simulateSync()">Simula Sync Bancario</button>
+            <button onclick="simulateSync()">Esegui Sincronizzazione</button>
             <div id="log" class="encryption-log"></div>
         </div>
     </div>

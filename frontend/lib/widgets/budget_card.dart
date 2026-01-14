@@ -9,21 +9,20 @@ class BudgetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progressColor = budget.isOverBudget 
-        ? Colors.redAccent 
-        : (budget.progress > 0.8 ? Colors.orangeAccent : Colors.cyanAccent);
+        ? const Color(0xFFD63031) // Terracotta-ish Red
+        : const Color(0xFF4A6741); // Sage Green
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2C).withOpacity(0.8),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -35,32 +34,29 @@ class BudgetCard extends StatelessWidget {
             children: [
               Text(
                 budget.decryptedCategoryName ?? "Caricamento...",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
               ),
               Text(
-                "${budget.limitAmount.toStringAsFixed(0)} €",
+                "Limite: ${budget.limitAmount.toStringAsFixed(0)} €",
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
-                  fontSize: 14,
+                  color: Colors.black.withOpacity(0.4),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: budget.progress.clamp(0.0, 1.0),
-              minHeight: 8,
-              backgroundColor: Colors.white.withOpacity(0.05),
+              minHeight: 6,
+              backgroundColor: const Color(0xFFF2F2F0),
               color: progressColor,
             ),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -69,11 +65,12 @@ class BudgetCard extends StatelessWidget {
                 children: [
                   Text(
                     "Spesi",
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                    style: TextStyle(color: Colors.black.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     "${budget.currentSpent.toStringAsFixed(2)} €",
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                    style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ],
               ),
@@ -81,14 +78,16 @@ class BudgetCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    budget.isOverBudget ? "Eccesso" : "Rimanenti",
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                    budget.isOverBudget ? "Eccesso" : "Disponibili",
+                    style: TextStyle(color: Colors.black.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     "${budget.remaining.abs().toStringAsFixed(2)} €",
                     style: TextStyle(
-                      color: budget.isOverBudget ? Colors.redAccent : Colors.white,
-                      fontWeight: FontWeight.w600,
+                      color: budget.isOverBudget ? const Color(0xFFD63031) : const Color(0xFF1A1A1A),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
                 ],

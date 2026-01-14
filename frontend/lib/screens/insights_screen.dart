@@ -5,6 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/analytics_service.dart';
 import '../providers/account_provider.dart';
 
+import 'package:lucide_icons/lucide_icons.dart';
+import '../providers/budget_provider.dart';
+import '../models/budget.dart';
+import '../models/account.dart';
+
 class InsightsScreen extends ConsumerStatefulWidget {
   const InsightsScreen({super.key});
 
@@ -17,43 +22,45 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // In production, we'd watch an InsightsProvider that uses the AnalyticsService
-    // For now, we connect to existing providers
     final accountsAsync = ref.watch(accountsProvider);
     final budgetsAsync = ref.watch(budgetsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1A),
+      backgroundColor: const Color(0xFFFBFBF9),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 280,
+            expandedHeight: 300,
             floating: false,
             pinned: true,
-            backgroundColor: const Color(0xFF0F0F1A),
+            elevation: 0,
+            backgroundColor: const Color(0xFFFBFBF9),
+            iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
             flexibleSpace: FlexibleSpaceBar(
               background: accountsAsync.when(
                 data: (accounts) => _buildNetWorthChart(accounts),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Icon(Icons.error, color: Colors.white24)),
+                loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                error: (_, __) => const Center(child: Icon(LucideIcons.alertTriangle, color: Color(0xFF1A1A1A))),
               ),
             ),
-            title: Text("Financial Insights", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            title: Text("Resoconto", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildToggleHeader(),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 32),
                   _buildBurnRateSection(),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 40),
+                  Text("DISTRIBUZIONE SPESE", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.4))),
+                  const SizedBox(height: 20),
                   budgetsAsync.when(
                     data: (budgets) => _buildTopCategoriesSection(budgets),
-                    loading: () => const LinearProgressIndicator(),
-                    error: (_, __) => const Text("Impossibile caricare categorie"),
+                    loading: () => const LinearProgressIndicator(color: Color(0xFF4A6741), backgroundColor: Color(0xFFF2F2F0)),
+                    error: (_, __) => const Text("Impossibile caricare i dati"),
                   ),
                 ],
               ),
@@ -65,44 +72,62 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
   }
 
   Widget _buildNetWorthChart(List<Account> accounts) {
-    // Calculate total net worth dynamically
     double netWorth = 0;
     for (var acc in accounts) {
       netWorth += double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.cyanAccent.withOpacity(0.1), Colors.transparent],
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 100, 24, 20),
       child: Column(
         children: [
           Text(
             "${netWorth.toStringAsFixed(2)} €",
-            style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.lora(fontSize: 40, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
           ),
-          const SizedBox(height: 20),
+          Text(
+            "PATRIMONIO NETTO",
+            style: GoogleFonts.inter(letterSpacing: 3, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+          ),
+          const SizedBox(height: 30),
           Expanded(
             child: LineChart(
               LineChartData(
                 gridData: const FlGridData(show: false),
                 titlesData: const FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipColor: (_) => const Color(0xFF1A1A1A),
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        return LineTooltipItem(
+                          "${spot.y.toStringAsFixed(0)} €",
+                          GoogleFonts.lora(color: Colors.white, fontWeight: FontWeight.bold),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: _generateDynamicSpots(netWorth), // Dynamic based on real data
+                    spots: _generateDynamicSpots(netWorth),
                     isCurved: true,
-                    color: Colors.cyanAccent,
-                    barWidth: 4,
+                    curveSmoothness: 0.3,
+                    color: const Color(0xFF4A6741),
+                    barWidth: 2,
+                    isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
                     belowArea: BarAreaData(
                       show: true,
-                      color: Colors.cyanAccent.withOpacity(0.1),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          const Color(0xFF4A6741).withOpacity(0.1),
+                          const Color(0xFF4A6741).withOpacity(0.0),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -115,31 +140,103 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
   }
 
   List<FlSpot> _generateDynamicSpots(double current) {
-    // In production this would come from a history table. 
-    // Mocking the trend slightly but using the REAL current value as endpoint.
     return [
-      FlSpot(0, current * 0.95),
-      FlSpot(1, current * 0.96),
-      FlSpot(2, current * 0.94),
-      FlSpot(3, current * 0.97),
-      FlSpot(4, current * 0.98),
-      FlSpot(5, current * 0.99),
+      FlSpot(0, current * 0.95), FlSpot(1, current * 0.96),
+      FlSpot(2, current * 0.94), FlSpot(3, current * 0.97),
+      FlSpot(4, current * 0.98), FlSpot(5, current * 0.99),
       FlSpot(6, current),
     ];
   }
 
-  Widget _buildTopCategoriesSection(List<Budget> budgets) {
-    // Sort budgets by usage to show 'Top Categories'
-    final sortedBudgets = List<Budget>.from(budgets)
-      ..sort((a, b) => b.currentSpent.compareTo(a.currentSpent));
+  Widget _buildToggleHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "Analisi Temporale",
+          style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+        ),
+        _buildMinimalToggle(),
+      ],
+    );
+  }
 
+  Widget _buildMinimalToggle() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2F2F0),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _toggleBtn("Current", !_showPreviousWeek),
+          _toggleBtn("Prev", _showPreviousWeek),
+        ],
+      ),
+    );
+  }
+
+  Widget _toggleBtn(String label, bool active) {
+    return GestureDetector(
+      onTap: () => setState(() => _showPreviousWeek = !active ? !_showPreviousWeek : _showPreviousWeek),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: active ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: active ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            color: active ? const Color(0xFF1A1A1A) : const Color(0xFF1A1A1A).withOpacity(0.4),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBurnRateSection() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("VELOCITÀ DI SPESA", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3))),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text("42.50 €", style: GoogleFonts.lora(fontSize: 32, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
+              const Spacer(),
+              const Icon(LucideIcons.trendingDown, color: Color(0xFF4A6741), size: 20),
+              const SizedBox(width: 4),
+              Text("-5%", style: GoogleFonts.inter(color: const Color(0xFF4A6741), fontWeight: FontWeight.bold, fontSize: 14)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text("/ giorno", style: GoogleFonts.inter(color: const Color(0xFF1A1A1A).withOpacity(0.3), fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopCategoriesSection(List<Budget> budgets) {
+    final sortedBudgets = List<Budget>.from(budgets)..sort((a, b) => b.currentSpent.compareTo(a.currentSpent));
     return Column(
       children: sortedBudgets.take(5).map((budget) {
         return _categoryRow(
           budget.decryptedCategoryName ?? "Sconosciuta",
           "${budget.currentSpent.toStringAsFixed(0)} €",
           budget.progress,
-          budget.isOverBudget ? Colors.redAccent : Colors.cyanAccent,
+          budget.isOverBudget ? const Color(0xFFD63031) : const Color(0xFF4A6741),
         );
       }).toList(),
     );
@@ -147,22 +244,25 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 
   Widget _categoryRow(String label, String amount, double progress, Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 24),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-              Text(amount, style: const TextStyle(color: Colors.white70)),
+              Text(label, style: GoogleFonts.lora(fontSize: 15, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))),
+              Text(amount, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF1A1A1A))),
             ],
           ),
-          const SizedBox(height: 10),
-          LinearProgressIndicator(
-            value: progress,
-            backgroundColor: Colors.white.withOpacity(0.05),
-            color: color,
-            minHeight: 6,
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress.clamp(0.0, 1.0),
+              backgroundColor: const Color(0xFFF2F2F0),
+              color: color,
+              minHeight: 4,
+            ),
           ),
         ],
       ),
