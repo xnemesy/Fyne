@@ -17,14 +17,14 @@ class CategorizationService {
 
   // Categories Mapping (Order must match Model output indices)
   final List<String> _labelOrder = [
+    'Abbonamenti',
     'Alimentari',
-    'Wellness',
+    'Altro',
+    'Fast Food',
     'Shopping',
     'Trasporti',
-    'Abbonamenti',
     'Vizi',
-    'Fast Food',
-    'Altro'
+    'Wellness'
   ];
 
   late final Map<String, Category> _categoryMap;
