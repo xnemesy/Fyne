@@ -14,12 +14,15 @@ firebase-export-*/
 
 # Secrets & Env
 .env
-.env.local
-.env.production
-.env.staging
+.env.*
 *.pem
 *.key
 service-account.json
+firebase-admin.json
+
+# Firebase Configs (Mobile)
+**/GoogleService-Info.plist
+**/google-services.json
 
 # IDEs
 .vscode/
