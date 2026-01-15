@@ -76,7 +76,7 @@ class CryptoService {
     }
     return _rsaPrivateKey!.decrypt(base64Data);
   }
-  
+
   /// Helper for testing: Encrypts data as if the backend did it
   Future<String> encryptWithSelfPublicKey(String text) async {
      if (_rsaPrivateKey == null) {

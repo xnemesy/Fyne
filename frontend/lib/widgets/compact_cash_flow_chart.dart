@@ -34,8 +34,8 @@ class CompactCashFlowChart extends StatelessWidget {
     }
 
     return Container(
-      height: 180,
-      padding: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+      height: 220, // Increased height for labels
+      padding: const EdgeInsets.fromLTRB(0, 20, 20, 10), // Added right padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -47,7 +47,7 @@ class CompactCashFlowChart extends StatelessWidget {
                 letterSpacing: 1.5,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                color: Colors.black54, // Darker text
               ),
             ),
           ),
@@ -56,7 +56,32 @@ class CompactCashFlowChart extends StatelessWidget {
             child: LineChart(
               LineChartData(
                 gridData: const FlGridData(show: false),
-                titlesData: const FlTitlesData(show: false),
+                titlesData: FlTitlesData(
+                  show: true,
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 45, // Increased space
+                      getTitlesWidget: (value, meta) {
+                         return Text(value.toInt().toString(), style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold));
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 5,
+                      getTitlesWidget: (value, meta) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(value.toInt().toString(), style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                        );
+                      },
+                    ),
+                  ),
+                ),
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(

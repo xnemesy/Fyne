@@ -117,14 +117,10 @@ class DashboardScreen extends ConsumerWidget {
               ),
               IconButton(
                 onPressed: () async {
-                  final api = ref.read(apiServiceProvider);
-                  try {
-                    await api.post('/api/banking/debug/seed-load-test');
-                    ref.invalidate(transactionsProvider);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Seed di 200 transazioni completato!")));
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Errore durante il seed")));
-                  }
+                  // Toggle mock mode locally for performance testing
+                  useMockData = true;
+                  ref.invalidate(transactionsProvider);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Modalità Stress Test Locale (200 TX) attivata!")));
                 },
                 icon: const Icon(LucideIcons.beaker, color: Color(0xFF1A1A1A), size: 20),
                 tooltip: "Load Test (RSA Performance)",

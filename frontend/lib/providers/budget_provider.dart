@@ -18,13 +18,13 @@ final masterKeyProvider = StateProvider<dynamic>((ref) => null);
 class BudgetNotifier extends AsyncNotifier<List<Budget>> {
   @override
   Future<List<Budget>> build() async {
-    return _fetchAndDecryptBudgets();
+    final masterKey = ref.watch(masterKeyProvider);
+    return _fetchAndDecryptBudgets(masterKey);
   }
 
-  Future<List<Budget>> _fetchAndDecryptBudgets() async {
+  Future<List<Budget>> _fetchAndDecryptBudgets(dynamic masterKey) async {
     final api = ref.read(apiServiceProvider);
     final crypto = ref.read(cryptoServiceProvider);
-    final masterKey = ref.read(masterKeyProvider);
 
     if (masterKey == null) return [];
 
@@ -49,8 +49,9 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
   }
 
   Future<void> refresh() async {
+    final masterKey = ref.read(masterKeyProvider);
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _fetchAndDecryptBudgets());
+    state = await AsyncValue.guard(() => _fetchAndDecryptBudgets(masterKey));
   }
 }
 

@@ -5,13 +5,13 @@ import '../providers/budget_provider.dart'; // sharing common providers like api
 class AccountNotifier extends AsyncNotifier<List<Account>> {
   @override
   Future<List<Account>> build() async {
-    return _fetchAndDecryptAccounts();
+    final masterKey = ref.watch(masterKeyProvider);
+    return _fetchAndDecryptAccounts(masterKey);
   }
 
-  Future<List<Account>> _fetchAndDecryptAccounts() async {
+  Future<List<Account>> _fetchAndDecryptAccounts(dynamic masterKey) async {
     final api = ref.read(apiServiceProvider);
     final crypto = ref.read(cryptoServiceProvider);
-    final masterKey = ref.read(masterKeyProvider);
 
     if (masterKey == null) return [];
 
@@ -41,8 +41,9 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
   }
 
   Future<void> refresh() async {
+    final masterKey = ref.read(masterKeyProvider);
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _fetchAndDecryptAccounts());
+    state = await AsyncValue.guard(() => _fetchAndDecryptAccounts(masterKey));
   }
 }
 

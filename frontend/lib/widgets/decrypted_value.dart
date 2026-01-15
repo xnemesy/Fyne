@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 class DecryptedValue extends StatelessWidget {
   final String? value;
   final String currency;
+  final String? suffix;
   final TextStyle style;
   final bool isLarge;
 
@@ -11,6 +12,7 @@ class DecryptedValue extends StatelessWidget {
     super.key,
     required this.value,
     this.currency = '€',
+    this.suffix,
     required this.style,
     this.isLarge = false,
   });
@@ -33,7 +35,7 @@ class DecryptedValue extends StatelessWidget {
       },
       child: value != null
           ? Text(
-              "$value $currency",
+              "$value${suffix ?? ' $currency'}",
               key: ValueKey(value),
               style: style,
             )

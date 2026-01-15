@@ -54,5 +54,10 @@
 	<string>Fyne necessita della fotocamera per scansionare gli scontrini e inserire le transazioni velocemente.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fyne necessita dell'accesso alle foto per caricare scontrini dalla galleria.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+	</array>
 </dict>
 </plist>

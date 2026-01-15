@@ -10,22 +10,21 @@ import 'privacy_provider.dart';
 
 final categorizationServiceProvider = Provider((ref) => CategorizationService());
 
+// Global flag for testing
+bool useMockData = false;
+
 final transactionsProvider = FutureProvider<List<TransactionModel>>((ref) async {
   final api = ref.read(apiServiceProvider);
   final crypto = ref.read(cryptoServiceProvider);
-  final masterKey = ref.read(masterKeyProvider);
+  final masterKey = ref.watch(masterKeyProvider);
   final categorizer = ref.read(categorizationServiceProvider);
 
   if (masterKey == null) return [];
 
   List<dynamic> data = [];
-  try {
-    final response = await api.get('/api/transactions');
-    data = response.data;
-  } catch (e) {
-    print("API Error (Mocking Data): $e");
-    // Generate Mock Data for Testing
-    final realisticData = [
+  
+  if (useMockData) {
+     final realisticData = [
       "Esselunga Milano", "Lidl Roma", "Carrefour Express", 
       "Netflix Monthly", "Spotify Premium", "Disney Plus", 
       "Virgin Active City", "Farmacia Centrale", "Amazon IT Order", 
@@ -47,6 +46,13 @@ final transactionsProvider = FutureProvider<List<TransactionModel>>((ref) async 
         "encryptedDescription": encryptedDesc,
         "bookingDate": DateTime.now().subtract(Duration(days: random.nextInt(30))).toIso8601String(),
       });
+    }
+  } else {
+    try {
+      final response = await api.get('/api/transactions');
+      data = response.data;
+    } catch (e) {
+      print("API Error: $e");
     }
   }
 

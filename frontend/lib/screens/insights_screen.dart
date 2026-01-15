@@ -11,6 +11,7 @@ import '../models/budget.dart';
 import '../models/account.dart';
 import '../models/transaction.dart';
 import '../providers/transaction_provider.dart';
+import '../widgets/decrypted_value.dart';
 import 'package:intl/intl.dart';
 
 class InsightsScreen extends ConsumerStatefulWidget {
@@ -31,53 +32,62 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBF9),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 300,
-            floating: false,
-            pinned: true,
-            elevation: 0,
-            backgroundColor: const Color(0xFFFBFBF9),
-            iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
-            flexibleSpace: FlexibleSpaceBar(
-              background: accountsAsync.when(
-                data: (accounts) => _buildNetWorthChart(accounts),
-                loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
-                error: (_, __) => const Center(child: Icon(LucideIcons.alertTriangle, color: Color(0xFF1A1A1A))),
+      body: RefreshIndicator(
+        color: const Color(0xFF4A6741),
+        onRefresh: () async {
+           await ref.read(accountsProvider.notifier).refresh();
+           await ref.read(budgetsProvider.notifier).refresh();
+           ref.invalidate(transactionsProvider);
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 300,
+              floating: false,
+              pinned: true,
+              elevation: 0,
+              backgroundColor: const Color(0xFFFBFBF9),
+              iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
+              flexibleSpace: FlexibleSpaceBar(
+                background: accountsAsync.when(
+                  data: (accounts) => _buildNetWorthChart(accounts, transactionsAsync.value ?? []),
+                  loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                  error: (_, __) => const Center(child: Icon(LucideIcons.alertTriangle, color: Color(0xFF1A1A1A))),
+                ),
+              ),
+              title: Text("Resoconto", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildToggleHeader(),
+                    const SizedBox(height: 32),
+                    _buildBurnRateSection(transactionsAsync.value ?? []),
+                    const SizedBox(height: 32),
+                    _buildCashFlowSection(transactionsAsync.value ?? []),
+                    const SizedBox(height: 40),
+                    Text("DISTRIBUZIONE SPESE", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.4))),
+                    const SizedBox(height: 20),
+                    budgetsAsync.when(
+                      data: (budgets) => _buildTopCategoriesSection(budgets),
+                      loading: () => const LinearProgressIndicator(color: Color(0xFF4A6741), backgroundColor: Color(0xFFF2F2F0)),
+                      error: (_, __) => const Text("Impossibile caricare i dati"),
+                    ),
+                  ],
+                ),
               ),
             ),
-            title: Text("Resoconto", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildToggleHeader(),
-                  const SizedBox(height: 32),
-                  _buildBurnRateSection(transactionsAsync.value ?? []),
-                  const SizedBox(height: 32),
-                  _buildCashFlowSection(transactionsAsync.value ?? []),
-                  const SizedBox(height: 40),
-                  Text("DISTRIBUZIONE SPESE", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.4))),
-                  const SizedBox(height: 20),
-                  budgetsAsync.when(
-                    data: (budgets) => _buildTopCategoriesSection(budgets),
-                    loading: () => const LinearProgressIndicator(color: Color(0xFF4A6741), backgroundColor: Color(0xFFF2F2F0)),
-                    error: (_, __) => const Text("Impossibile caricare i dati"),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildNetWorthChart(List<Account> accounts) {
+  Widget _buildNetWorthChart(List<Account> accounts, List<TransactionModel> transactions) {
     double netWorth = 0;
     for (var acc in accounts) {
       netWorth += double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
@@ -87,29 +97,46 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
       padding: const EdgeInsets.fromLTRB(24, 100, 24, 20),
       child: Column(
         children: [
-          Text(
-            "${netWorth.toStringAsFixed(2)} €",
+          DecryptedValue(
+            value: netWorth.toStringAsFixed(2),
+            isLarge: true,
             style: GoogleFonts.lora(fontSize: 40, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+            suffix: " €",
           ),
+          const SizedBox(height: 8),
           Text(
             "PATRIMONIO NETTO",
-            style: GoogleFonts.inter(letterSpacing: 3, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+            style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
           ),
           const SizedBox(height: 30),
           Expanded(
             child: LineChart(
               LineChartData(
                 gridData: const FlGridData(show: false),
-                titlesData: const FlTitlesData(show: false),
+                titlesData: const FlTitlesData(
+                  show: true,
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 30,
+                      interval: 1,
+                      getTitlesWidget: (value, meta) => const SizedBox(),
+                    ),
+                  ),
+                ),
                 borderData: FlBorderData(show: false),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: const Color(0xFF1A1A1A),
+                    tooltipBgColor: const Color(0xFF1A1A1A).withOpacity(0.8),
+                    tooltipRoundedRadius: 8,
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(
-                          "${spot.y.toStringAsFixed(0)} €",
-                          GoogleFonts.lora(color: Colors.white, fontWeight: FontWeight.bold),
+                          "${spot.y.toStringAsFixed(2)} €",
+                          GoogleFonts.lora(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                         );
                       }).toList();
                     },
@@ -117,11 +144,11 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                 ),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: _generateDynamicSpots(netWorth),
+                    spots: _generateDynamicSpots(netWorth, transactions),
                     isCurved: true,
                     curveSmoothness: 0.3,
                     color: const Color(0xFF4A6741),
-                    barWidth: 2,
+                    barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
@@ -130,7 +157,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFF4A6741).withOpacity(0.1),
+                          const Color(0xFF4A6741).withOpacity(0.15),
                           const Color(0xFF4A6741).withOpacity(0.0),
                         ],
                       ),
@@ -145,13 +172,41 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     );
   }
 
-  List<FlSpot> _generateDynamicSpots(double current) {
-    return [
-      FlSpot(0, current * 0.95), FlSpot(1, current * 0.96),
-      FlSpot(2, current * 0.94), FlSpot(3, current * 0.97),
-      FlSpot(4, current * 0.98), FlSpot(5, current * 0.99),
-      FlSpot(6, current),
-    ];
+  List<FlSpot> _generateDynamicSpots(double current, List<TransactionModel> transactions) {
+    if (transactions.isEmpty) {
+      return [
+        FlSpot(0, current * 0.98), FlSpot(1, current * 0.99),
+        FlSpot(2, current * 0.97), FlSpot(3, current * 0.98),
+        FlSpot(4, current * 0.99), FlSpot(5, current * 0.995),
+        FlSpot(6, current),
+      ];
+    }
+
+    // Sort transactions by date
+    final sortedTxs = List<TransactionModel>.from(transactions)
+      ..sort((a, b) => a.bookingDate.compareTo(b.bookingDate));
+
+    // Calculate historical net worth by subtracting transaction amounts backwards
+    List<FlSpot> spots = [];
+    double runningNetWorth = current;
+    spots.add(FlSpot(6, runningNetWorth));
+
+    final now = DateTime.now();
+    for (int i = 1; i <= 6; i++) {
+        final dayStart = now.subtract(Duration(days: i));
+        final dayEnd = now.subtract(Duration(days: i - 1));
+        
+        final daysTransactions = transactions.where((tx) => 
+          tx.bookingDate.isAfter(dayStart) && tx.bookingDate.isBefore(dayEnd));
+        
+        for (var tx in daysTransactions) {
+             // To go back in time, subtract income and add back expenses
+             runningNetWorth -= tx.amount;
+        }
+        spots.add(FlSpot((6 - i).toDouble(), runningNetWorth));
+    }
+
+    return spots.reversed.toList();
   }
 
   Widget _buildToggleHeader() {
