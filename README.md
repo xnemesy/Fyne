@@ -1,46 +1,35 @@
 # Fyne - Zero-Knowledge Financial Intelligence
 
-Fyne is a premium financial intelligence application built with a **Zero-Knowledge** architecture. It prioritizes absolute privacy, sophisticated aesthetics, and real-time insights without ever exposing your financial life to the server in clear text.
+Fyne è un'applicazione di personal finance premium costruita su un'architettura **Zero-Knowledge**. Priorità assoluta alla privacy, estetica sofisticata e insights in tempo reale senza mai esporre i propri dati finanziari al server in chiaro.
 
-## 🚀 Features & Status (v1.0.0-stable)
-- **Neo-Minimalist Editorial UI**: A high-end aesthetic inspired by editorial design. Palette: Paper White (`#FBFBF9`), Deep Sage Green (`#4A6741`), Charcoal Grey (`#1A1A1A`).
-- **Zero-Knowledge Architecture**: Financial data is encrypted locally using AES-256 (PBKDF2) before syncing. No clear-text transaction descriptions or amounts are stored on the server.
-- **Local Smart Categorization**: An on-device engine (Rule-based + ML) maps transactions to categories using deterministic UUIDs (v5) for cross-device consistency.
-- **iOS TestFlight Ready**: Successfully archived and deployed with Bundle ID `app.fyne.ios`.
-- **Backend v11.0.0**: High-performance Node.js/Express layer on Google Cloud Run with automated PostgreSQL schema migrations.
+## 🚀 Funzionalità & Stato (v1.1.0-stable)
+- **Dinamiche MoneyWiz**: Gestione del saldo atomica e precisa. Le spese sono evidenziate in rosso e i saldi dei conti si aggiornano istantaneamente al salvataggio delle transazioni.
+- **Neo-Minimalist Editorial UI**: Estetica di alto livello ispirata al design editoriale. Palette core: Paper White (`#FBFBF9`), Deep Sage Green (`#4A6741`), Red Alert (`#D63031`).
+- **Zero-Knowledge Architecture**: I dati finanziari vengono cifrati localmente (AES-256 per inserimenti manuali, RSA per sync bancario). Nessun dato sensibile tocca il server non cifrato.
+- **Privacy Mode**: Funzione "Shield" integrata per oscurare i dati sensibili con un effetto blur cinematografico.
+- **Insights Avanzati**: Analisi del patrimonio netto (Net Worth) con grafici interattivi e calcolo storico basato sul registro transazioni.
+- **Supporto OCR**: Scansione intelligente degli scontrini per l'inserimento rapido.
 
-## 🛠️ Project Structure
-- `/frontend`: Flutter application. Uses Isar for local encrypted storage and Riverpod for state management.
-- `/backend`: Node.js server. Handles encrypted transaction syncing and GoCardless (Nordigen) bank integration.
-- `/docs`: Contains ASO metadata, deployment logs, and UI preview mocks.
+## 🛠️ Struttura del Progetto
+- `/frontend`: Applicazione Flutter. Utilizza **Riverpod** per la gestione dello stato e **Cryptography** per la sicurezza on-device.
+- `/backend`: Server Node.js/Express. Gestisce la sincronizzazione dei dati cifrati e l'integrazione bancaria (GoCardless/Nordigen).
+- `/infrastructure`: Script di deployment per Google Cloud (Run & SQL).
 
 ## 📱 Getting Started (Frontend)
-1. **Infrastructure**:
+1. **Configurazione**:
    ```bash
    cd frontend
    flutter pub get
-   # Code generation for Isar and Riverpod
-   dart run build_runner build --delete-conflicting-outputs
    ```
 2. **iOS Build**:
-   - Open `ios/Runner.xcworkspace` in Xcode.
-   - Deployment target: iOS 13.0+.
+   - Assicurarsi di aver eseguito `pod install` nella cartella `ios`.
+   - Il progetto è configurato per gestire automaticamente i link non-modulari per framework come TensorFlow e MLKit.
    - Bundle ID: `app.fyne.ios`.
-   - Ensure `Allow Non-modular Includes in Framework Modules` is set to **YES** in Build Settings.
 
-## 🛠️ Backend Setup
-1. **Deploy to Cloud Run**:
-   ```bash
-   gcloud run deploy banking-abstraction-layer --source ./backend
-   ```
-2. **DB Schema**: PostgreSQL tables for `accounts`, `transactions`, and `budgets` are initialized automatically on startup.
-
-## 🤖 Handover Info (For External Agents)
-If you are taking over this task, please note the following critical implementation details:
-- **Encryption**: Always use `CryptoService` for any financial field. Never send raw descriptions to the `/api/transactions` endpoints.
-- **Categorization**: Use the deterministic UUID v5 generator in `CategorizationService` to ensure the backend can aggregate data without knowing the category names.
-- **iOS Issues**: If you encounter "non-modular header" errors in CocoaPods, verify the `post_install` hook in the `Podfile` matches the current configuration (allows non-modular includes).
-- **TFLite**: A placeholder `category_model.tflite` exists in `assets/models/` to satisfy build dependencies until the production model is trained.
+## 🛡️ Handover & Sicurezza (Per Sviluppatori)
+- **Encryption Flow**: Utilizzare sempre `CryptoService` prima di qualsiasi chiamata API che coinvolga importi o descrizioni. 
+- **Atomic Updates**: Quando si salva una transazione manuale, calcolare sempre il `encryptedNewBalance` lato client per mantenere la coerenza del saldo senza che il server debba decifrare i dati.
+- **Theme**: Rispettare rigorosamente il sistema di font (Lora per i titoli/numeri grandi, Inter per i dati tecnici).
 
 ---
-**Privacy Policy**: Fyne does NOT link financial data to user identity. All "Intelligence" features are processed locally on the user's silicon.
+**Privacy First**: Fyne NON collega l'identità dell'utente ai dati finanziari. Tutte le funzionalità di "Intelligence" avvengono sul silicio locale dell'utente.

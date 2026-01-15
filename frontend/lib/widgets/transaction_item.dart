@@ -12,7 +12,7 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(locale: 'it_IT', symbol: '€');
-    final dateFormat = DateFormat('dd MMM');
+    final dateFormat = DateFormat('dd MMM yyyy • HH:mm');
 
     IconData getIcon() {
       switch (transaction.categoryName) {
@@ -75,7 +75,7 @@ class TransactionItem extends StatelessWidget {
             style: GoogleFonts.lora(
               fontWeight: FontWeight.bold,
               fontSize: 15,
-              color: transaction.amount > 0 ? const Color(0xFF4A6741) : const Color(0xFF1A1A1A),
+              color: transaction.amount > 0 ? const Color(0xFF4A6741) : const Color(0xFFD63031), // Red for expenses
             ),
           ),
         ],

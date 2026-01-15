@@ -11,6 +11,7 @@ const bankingRouter = require('./routes/banking');
 const accountsRouter = require('./routes/accounts');
 const transactionsRouter = require('./routes/transactions');
 const budgetsRouter = require('./routes/budgets');
+const usersRouter = require('./routes/users');
 const testRouter = require('./routes/test');
 
 app.use(cors());
@@ -21,6 +22,7 @@ app.use('/api/banking', bankingRouter);
 app.use('/api/accounts', accountsRouter);
 app.use('/api/transactions', transactionsRouter);
 app.use('/api/budgets', budgetsRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/test', testRouter);
 
 app.get('/', (req, res) => {

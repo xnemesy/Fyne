@@ -15,18 +15,21 @@ router.post('/manual', verifyToken, async (req, res) => {
     encryptedDescription,
     encryptedCounterParty,
     categoryUuid,
-    date
+    date,
+    encryptedNewBalance
   } = req.body;
 
   if (!accountId || !amount || !categoryUuid) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  const client = await db.pool.connect();
   try {
+    await client.query('BEGIN');
     await db.ensureUser(req.user.uid);
 
-    // We use a custom insert for manual transactions to handle the specific fields
-    const query = `
+    // 1. Insert Transaction
+    const txQuery = `
       INSERT INTO transactions (
         account_id, user_id, amount, currency, 
         encrypted_description, encrypted_counter_party, category_uuid, 
@@ -35,10 +38,9 @@ router.post('/manual', verifyToken, async (req, res) => {
       RETURNING id
     `;
 
-    // For manual transactions, we generate a unique local external_id
     const externalId = `manual_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    const result = await db.query(query, [
+    const txResult = await client.query(txQuery, [
       accountId,
       req.user.uid,
       amount,
@@ -50,13 +52,26 @@ router.post('/manual', verifyToken, async (req, res) => {
       externalId
     ]);
 
+    // 2. Optionally update Account Balance (Client-calculated & encrypted)
+    if (encryptedNewBalance) {
+      await client.query(
+        'UPDATE accounts SET encrypted_balance = $1 WHERE id = $2 AND user_id = $3',
+        [encryptedNewBalance, accountId, req.user.uid]
+      );
+    }
+
+    await client.query('COMMIT');
+
     res.json({
-      id: result.rows[0].id,
-      message: 'Transaction saved and budgets updated via trigger'
+      id: txResult.rows[0].id,
+      message: 'Transaction saved and balance updated'
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Manual Transaction Error:', error);
     res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
   }
 });
 

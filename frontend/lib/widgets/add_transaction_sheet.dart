@@ -237,22 +237,31 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       // 2. Use suggested category or fallback
       final categoryUuid = _suggestedCategoryUuid ?? "550e8400-e29b-41d4-a716-446655440000"; 
       
-      // 3. Get proper account ID
-      final accId = _selectedAccount?.id ?? (accounts.isNotEmpty ? accounts.first.id : "none");
+      // 3. Get proper account ID/Account
+      final selectedAcc = _selectedAccount ?? (accounts.isNotEmpty ? accounts.first : null);
+      if (selectedAcc == null) throw Exception("No account selected");
 
-      // 4. Send to backend
+      // 4. Calculate New Balance (MoneyWiz dynamic)
+      final amount = double.parse(_amountController.text);
+      final currentBal = double.tryParse(selectedAcc.decryptedBalance ?? '0') ?? 0;
+      final newBal = currentBal - amount; // Expense subtracts from balance
+      final encryptedNewBalance = await crypto.encrypt(newBal.toStringAsFixed(2), masterKey);
+
+      // 5. Send to backend
       await api.post('/api/transactions/manual', data: {
-        'accountId': accId,
-        'amount': double.parse(_amountController.text),
+        'accountId': selectedAcc.id,
+        'amount': -amount, // Save as negative for expense
         'currency': 'EUR',
         'encryptedDescription': encryptedDesc,
         'categoryUuid': categoryUuid,
         'date': DateTime.now().toIso8601String(),
+        'encryptedNewBalance': encryptedNewBalance,
       });
 
-      // 5. Update UI 
+      // 6. Update UI 
       ref.invalidate(accountsProvider);
       ref.invalidate(budgetsProvider);
+      ref.invalidate(transactionsProvider);
 
       Navigator.pop(context);
       
