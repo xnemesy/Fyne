@@ -49,6 +49,9 @@ PODS:
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
+  - flutter_secure_storage_darwin (10.0.0):
+    - Flutter
+    - FlutterMacOS
   - google_mlkit_commons (0.5.0):
     - Flutter
     - MLKitVision
@@ -145,7 +148,11 @@ PODS:
   - printing (1.0.0):
     - Flutter
   - PromisesObjC (2.4.0)
+  - proximity_sensor (0.0.1):
+    - Flutter
   - RecaptchaInterop (100.0.0)
+  - sensors_plus (0.0.1):
+    - Flutter
   - share_plus (0.0.1):
     - Flutter
   - TensorFlowLiteC (2.12.0):
@@ -170,6 +177,8 @@ PODS:
     - TensorFlowLiteSwift (= 2.12.0)
     - TensorFlowLiteSwift/CoreML (= 2.12.0)
     - TensorFlowLiteSwift/Metal (= 2.12.0)
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -177,6 +186,7 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_secure_storage_darwin (from `.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
   - google_mlkit_commons (from `.symlinks/plugins/google_mlkit_commons/ios`)
   - google_mlkit_text_recognition (from `.symlinks/plugins/google_mlkit_text_recognition/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
@@ -184,8 +194,11 @@ DEPENDENCIES:
   - local_auth_darwin (from `.symlinks/plugins/local_auth_darwin/darwin`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - printing (from `.symlinks/plugins/printing/ios`)
+  - proximity_sensor (from `.symlinks/plugins/proximity_sensor/ios`)
+  - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - tflite_flutter (from `.symlinks/plugins/tflite_flutter/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -224,6 +237,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_secure_storage_darwin:
+    :path: ".symlinks/plugins/flutter_secure_storage_darwin/darwin"
   google_mlkit_commons:
     :path: ".symlinks/plugins/google_mlkit_commons/ios"
   google_mlkit_text_recognition:
@@ -238,10 +253,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   printing:
     :path: ".symlinks/plugins/printing/ios"
+  proximity_sensor:
+    :path: ".symlinks/plugins/proximity_sensor/ios"
+  sensors_plus:
+    :path: ".symlinks/plugins/sensors_plus/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   tflite_flutter:
     :path: ".symlinks/plugins/tflite_flutter/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
@@ -256,6 +277,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 88950ba9485052891ebe26f6c43a52bb62248952
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
+  flutter_secure_storage_darwin: acdb3f316ed05a3e68f856e0353b133eec373a23
   google_mlkit_commons: 8c42b5f6f6b7efa19adaf7e32613abf59bba88ad
   google_mlkit_text_recognition: abd8120859a0f202888d81d76d676000d1b54939
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
@@ -276,12 +298,15 @@ SPEC CHECKSUMS:
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   printing: 54ff03f28fe9ba3aa93358afb80a8595a071dd07
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  proximity_sensor: 2aef59f90cf0382935faf58ad0a79e1e860773bd
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  sensors_plus: 6a11ed0c2e1d0bd0b20b4029d3bad27d96e0c65b
   share_plus: de6030e33b4e106470e09322d87cf2a4258d2d1d
   TensorFlowLiteC: 20785a69299185a379ba9852b6625f00afd7984a
   TensorFlowLiteSwift: 3a4928286e9e35bdd3e17970f48e53c80d25e793
   tflite_flutter: 64b192e11352fe36943ab6656e1d49207f1a5595
+  url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
-PODFILE CHECKSUM: 84d23662f0f55dcbb0896e2ae36ca2f71f29f944
+PODFILE CHECKSUM: a82e7421c510d1cd0f595b572a3fe58d8f75764d
 
 COCOAPODS: 1.16.2

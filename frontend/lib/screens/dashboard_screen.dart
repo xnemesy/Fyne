@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/budget_provider.dart';
+import '../providers/transaction_provider.dart';
 import '../widgets/budget_card.dart';
 import '../widgets/add_transaction_sheet.dart';
 import '../widgets/daily_indicator.dart';
@@ -96,7 +97,7 @@ class DashboardScreen extends ConsumerWidget {
                   ref.read(privacyProvider.notifier).togglePrivacyFilter(!ref.read(privacyProvider).isSettingsEnabled);
                 },
                 icon: Icon(
-                  ref.watch(privacyProvider).isSettingsEnabled ? LucideIcons.shieldCheck : LucideIcons.shieldCross, 
+                  ref.watch(privacyProvider).isSettingsEnabled ? LucideIcons.shieldCheck : LucideIcons.shieldOff, 
                   color: const Color(0xFF4A6741), 
                   size: 20
                 ),
@@ -282,6 +283,8 @@ class DashboardScreen extends ConsumerWidget {
         label: Text("NUOVA SPESA", style: GoogleFonts.inter(fontWeight: FontWeight.w700, letterSpacing: 1, fontSize: 13)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
+    );
+      },
     );
   }
 

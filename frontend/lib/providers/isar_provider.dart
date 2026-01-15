@@ -7,11 +7,7 @@ import '../services/scheduler_service.dart';
 final isarProvider = FutureProvider<Isar>((ref) async {
   final dir = await getApplicationDocumentsDirectory();
   return Isar.open(
-    [CategoryOverrideSchema, PlannedTransactionSchema],
+    [PlannedTransactionSchema],
     directory: dir.path,
   );
-});
-
-final categorizationServiceProvider = Provider.family<CategorizationService, Isar>((ref, isar) {
-  return CategorizationService(isar);
 });

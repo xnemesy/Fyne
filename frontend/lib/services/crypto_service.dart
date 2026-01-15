@@ -71,8 +71,18 @@ class CryptoService {
 
   /// Decrypts a Base64 string encrypted with our Public Key by the backend.
   Future<String> decryptWithPrivateKey(String base64Data) async {
-    if (_rsaPrivateKey == null) throw Exception("RSA Private Key not initialized");
+    if (_rsaPrivateKey == null) {
+      await getOrGeneratePublicKey();
+    }
     return _rsaPrivateKey!.decrypt(base64Data);
+  }
+  
+  /// Helper for testing: Encrypts data as if the backend did it
+  Future<String> encryptWithSelfPublicKey(String text) async {
+     if (_rsaPrivateKey == null) {
+      await getOrGeneratePublicKey();
+    }
+    return _rsaPrivateKey!.publicKey.encrypt(text);
   }
 
   /// Decrypts a Base64 string using a derived key.

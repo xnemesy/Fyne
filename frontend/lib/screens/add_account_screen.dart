@@ -172,6 +172,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           ),
         );
       }).toList(),
+      ],
     );
   }
 
