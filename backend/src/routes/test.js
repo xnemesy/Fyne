@@ -197,4 +197,75 @@ router.get('/simulate-auth', (req, res) => {
     `);
 });
 
+/**
+ * @route POST /api/test/stress-data
+ * @desc Stress Test: Generate 200 realistic Italian transactions encrypted with RSA
+ */
+router.post('/stress-data', async (req, res) => {
+    const { userUid } = req.body;
+    if (!userUid) return res.status(400).json({ error: 'userUid is required' });
+
+    try {
+        // 1. Get user public key
+        const userResult = await db.query('SELECT public_key FROM users WHERE uid = $1', [userUid]);
+        const user = userResult.rows[0];
+        if (!user || !user.public_key) return res.status(400).json({ error: 'User not found or public key missing' });
+
+        // 2. Ensure an account exists
+        const accountResult = await db.query('SELECT id FROM accounts WHERE user_id = $1 LIMIT 1', [userUid]);
+        let accountId;
+        if (accountResult.rows.length === 0) {
+            accountId = await db.saveAccount(userUid, {
+                encryptedName: encryptWithPublicKey("Conto Stress Test", user.public_key),
+                encryptedBalance: encryptWithPublicKey("50000.00", user.public_key),
+                providerId: 'STRESS_TEST_AUTO'
+            });
+        } else {
+            accountId = accountResult.rows[0].id;
+        }
+
+        const realisticData = [
+            { desc: "Esselunga Milano", cat: "Alimentari" },
+            { desc: "Lidl Roma", cat: "Alimentari" },
+            { desc: "Carrefour Express", cat: "Alimentari" },
+            { desc: "Netflix Monthly", cat: "Abbonamenti" },
+            { desc: "Spotify Premium", cat: "Abbonamenti" },
+            { desc: "Disney Plus", cat: "Abbonamenti" },
+            { desc: "Virgin Active City", cat: "Wellness" },
+            { desc: "Farmacia Centrale", cat: "Wellness" },
+            { desc: "Amazon IT Order", cat: "Shopping" },
+            { desc: "Zalando Reso", cat: "Shopping" },
+            { desc: "Benzina Eni", cat: "Trasporti" },
+            { desc: "Biglietto Trenitalia", cat: "Trasporti" },
+            { desc: "Uber Black", cat: "Trasporti" },
+            { desc: "McDonalds Drive", cat: "Fast Food" },
+            { desc: "Poke House", cat: "Fast Food" },
+            { desc: "Scommesse Snai", cat: "Vizi" },
+            { desc: "Tabacchi n.12", cat: "Vizi" }
+        ];
+
+        const transactions = [];
+        const now = new Date();
+        for (let i = 0; i < 200; i++) {
+            const entry = realisticData[Math.floor(Math.random() * realisticData.length)];
+            const date = new Date(now.getTime() - (Math.random() * 30 * 24 * 60 * 60 * 1000));
+
+            transactions.push({
+                amount: -(Math.random() * 120 + 5).toFixed(2),
+                currency: 'EUR',
+                description: encryptWithPublicKey(`${entry.desc} #${i}`, user.public_key),
+                counterPartyName: encryptWithPublicKey("Esercente stress test", user.public_key),
+                categoryUuid: '550e8400-e29b-41d4-a716-446655440000',
+                bookingDate: date.toISOString().split('T')[0],
+                externalId: `stress_${Date.now()}_${i}`
+            });
+        }
+
+        await db.saveTransactions(userUid, accountId, transactions);
+        res.json({ message: 'Stress test data (200 TX) seeded successfully!', count: 200 });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 module.exports = router;

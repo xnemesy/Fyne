@@ -1032,6 +1032,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.14.2"
+  proximity_sensor:
+    dependency: "direct main"
+    description:
+      name: proximity_sensor
+      sha256: aea20f05a697b7e709434073f624a7682e3a7a64a20e7785cfbab87b94b9a100
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.9"
   pub_semver:
     dependency: transitive
     description:
@@ -1096,6 +1104,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  sensors_plus:
+    dependency: "direct main"
+    description:
+      name: sensors_plus
+      sha256: "56e8cd4260d9ed8e00ecd8da5d9fdc8a1b2ec12345a750dfa51ff83fcf12e3fa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
+  sensors_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: sensors_plus_platform_interface
+      sha256: "58815d2f5e46c0c41c40fb39375d3f127306f7742efe3b891c0b1c87e2b5cd5d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   share_plus:
     dependency: "direct main"
     description:
@@ -1325,6 +1349,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  visibility_detector:
+    dependency: "direct main"
+    description:
+      name: visibility_detector
+      sha256: dd5cc11e13494f432d15939c3aa8ae76844c42b723398643ce9addb88a5ed420
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0+2"
   vm_service:
     dependency: transitive
     description:

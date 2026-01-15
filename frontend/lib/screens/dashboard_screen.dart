@@ -12,7 +12,15 @@ import '../providers/notification_scheduler.dart';
 import '../providers/budget_overrun_handler.dart';
 import '../widgets/budget_transfer_sheet.dart';
 import '../widgets/daily_allowance_widget.dart';
-import '../widgets/health_alert_widget.dart';
+import '../widgets/financial_insight_card.dart';
+import '../widgets/transaction_item.dart';
+import '../widgets/decrypted_value.dart';
+import '../widgets/compact_cash_flow_chart.dart';
+import '../widgets/subscription_list.dart';
+import '../providers/account_provider.dart';
+import '../providers/privacy_provider.dart';
+import '../models/account.dart';
+import 'terminal_mode_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -20,12 +28,30 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetsAsync = ref.watch(budgetsProvider);
+    final accountsAsync = ref.watch(accountsProvider);
+    final transactionsAsync = ref.watch(transactionsProvider);
+    
     ref.watch(notificationSchedulerProvider);
     ref.watch(budgetOverrunHandlerProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
-      body: CustomScrollView(
+    double totalBalance = 0;
+    if (accountsAsync.hasValue) {
+      for (var acc in accountsAsync.value!) {
+        totalBalance += double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
+      }
+    }
+
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.landscape) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _navigateToTerminal(context, accountsAsync.value ?? []);
+          });
+        }
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFFBFBF9),
+          body: CustomScrollView(
         slivers: [
           // Minimalist Editorial Header
           SliverAppBar(
@@ -34,7 +60,6 @@ class DashboardScreen extends ConsumerWidget {
             pinned: true,
             elevation: 0,
             scrolledUnderElevation: 0,
-            backgroundColor: const Color(0xFFFBFBF9),
             flexibleSpace: FlexibleSpaceBar(
               background: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 100, 25, 20),
@@ -42,18 +67,22 @@ class DashboardScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Bentornato,",
+                      "PATRIMONIO NETTO",
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF1A1A1A).withOpacity(0.5),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "La tua situazione",
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontSize: 32,
+                    const SizedBox(height: 8),
+                    DecryptedValue(
+                      value: totalBalance == 0 && !accountsAsync.hasValue ? null : totalBalance.toStringAsFixed(2),
+                      isLarge: true,
+                      style: GoogleFonts.lora(
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1A1A),
                         letterSpacing: -1,
                       ),
                     ),
@@ -62,6 +91,17 @@ class DashboardScreen extends ConsumerWidget {
               ),
             ),
             actions: [
+              IconButton(
+                onPressed: () {
+                  ref.read(privacyProvider.notifier).togglePrivacyFilter(!ref.read(privacyProvider).isSettingsEnabled);
+                },
+                icon: Icon(
+                  ref.watch(privacyProvider).isSettingsEnabled ? LucideIcons.shieldCheck : LucideIcons.shieldCross, 
+                  color: const Color(0xFF4A6741), 
+                  size: 20
+                ),
+                tooltip: "Privacy Blur",
+              ),
               IconButton(
                 onPressed: () {
                   showModalBottomSheet(
@@ -73,6 +113,20 @@ class DashboardScreen extends ConsumerWidget {
                 },
                 icon: const Icon(LucideIcons.arrowLeftRight, color: Color(0xFF4A6741), size: 20),
                 tooltip: "Trasferisci budget",
+              ),
+              IconButton(
+                onPressed: () async {
+                  final api = ref.read(apiServiceProvider);
+                  try {
+                    await api.post('/api/banking/debug/seed-load-test');
+                    ref.invalidate(transactionsProvider);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Seed di 200 transazioni completato!")));
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Errore durante il seed")));
+                  }
+                },
+                icon: const Icon(LucideIcons.beaker, color: Color(0xFF1A1A1A), size: 20),
+                tooltip: "Load Test (RSA Performance)",
               ),
               IconButton(
                 onPressed: () {
@@ -97,8 +151,31 @@ class DashboardScreen extends ConsumerWidget {
               child: DailyAllowanceWidget(),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: HealthAlertWidget(),
+
+          SliverToBoxAdapter(
+            child: transactionsAsync.when(
+              data: (txs) => FinancialInsightCard(transactions: txs),
+              loading: () => const SizedBox(),
+              error: (_, __) => const SizedBox(),
+            ),
+          ),
+
+          // Cash Flow Chart
+          SliverToBoxAdapter(
+            child: transactionsAsync.when(
+              data: (txs) => CompactCashFlowChart(transactions: txs),
+              loading: () => const SizedBox(),
+              error: (_, __) => const SizedBox(),
+            ),
+          ),
+
+          // Smart Subscription List
+          SliverToBoxAdapter(
+            child: transactionsAsync.when(
+              data: (txs) => SubscriptionList(transactions: txs),
+              loading: () => const SizedBox(),
+              error: (_, __) => const SizedBox(),
+            ),
           ),
 
           // Budget List (Bento Grid)
@@ -131,6 +208,60 @@ class DashboardScreen extends ConsumerWidget {
               ),
             ),
           ),
+
+          // Recent Transactions Header
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(25, 20, 25, 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "TRANSAZIONI RECENTI",
+                    style: GoogleFonts.inter(
+                      letterSpacing: 1.5,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _navigateTo(context, const WalletScreen());
+                    },
+                    child: Text(
+                      "VEDI TUTTE",
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF4A6741),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Recent Transactions List
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: transactionsAsync.when(
+              data: (transactions) {
+                final recent = transactions.take(5).toList();
+                if (recent.isEmpty) return const SliverToBoxAdapter(child: SizedBox());
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => TransactionItem(transaction: recent[index]),
+                    childCount: recent.length,
+                  ),
+                );
+              },
+              loading: () => const SliverToBoxAdapter(child: SizedBox()),
+              error: (_, __) => const SliverToBoxAdapter(child: SizedBox()),
+            ),
+          ),
+
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
@@ -186,6 +317,19 @@ class DashboardScreen extends ConsumerWidget {
           child: Text("Configura Budget", style: GoogleFonts.inter(color: const Color(0xFF4A6741), fontWeight: FontWeight.bold)),
         ),
       ],
+    );
+  }
+
+  void _navigateToTerminal(BuildContext context, List<Account> accounts) {
+    if (Navigator.canPop(context)) return; // Avoid multiple pushes
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => TerminalModeScreen(accounts: accounts),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
     );
   }
 }

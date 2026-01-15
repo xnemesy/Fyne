@@ -410,4 +410,72 @@ router.post('/webhook/tink', async (req, res) => {
     res.status(200).send('OK');
 });
 
+/**
+ * @route POST /api/banking/debug/seed-load-test
+ * @desc Generate 200 historical transactions for RSA performance stress testing
+ */
+router.post('/debug/seed-load-test', verifyToken, async (req, res) => {
+    try {
+        const user = await db.query('SELECT public_key FROM users WHERE uid = $1', [req.user.uid]);
+        const publicKey = user.rows[0].public_key;
+        if (!publicKey) return res.status(400).json({ error: 'Public key missing' });
+
+        const accounts = await db.query('SELECT id FROM accounts WHERE user_id = $1 LIMIT 1', [req.user.uid]);
+        let accountId;
+        if (accounts.rows.length === 0) {
+            accountId = await db.saveAccount(req.user.uid, {
+                encryptedName: encryptWithPublicKey("Conto Stress Test", publicKey),
+                encryptedBalance: encryptWithPublicKey("25000.00", publicKey),
+                providerId: 'STRESS_TEST_ACC'
+            });
+        } else {
+            accountId = accounts.rows[0].id;
+        }
+
+        const realisticData = [
+            { desc: "Esselunga Milano", cat: "Alimentari" },
+            { desc: "Lidl Roma", cat: "Alimentari" },
+            { desc: "Carrefour Express", cat: "Alimentari" },
+            { desc: "Netflix Monthly", cat: "Abbonamenti" },
+            { desc: "Spotify Premium", cat: "Abbonamenti" },
+            { desc: "Disney Plus", cat: "Abbonamenti" },
+            { desc: "Virgin Active City", cat: "Wellness" },
+            { desc: "Farmacia Centrale", cat: "Wellness" },
+            { desc: "Amazon IT Order", cat: "Shopping" },
+            { desc: "Zalando Reso", cat: "Shopping" },
+            { desc: "Benzina Eni", cat: "Trasporti" },
+            { desc: "Biglietto Trenitalia", cat: "Trasporti" },
+            { desc: "Uber Black", cat: "Trasporti" },
+            { desc: "McDonalds Drive", cat: "Fast Food" },
+            { desc: "Poke House", cat: "Fast Food" },
+            { desc: "Scommesse Snai", cat: "Vizi" },
+            { desc: "Tabacchi n.12", cat: "Vizi" }
+        ];
+
+        const transactions = [];
+        const now = new Date();
+        for (let i = 0; i < 200; i++) {
+            const entry = realisticData[Math.floor(Math.random() * realisticData.length)];
+            // Spread over last 30 days
+            const date = new Date(now.getTime() - (Math.random() * 30 * 24 * 60 * 60 * 1000));
+
+            transactions.push({
+                amount: -(Math.random() * 150 + 2).toFixed(2),
+                currency: 'EUR',
+                description: encryptWithPublicKey(`${entry.desc} #${i}`, publicKey),
+                counterPartyName: encryptWithPublicKey("Esercente Verificato", publicKey),
+                categoryUuid: '550e8400-e29b-41d4-a716-446655440000', // Default, local categorizer will handle it
+                bookingDate: date.toISOString().split('T')[0],
+                externalId: `stress_test_${Date.now()}_${i}`
+            });
+        }
+
+        await db.saveTransactions(req.user.uid, accountId, transactions);
+        console.log(`✅ Stress Test Seeded: 200 transactions for ${req.user.uid}`);
+        res.json({ message: 'Stress test data (200 TX) seeded successfully!', count: 200 });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

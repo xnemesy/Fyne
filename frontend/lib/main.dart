@@ -10,6 +10,7 @@ import 'package:cryptography/cryptography.dart';
 import 'dart:convert';
 import 'providers/budget_provider.dart';
 import 'providers/sync_provider.dart';
+import 'widgets/privacy_blur_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,7 +78,9 @@ class FyneApp extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
       ),
-      home: const InitializationWrapper(child: DashboardScreen()),
+      home: const PrivacyBlurOverlay(
+        child: InitializationWrapper(child: DashboardScreen()),
+      ),
     );
   }
 }

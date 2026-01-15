@@ -7,6 +7,7 @@ import '../models/account.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'add_account_screen.dart';
+import 'transactions_screen.dart';
 import '../widgets/crypto_account_card.dart';
 
 class WalletScreen extends ConsumerWidget {
@@ -75,81 +76,91 @@ class WalletScreen extends ConsumerWidget {
     if (account.type == AccountType.investment) typeIcon = LucideIcons.trendingUp;
     if (account.type == AccountType.loan) typeIcon = LucideIcons.coins;
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TransactionsScreen(accountId: account.id),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                account.decryptedName ?? "Conto Bancario",
-                style: GoogleFonts.lora(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1A1A1A),
-                ),
-              ),
-              Icon(typeIcon, color: const Color(0xFF4A6741), size: 20),
-            ],
-          ),
-          const SizedBox(height: 40),
-          Text(
-            "SALDO DISPONIBILE",
-            style: GoogleFonts.inter(
-              letterSpacing: 2,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.only(bottom: 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "${account.decryptedBalance ?? "0.00"} ${account.currency}",
-            style: GoogleFonts.lora(
-              fontSize: 34,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  account.decryptedName ?? "Conto Bancario",
+                  style: GoogleFonts.lora(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1A1A1A),
+                  ),
+                ),
+                Icon(typeIcon, color: const Color(0xFF4A6741), size: 20),
+              ],
             ),
-          ),
-          const SizedBox(height: 30),
-          Row(
-            children: [
-              Text(
-                "ID CONTO: **** ${account.id.length > 4 ? account.id.substring(account.id.length - 4) : '....'}",
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF1A1A1A).withOpacity(0.2),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
+            const SizedBox(height: 40),
+            Text(
+              "SALDO DISPONIBILE",
+              style: GoogleFonts.inter(
+                letterSpacing: 2,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1A1A1A).withOpacity(0.3),
               ),
-              const Spacer(),
-              const Icon(LucideIcons.checkCircle2, color: Color(0xFF4A6741), size: 14),
-              const SizedBox(width: 4),
-              Text(
-                "Sincronizzato",
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF4A6741),
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "${account.decryptedBalance ?? "0.00"} ${account.currency}",
+              style: GoogleFonts.lora(
+                fontSize: 34,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1A1A1A),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 30),
+            Row(
+              children: [
+                Text(
+                  "ID CONTO: **** ${account.id.length > 4 ? account.id.substring(account.id.length - 4) : '....'}",
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF1A1A1A).withOpacity(0.2),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                const Icon(LucideIcons.checkCircle2, color: Color(0xFF4A6741), size: 14),
+                const SizedBox(width: 4),
+                Text(
+                  "Sincronizzato",
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF4A6741),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

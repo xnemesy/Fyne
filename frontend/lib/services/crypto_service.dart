@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:crypton/crypton.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /**
  * Service to handle Client-Side Encryption (Zero-Knowledge).
@@ -47,15 +48,25 @@ class CryptoService {
 
   /// RSA Key Management for Backend-to-Client encryption
   RSAPrivateKey? _rsaPrivateKey;
+  final _storage = const FlutterSecureStorage();
+  static const _rsaKeyIdentifier = 'fyne_rsa_private_key';
 
   Future<String> getOrGeneratePublicKey() async {
-    // In a real app, read from SecureStorage
-    if (_rsaPrivateKey == null) {
-      final keyPair = RSAKeypair.fromRandom();
-      _rsaPrivateKey = keyPair.privateKey;
-      return keyPair.publicKey.toString();
+    // 1. Try to load from SecureStorage
+    final storedKey = await _storage.read(key: _rsaKeyIdentifier);
+    if (storedKey != null) {
+      _rsaPrivateKey = RSAPrivateKey.fromString(storedKey);
+      return _rsaPrivateKey!.publicKey.toString();
     }
-    return _rsaPrivateKey!.publicKey.toString();
+
+    // 2. Generate if not found
+    final keyPair = RSAKeypair.fromRandom();
+    _rsaPrivateKey = keyPair.privateKey;
+    
+    // 3. Save to SecureStorage for persistence
+    await _storage.write(key: _rsaKeyIdentifier, value: _rsaPrivateKey!.toString());
+    
+    return keyPair.publicKey.toString();
   }
 
   /// Decrypts a Base64 string encrypted with our Public Key by the backend.

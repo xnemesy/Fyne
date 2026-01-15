@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/budget.dart';
+import 'decrypted_value.dart';
 
 class BudgetCard extends StatelessWidget {
   final Budget budget;
@@ -68,8 +69,8 @@ class BudgetCard extends StatelessWidget {
                     style: TextStyle(color: Colors.black.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    "${budget.currentSpent.toStringAsFixed(2)} €",
+                  DecryptedValue(
+                    value: budget.currentSpent.toStringAsFixed(2),
                     style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ],
@@ -82,8 +83,8 @@ class BudgetCard extends StatelessWidget {
                     style: TextStyle(color: Colors.black.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    "${budget.remaining.abs().toStringAsFixed(2)} €",
+                  DecryptedValue(
+                    value: budget.remaining.abs().toStringAsFixed(2),
                     style: TextStyle(
                       color: budget.isOverBudget ? const Color(0xFFD63031) : const Color(0xFF1A1A1A),
                       fontWeight: FontWeight.bold,

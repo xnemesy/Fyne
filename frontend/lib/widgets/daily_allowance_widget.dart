@@ -108,7 +108,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            "Spendi con consapevolezza oggi per mantenere il tuo equilibrio finanziario e di salute.",
+            "Spendi con consapevolezza oggi per mantenere il tuo equilibrio finanziario.",
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.5,
