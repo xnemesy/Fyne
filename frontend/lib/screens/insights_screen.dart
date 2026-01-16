@@ -31,7 +31,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     final transactionsAsync = ref.watch(transactionsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
+      backgroundColor: const Color(0xFFF5F5F7),
       body: RefreshIndicator(
         color: const Color(0xFF4A6741),
         onRefresh: () async {
@@ -42,21 +42,53 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              expandedHeight: 300,
-              floating: false,
-              pinned: true,
-              elevation: 0,
-              backgroundColor: const Color(0xFFFBFBF9),
-              iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
-              flexibleSpace: FlexibleSpaceBar(
-                background: accountsAsync.when(
-                  data: (accounts) => _buildNetWorthChart(accounts, transactionsAsync.value ?? []),
-                  loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
-                  error: (_, __) => const Center(child: Icon(LucideIcons.alertTriangle, color: Color(0xFF1A1A1A))),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 60, 20, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(LucideIcons.pieChart, size: 28, color: Color(0xFF34C759)),
+                    const SizedBox(height: 20),
+                    Text(
+                      "Rapporti",
+                      style: GoogleFonts.lora(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                    Text(
+                      "Analisi dettagliata delle tue finanze",
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              title: Text("Resoconto", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Container(
+                  height: 250,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10),
+                    ],
+                  ),
+                  child: accountsAsync.when(
+                    data: (accounts) => _buildNetWorthChart(accounts, transactionsAsync.value ?? []),
+                    loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                    error: (_, __) => const Center(child: Icon(LucideIcons.alertTriangle, color: Color(0xFF1A1A1A))),
+                  ),
+                ),
+              ),
             ),
             SliverToBoxAdapter(
               child: Padding(

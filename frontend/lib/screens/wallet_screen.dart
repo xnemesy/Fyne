@@ -8,6 +8,7 @@ import '../providers/auth_provider.dart';
 import '../models/account.dart';
 import 'add_account_screen.dart';
 import 'transactions_screen.dart';
+import '../widgets/add_transaction_sheet.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -21,6 +22,18 @@ class WalletScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const AddTransactionSheet(),
+          );
+        },
+        backgroundColor: const Color(0xFF007AFF),
+        child: const Icon(LucideIcons.plus, color: Colors.white),
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(accountsProvider.notifier).refresh(),

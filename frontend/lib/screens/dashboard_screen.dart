@@ -4,6 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'wallet_screen.dart';
 import 'insights_screen.dart';
+import 'budgets_screen.dart';
+import 'scheduled_screen.dart';
+import 'settings_screen.dart';
 import 'terminal_mode_screen.dart';
 import '../providers/account_provider.dart';
 import '../models/account.dart';
@@ -20,10 +23,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   final List<Widget> _pages = [
     const WalletScreen(), // Conti
-    const Center(child: Text("Bilanci (In arrivo)")), // Bilanci
-    const Center(child: Text("Programmate (In arrivo)")), // Programmate
+    const BudgetsScreen(), // Bilanci
+    const ScheduledTransactionsScreen(), // Programmate
     const InsightsScreen(), // Rapporti
-    const Center(child: Text("Impostazioni (In arrivo)")), // Impostazioni
+    const SettingsScreen(), // Impostazioni
   ];
 
   @override
