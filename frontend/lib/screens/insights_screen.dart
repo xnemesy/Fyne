@@ -74,7 +74,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Container(
-                  height: 250,
+                  height: 380,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -127,7 +127,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 100, 24, 20),
+      padding: const EdgeInsets.fromLTRB(24, 40, 24, 20),
       child: Column(
         children: [
           DecryptedValue(

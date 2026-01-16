@@ -69,10 +69,11 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           topRight: Radius.circular(40),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -260,10 +261,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       final amount = double.tryParse(amountStr) ?? 0.0;
       
       final currentBalStr = selectedAcc.decryptedBalance?.replaceAll(',', '.') ?? '0';
-      final currentBal = double.tryParse(currentBalStr) ?? 0;
+      final currentBal = double.tryParse(currentBalStr) ?? 0.0;
       
       final netAmount = _isExpense ? -amount : amount;
-      final newBal = currentBal + netAmount; 
+      final newBal = currentBal + (netAmount as double); 
       final encryptedNewBalance = await crypto.encrypt(newBal.toStringAsFixed(2), masterKey);
 
       // 5. Send to backend

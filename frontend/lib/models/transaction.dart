@@ -34,7 +34,7 @@ class TransactionModel {
     return TransactionModel(
       id: json['id'],
       accountId: json['account_id'],
-      amount: (json['amount'] as num).toDouble(),
+      amount: double.tryParse(json['amount']?.toString() ?? '0.0') ?? 0.0,
       currency: json['currency'],
       encryptedDescription: json['encrypted_description'],
       encryptedCounterParty: json['encrypted_counter_party'],

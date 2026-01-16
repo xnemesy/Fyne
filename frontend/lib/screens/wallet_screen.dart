@@ -8,6 +8,7 @@ import '../providers/auth_provider.dart';
 import '../models/account.dart';
 import 'add_account_screen.dart';
 import 'transactions_screen.dart';
+import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
 
 class WalletScreen extends ConsumerWidget {
@@ -62,9 +63,13 @@ class WalletScreen extends ConsumerWidget {
                           ),
                           Row(
                             children: [
-                              _headerAction(LucideIcons.sliders, () {}),
-                              const SizedBox(width: 12),
-                              _headerAction(LucideIcons.folderPlus, () {}),
+                               _headerAction(LucideIcons.sliders, () {
+                                 Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+                               }),
+                               const SizedBox(width: 12),
+                               _headerAction(LucideIcons.folderPlus, () {
+                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gestione gruppi conti (Prossimamente)")));
+                               }),
                               const SizedBox(width: 12),
                               _headerAction(LucideIcons.plus, () {
                                 Navigator.push(

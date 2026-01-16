@@ -51,17 +51,17 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   _buildSection("ACCOUNT", [
-                    _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? "utente@fyne.it"),
-                    _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Zero-Knowledge attivo"),
+                    _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? "utente@fyne.it", onTap: () => _showMsg(context, "Profilo utente")),
+                    _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Zero-Knowledge attivo", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
                   ]),
                   _buildSection("PREFERENZE", [
-                    _buildTile(LucideIcons.palette, "Tema", "Segui sistema"),
-                    _buildTile(LucideIcons.bell, "Notifiche", "Attive"),
-                    _buildTile(LucideIcons.coins, "Valuta", "EUR (€)"),
+                    _buildTile(LucideIcons.palette, "Tema", "Segui sistema", onTap: () => _showMsg(context, "Cambia tema")),
+                    _buildTile(LucideIcons.bell, "Notifiche", "Attive", onTap: () => _showMsg(context, "Preferenze notifiche")),
+                    _buildTile(LucideIcons.coins, "Valuta", "EUR (€)", onTap: () => _showMsg(context, "Cambia valuta")),
                   ]),
                   _buildSection("SISTEMA", [
-                    _buildTile(LucideIcons.database, "Esporta Dati", "CSV, PDF"),
-                    _buildTile(LucideIcons.info, "Info su Fyne", "v1.0.0"),
+                    _buildTile(LucideIcons.database, "Esporta Dati", "CSV, PDF", onTap: () => _showMsg(context, "Esportazione dati")),
+                    _buildTile(LucideIcons.info, "Info su Fyne", "v1.0.0", onTap: () => _showMsg(context, "Fyne v1.0.0 Stable")),
                   ]),
                   const SizedBox(height: 20),
                   Padding(
@@ -120,8 +120,9 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTile(IconData icon, String title, String value) {
+  Widget _buildTile(IconData icon, String title, String value, {VoidCallback? onTap}) {
     return ListTile(
+      onTap: onTap ?? () {},
       leading: Icon(icon, color: const Color(0xFF1A1A1A), size: 20),
       title: Text(title, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500)),
       trailing: Row(
@@ -133,5 +134,9 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _showMsg(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 }

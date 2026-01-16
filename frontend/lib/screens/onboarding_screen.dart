@@ -101,13 +101,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          Text(
-            page.description,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
-              height: 1.6,
+          SizedBox(
+            height: 100, // Fixed height to prevent overlap
+            child: Text(
+              page.description,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                height: 1.6,
+              ),
             ),
           ),
         ],
