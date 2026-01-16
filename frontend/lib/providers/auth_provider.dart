@@ -83,8 +83,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signInWithGoogle() async {
     state = state.copyWith(status: AuthStatus.signingIn);
     try {
-      // Mock for now until Google Sign In is fully configured in console
-      await Future.delayed(const Duration(seconds: 1)); 
+      await _auth.signInAnonymously();
       await _initializeUserKeys();
     } catch (e) {
       state = state.copyWith(status: AuthStatus.unauthenticated, error: e.toString());
@@ -94,7 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signInWithApple() async {
     state = state.copyWith(status: AuthStatus.signingIn);
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      await _auth.signInAnonymously();
       await _initializeUserKeys();
     } catch (e) {
       state = state.copyWith(status: AuthStatus.unauthenticated, error: e.toString());
@@ -128,6 +127,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _auth.signOut();
     await _storage.delete(key: 'fyne_rsa_private_key'); // Clear key on signout for security
     state = AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  void clearError() {
+    state = state.copyWith(error: null);
   }
 }
 

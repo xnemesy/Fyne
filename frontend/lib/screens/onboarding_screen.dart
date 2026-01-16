@@ -68,6 +68,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
           if (authState.status == AuthStatus.signingIn || authState.status == AuthStatus.initializingKeys)
             _buildLoadingOverlay(authState.status == AuthStatus.initializingKeys),
+            
+          if (authState.error != null)
+            _buildErrorHint(authState.error!),
         ],
       ),
     );
@@ -309,6 +312,37 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   color: const Color(0xFF1A1A1A).withOpacity(0.4),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorHint(String error) {
+    return Positioned(
+      top: 60,
+      left: 20,
+      right: 20,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFF3B30).withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.alertCircle, color: Colors.white, size: 18),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                error,
+                style: GoogleFonts.inter(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(LucideIcons.x, color: Colors.white, size: 16),
+              onPressed: () => ref.read(authProvider.notifier).clearError(),
+            ),
           ],
         ),
       ),

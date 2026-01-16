@@ -29,7 +29,6 @@ void main() async {
   }
 
   await NotificationService().init();
-  await FcmService().init();
   
   runApp(
     const ProviderScope(
@@ -107,14 +106,19 @@ class _InitializationWrapperState extends ConsumerState<InitializationWrapper> {
     // 1. Load ML Model after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
        await ref.read(categorizationServiceProvider).loadModel();
+       
+       // 2. Initialize FCM now that we are authenticated
+       await FcmService().init();
     });
 
-    // 2. Inject Demo Key for prototype
-    final currentKey = ref.read(masterKeyProvider);
-    if (currentKey == null) {
-      final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch"));
-      ref.read(masterKeyProvider.notifier).state = demoKey;
-    }
+    // 3. Inject Demo Key for prototype - use Future.microtask to avoid build phase error
+    Future.microtask(() {
+      final currentKey = ref.read(masterKeyProvider);
+      if (currentKey == null) {
+        final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch"));
+        ref.read(masterKeyProvider.notifier).state = demoKey;
+      }
+    });
   }
 
   @override

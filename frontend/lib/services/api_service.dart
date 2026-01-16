@@ -15,13 +15,23 @@ class ApiService {
   ApiService() {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // Automatically inject Firebase ID Token into every request
         final user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           final token = await user.getIdToken();
           options.headers['Authorization'] = 'Bearer $token';
+          print("➡️ API Request: ${options.method} ${options.path} [Auth Token Present]");
+        } else {
+          print("➡️ API Request: ${options.method} ${options.path} [Anonymous/No User]");
         }
         return handler.next(options);
+      },
+      onResponse: (response, handler) {
+        print("⬅️ API Response: ${response.statusCode} ${response.requestOptions.path}");
+        return handler.next(response);
+      },
+      onError: (error, handler) {
+        print("❌ API Error: ${error.response?.statusCode} ${error.requestOptions.path} - ${error.message}");
+        return handler.next(error);
       },
     ));
   }
