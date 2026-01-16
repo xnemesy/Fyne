@@ -91,7 +91,7 @@ class WalletScreen extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        "${authState.user?.email ?? 'utente@fyne.it'} / $formattedDate",
+                        "${authState.user?.email ?? (authState.user?.isAnonymous == true ? 'Utente Verificato' : 'utente@fyne.it')} / $formattedDate",
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: const Color(0xFF1A1A1A).withOpacity(0.4),

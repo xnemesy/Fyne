@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/budget_card.dart';
+import '../widgets/add_budget_sheet.dart';
 
 class BudgetsScreen extends ConsumerWidget {
   const BudgetsScreen({super.key});
@@ -31,7 +32,12 @@ class BudgetsScreen extends ConsumerWidget {
                         children: [
                           const Icon(LucideIcons.box, size: 28, color: Color(0xFF4A6741)),
                           _headerAction(LucideIcons.plus, () {
-                            // TODO: Add budget dialog
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => const AddBudgetSheet(),
+                            );
                           }, isPrimary: true),
                         ],
                       ),

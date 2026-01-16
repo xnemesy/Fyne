@@ -8,6 +8,7 @@ import '../models/transaction.dart';
 import '../models/account.dart';
 import '../widgets/transaction_item.dart';
 import '../widgets/add_transaction_sheet.dart';
+import 'transaction_detail_screen.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {
   final String? accountId;
@@ -170,7 +171,17 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                               onDismissed: (direction) {
                                 ref.read(transactionsProvider.notifier).deleteTransaction(tx.id);
                               },
-                              child: TransactionItem(transaction: tx),
+                              child: TransactionItem(
+                                transaction: tx,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TransactionDetailScreen(transaction: tx),
+                                    ),
+                                  );
+                                },
+                              ),
                             );
                           },
                           childCount: filtered.length,

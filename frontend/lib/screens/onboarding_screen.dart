@@ -31,6 +31,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       description: "Controlla il tuo patrimonio con estetica e precisione. Fyne è la custodia digitale dei tuoi risparmi.",
       icon: LucideIcons.key,
     ),
+    OnboardingData(
+      title: "Benvenuto in Fyne",
+      description: "Il futuro della finanza personale è privato, bello e intelligente. Accedi ora per iniziare.",
+      icon: LucideIcons.sparkles,
+    ),
   ];
 
   @override
@@ -82,13 +87,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4A6741).withOpacity(0.05),
-              shape: BoxShape.circle,
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(seconds: 1),
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: value,
+                child: Opacity(opacity: value, child: child),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A6741).withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(page.icon, size: 80, color: const Color(0xFF4A6741)),
             ),
-            child: Icon(page.icon, size: 80, color: const Color(0xFF4A6741)),
           ),
           const SizedBox(height: 60),
           Text(
@@ -101,18 +116,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          SizedBox(
-            height: 100, // Fixed height to prevent overlap
-            child: Text(
-              page.description,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                color: const Color(0xFF1A1A1A).withOpacity(0.6),
-                height: 1.6,
-              ),
+          Text(
+            page.description,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              height: 1.6,
             ),
           ),
+          const SizedBox(height: 120), // Spacer for bottom buttons
         ],
       ),
     );
@@ -122,7 +135,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(_pages.length, (index) {
-        return Container(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.symmetric(horizontal: 4),
           width: _currentPage == index ? 24 : 8,
           height: 8,
@@ -160,42 +174,47 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget _buildAuthButtons(AuthState authState) {
     return Column(
       children: [
-        _authButton(
-          label: "ACCEDI CON APPLE",
-          icon: Icons.apple,
-          onPressed: () => ref.read(authProvider.notifier).signInWithApple(),
-          backgroundColor: const Color(0xFF1A1A1A),
-        ),
-        const SizedBox(height: 12),
-        _authButton(
-          label: "ACCEDI CON GOOGLE",
-          icon: LucideIcons.chrome,
-          onPressed: () => ref.read(authProvider.notifier).signInWithGoogle(),
-          backgroundColor: Colors.white,
-          textColor: const Color(0xFF1A1A1A),
-          border: BorderSide(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
-        ),
-        const SizedBox(height: 12),
-        _authButton(
-          label: "ACCEDI CON EMAIL",
-          icon: LucideIcons.mail,
-          onPressed: () => _showEmailAuthSheet(),
-          backgroundColor: const Color(0xFF4A6741),
-        ),
-        const SizedBox(height: 12),
-        TextButton(
-          onPressed: () => ref.read(authProvider.notifier).signInAnonymously(),
-          child: Text(
-            "ACCEDI ANONIMAMENTE",
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF4A6741),
-              letterSpacing: 1,
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () => _showEmailAuthSheet(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1A1A1A),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 0,
             ),
+            child: Text("ACCEDI CON EMAIL", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
           ),
         ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildSocialBtn(LucideIcons.chrome, "Google", () => ref.read(authProvider.notifier).signInWithGoogle()),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildSocialBtn(LucideIcons.apple, "Apple", () => ref.read(authProvider.notifier).signInWithApple()),
+            ),
+          ],
+        ),
       ],
+    );
+  }
+
+  Widget _buildSocialBtn(IconData icon, String label, VoidCallback onTap) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 18),
+      label: Text(label.toUpperCase(), style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF1A1A1A),
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        side: BorderSide(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
     );
   }
 
@@ -225,13 +244,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               const SizedBox(height: 24),
               TextField(
                 controller: emailController,
-                decoration: InputDecoration(hintText: "Email", border: OutlineInputBorder(borderRadius: BorderRadius.circular(16))),
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: "Email", 
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(hintText: "Password", border: OutlineInputBorder(borderRadius: BorderRadius.circular(16))),
+                decoration: InputDecoration(
+                  hintText: "Password", 
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -245,13 +275,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     backgroundColor: const Color(0xFF4A6741),
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
                   ),
-                  child: Text(isSignUp ? "REGISTRATI" : "ACCEDI", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text(isSignUp ? "REGISTRATI" : "ACCEDI", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 ),
               ),
+              const SizedBox(height: 8),
               TextButton(
                 onPressed: () => setModalState(() => isSignUp = !isSignUp),
-                child: Text(isSignUp ? "Hai già un account? Accedi" : "Nuovo qui? Crea un account"),
+                child: Text(
+                  isSignUp ? "Hai già un account? Accedi" : "Nuovo qui? Crea un account",
+                  style: GoogleFonts.inter(color: const Color(0xFF1A1A1A).withOpacity(0.5), fontSize: 13),
+                ),
               ),
             ],
           ),
@@ -260,61 +295,35 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Widget _authButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onPressed,
-    required Color backgroundColor,
-    Color textColor = Colors.white,
-    BorderSide? border,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 20),
-        label: Text(label, style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: border ?? BorderSide.none,
-          ),
-          elevation: 0,
-        ),
-      ),
-    );
-  }
-
   Widget _buildLoadingOverlay(bool isInitializingKeys) {
     return Container(
-      color: const Color(0xFFFBFBF9).withOpacity(0.9),
+      color: const Color(0xFFFBFBF9).withOpacity(0.95),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(color: Color(0xFF4A6741)),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             Text(
               isInitializingKeys ? "GENERAZIONE CHIAVI SICURE..." : "ACCESSO IN CORSO...",
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                color: const Color(0xFF4A6741),
-                fontSize: 12,
+                letterSpacing: 2,
+                fontSize: 11,
+                color: const Color(0xFF1A1A1A).withOpacity(0.6),
               ),
             ),
-            const SizedBox(height: 8),
-            if (isInitializingKeys)
-              Text(
-                "Questo garantisce che i tuoi dati siano solo tuoi.",
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.4),
-                ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 60),
+              child: Text(
+                isInitializingKeys 
+                  ? "Stiamo creando le tue chiavi crittografiche locali per una privacy totale."
+                  : "Stiamo preparando la tua custodia digitale.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.4), height: 1.5),
               ),
+            ),
           ],
         ),
       ),
@@ -327,24 +336,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       left: 20,
       right: 20,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: const Color(0xFFFF3B30).withOpacity(0.9),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
-            const Icon(LucideIcons.alertCircle, color: Colors.white, size: 18),
+            const Icon(LucideIcons.alertCircle, color: Colors.white, size: 20),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                error,
-                style: GoogleFonts.inter(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
-              ),
+              child: Text(error, style: GoogleFonts.inter(color: Colors.white, fontSize: 13)),
             ),
             IconButton(
-              icon: const Icon(LucideIcons.x, color: Colors.white, size: 16),
               onPressed: () => ref.read(authProvider.notifier).clearError(),
+              icon: const Icon(LucideIcons.x, color: Colors.white, size: 16),
             ),
           ],
         ),
@@ -357,6 +363,5 @@ class OnboardingData {
   final String title;
   final String description;
   final IconData icon;
-
   OnboardingData({required this.title, required this.description, required this.icon});
 }

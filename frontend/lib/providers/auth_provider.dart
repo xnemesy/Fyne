@@ -83,6 +83,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signInWithGoogle() async {
     state = state.copyWith(status: AuthStatus.signingIn);
     try {
+      // In a real app we'd use GoogleSignIn()
+      // For this demo we use anonymous auth as placeholder but update the state
       await _auth.signInAnonymously();
       await _initializeUserKeys();
     } catch (e) {
@@ -93,6 +95,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signInWithApple() async {
     state = state.copyWith(status: AuthStatus.signingIn);
     try {
+      // In a real app we'd use SignInWithApple()
       await _auth.signInAnonymously();
       await _initializeUserKeys();
     } catch (e) {

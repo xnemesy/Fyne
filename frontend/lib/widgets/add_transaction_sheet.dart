@@ -217,8 +217,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Future<void> _suggestCategory(String val) async {
     final categorizer = ref.read(categorizationServiceProvider);
@@ -304,23 +305,26 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Widget _typeButton(String label, bool active, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        decoration: BoxDecoration(
-          color: active ? (label == "USCITA" ? const Color(0xFFFF3B30) : const Color(0xFF34C759)) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: active ? Colors.transparent : Colors.black.withOpacity(0.05)),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-            color: active ? Colors.white : const Color(0xFF1A1A1A).withOpacity(0.4),
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: active ? (label == "USCITA" ? const Color(0xFFFF3B30) : const Color(0xFF34C759)) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: active ? Colors.transparent : Colors.black.withOpacity(0.05)),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+              color: active ? Colors.white : const Color(0xFF1A1A1A).withOpacity(0.4),
+            ),
           ),
         ),
       ),

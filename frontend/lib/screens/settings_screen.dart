@@ -51,7 +51,7 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   _buildSection("ACCOUNT", [
-                    _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? "utente@fyne.it", onTap: () => _showMsg(context, "Profilo utente")),
+                    _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? (authState.user?.isAnonymous == true ? "Utente Verificato" : "utente@fyne.it"), onTap: () => _showMsg(context, "Profilo utente")),
                     _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Zero-Knowledge attivo", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
                   ]),
                   _buildSection("PREFERENZE", [

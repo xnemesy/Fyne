@@ -7,7 +7,8 @@ import 'decrypted_value.dart';
 
 class TransactionItem extends StatelessWidget {
   final TransactionModel transaction;
-  const TransactionItem({super.key, required this.transaction});
+  final VoidCallback? onTap;
+  const TransactionItem({super.key, required this.transaction, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -27,58 +28,62 @@ class TransactionItem extends StatelessWidget {
       }
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.03)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFBFBF9),
-              borderRadius: BorderRadius.circular(14),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.black.withOpacity(0.03)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFBFBF9),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(getIcon(), size: 18, color: const Color(0xFF4A6741)),
             ),
-            child: Icon(getIcon(), size: 18, color: const Color(0xFF4A6741)),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.decryptedDescription ?? "Transazione",
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: const Color(0xFF1A1A1A),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    transaction.decryptedDescription ?? "Transazione",
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: const Color(0xFF1A1A1A),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  "${dateFormat.format(transaction.bookingDate)} • ${transaction.categoryName ?? 'Altro'}",
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                  Text(
+                    "${dateFormat.format(transaction.bookingDate)} • ${transaction.categoryName ?? 'Altro'}",
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          DecryptedValue(
-            value: "${transaction.amount > 0 ? '+' : ''}${transaction.amount.abs().toStringAsFixed(2)}",
-            style: GoogleFonts.lora(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: transaction.amount > 0 ? const Color(0xFF4A6741) : const Color(0xFFD63031), // Red for expenses
+            DecryptedValue(
+              value: "${transaction.amount > 0 ? '+' : ''}${transaction.amount.abs().toStringAsFixed(2)}",
+              style: GoogleFonts.lora(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: transaction.amount > 0 ? const Color(0xFF4A6741) : const Color(0xFFD63031), // Red for expenses
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
