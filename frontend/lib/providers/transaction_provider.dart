@@ -93,6 +93,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
         encryptedDescription: "mock_Starbucks Coffee",
         decryptedDescription: "Starbucks Coffee",
         categoryName: "CIBO",
+        categoryUuid: "mock_cat_1",
       ),
       TransactionModel(
         id: "2",
@@ -103,6 +104,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
         encryptedDescription: "mock_Apple Music Subscription",
         decryptedDescription: "Apple Music Subscription",
         categoryName: "INTRATTENIMENTO",
+        categoryUuid: "mock_cat_2",
       ),
       TransactionModel(
         id: "3",
@@ -113,6 +115,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
         encryptedDescription: "mock_Stipendio Gennaio",
         decryptedDescription: "Stipendio Gennaio",
         categoryName: "STIPENDIO",
+        categoryUuid: "mock_cat_3",
       ),
     ];
   }

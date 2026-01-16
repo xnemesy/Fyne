@@ -58,19 +58,17 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
     return [
       Budget(
         id: "b1",
-        categoryId: "c1",
+        categoryUuid: "c1",
         encryptedCategoryName: "mock_Cibo",
         limitAmount: 500.0,
         currentSpent: 125.40,
-        period: "MONTHLY",
       )..decryptedCategoryName = "Cibo",
       Budget(
         id: "b2",
-        categoryId: "c2",
+        categoryUuid: "c2",
         encryptedCategoryName: "mock_Trasporti",
         limitAmount: 200.0,
         currentSpent: 180.0,
-        period: "MONTHLY",
       )..decryptedCategoryName = "Trasporti",
     ];
   }

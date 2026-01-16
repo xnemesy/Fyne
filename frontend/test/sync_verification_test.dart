@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fyne_frontend/services/categorization_service.dart';
 import 'package:isar/isar.dart';
-import 'package:mockito/mockito.dart';
+// import 'package:mockito/mockito.dart';
 
 void main() {
   test('Verify SyncService Logic: Amazon -> Shopping UUID', () async {
