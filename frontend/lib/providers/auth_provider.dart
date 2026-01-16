@@ -44,8 +44,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (hasKey) {
         state = AuthState(status: AuthStatus.authenticated, user: user);
       } else {
-        // User is logged in but keys are missing (should not happen if flow is correct)
-        state = AuthState(status: AuthStatus.unauthenticated, user: user);
+        // User is logged in but local keys are missing (e.g. app reinstalled)
+        // Auto-initialize for demo/smooth recovery
+        await _initializeUserKeys();
       }
     } else {
       state = AuthState(status: AuthStatus.unauthenticated);

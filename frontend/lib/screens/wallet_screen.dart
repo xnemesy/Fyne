@@ -183,7 +183,8 @@ class WalletScreen extends ConsumerWidget {
     double liabilities = 0;
 
     for (var acc in accounts) {
-      double bal = double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
+      final balStr = acc.decryptedBalance?.replaceAll(',', '.') ?? '0';
+      double bal = double.tryParse(balStr) ?? 0;
       if (bal >= 0) {
         netBalance += bal;
       } else {
@@ -248,7 +249,8 @@ class WalletScreen extends ConsumerWidget {
     if (account.type == AccountType.cash) typeIcon = LucideIcons.banknote;
     if (account.type == AccountType.credit) typeIcon = LucideIcons.creditCard;
 
-    double bal = double.tryParse(account.decryptedBalance ?? '0') ?? 0;
+    final balStr = account.decryptedBalance?.replaceAll(',', '.') ?? '0';
+    double bal = double.tryParse(balStr) ?? 0;
 
     return Dismissible(
       key: Key(account.id),

@@ -30,6 +30,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   String? _suggestedCategoryUuid;
   String _suggestedCategoryName = "Seleziona Categoria";
   bool _isSaving = false;
+  bool _isExpense = true;
 
   @override
   void dispose() {
@@ -114,6 +115,16 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               hintStyle: TextStyle(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
               border: InputBorder.none,
             ),
+          ),
+          const SizedBox(height: 16),
+          // Type Selector
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _typeButton("USCITA", _isExpense, () => setState(() => _isExpense = true)),
+              const SizedBox(width: 12),
+              _typeButton("ENTRATA", !_isExpense, () => setState(() => _isExpense = false)),
+            ],
           ),
           const SizedBox(height: 32),
 
@@ -250,14 +261,16 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       
       final currentBalStr = selectedAcc.decryptedBalance?.replaceAll(',', '.') ?? '0';
       final currentBal = double.tryParse(currentBalStr) ?? 0;
-      final newBal = currentBal - amount; // Expense subtracts from balance
+      
+      final netAmount = _isExpense ? -amount : amount;
+      final newBal = currentBal + netAmount; 
       final encryptedNewBalance = await crypto.encrypt(newBal.toStringAsFixed(2), masterKey);
 
       // 5. Send to backend
       try {
         await api.post('/api/transactions/manual', data: {
           'accountId': selectedAcc.id,
-          'amount': -amount, // Save as negative for expense
+          'amount': netAmount, 
           'currency': 'EUR',
           'encryptedDescription': encryptedDesc,
           'categoryUuid': categoryUuid,
@@ -287,5 +300,29 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     } finally {
       setState(() { _isSaving = false; });
     }
+  }
+
+  Widget _typeButton(String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? (label == "USCITA" ? const Color(0xFFFF3B30) : const Color(0xFF34C759)) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: active ? Colors.transparent : Colors.black.withOpacity(0.05)),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+            color: active ? Colors.white : const Color(0xFF1A1A1A).withOpacity(0.4),
+          ),
+        ),
+      ),
+    );
   }
 }

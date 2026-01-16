@@ -275,8 +275,12 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       if (masterKey == null) throw Exception("Master key not found");
 
       // 1. Encrypt details
+      // Robust decimal parsing for Europe (comma support)
+      final balanceStr = _balanceController.text.replaceAll(',', '.');
+      final balance = double.tryParse(balanceStr) ?? 0.0;
+      
       final encryptedName = await crypto.encrypt(_nameController.text, masterKey);
-      final encryptedBalance = await crypto.encrypt(_balanceController.text, masterKey);
+      final encryptedBalance = await crypto.encrypt(balance.toStringAsFixed(2), masterKey);
       
       // 2. Metadata (potentially including crypto ID)
       // For now, let's keep it simple and add it to a metadata field if backend supports or just providerId

@@ -122,7 +122,8 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
   Widget _buildNetWorthChart(List<Account> accounts, List<TransactionModel> transactions) {
     double netWorth = 0;
     for (var acc in accounts) {
-      netWorth += double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
+      final balStr = acc.decryptedBalance?.replaceAll(',', '.') ?? '0';
+      netWorth += double.tryParse(balStr) ?? 0;
     }
 
     return Container(
