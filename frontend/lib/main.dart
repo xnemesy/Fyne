@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/notification_service.dart';
@@ -17,6 +18,8 @@ import 'providers/budget_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  await initializeDateFormatting('it_IT', null);
+
   try {
     await Firebase.initializeApp();
     print("Firebase initialized successfully");

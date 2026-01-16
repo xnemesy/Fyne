@@ -4,10 +4,6 @@ import '../services/api_service.dart';
 import '../services/crypto_service.dart';
 import 'transaction_provider.dart';
 
-// Service providers
-final apiServiceProvider = Provider((ref) => ApiService());
-final cryptoServiceProvider = Provider((ref) => CryptoService());
-
 // The master key provider (in a real app, this is derived once at login and kept in secure memory)
 final masterKeyProvider = StateProvider<dynamic>((ref) => null);
 

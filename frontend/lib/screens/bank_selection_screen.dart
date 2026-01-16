@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../providers/budget_provider.dart'; // sharing apiServiceProvider
+import '../services/api_service.dart';
+import '../providers/budget_provider.dart';
 
 class BankSelectionScreen extends ConsumerStatefulWidget {
   const BankSelectionScreen({super.key});

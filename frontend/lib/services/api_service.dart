@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /**
  * Service to handle communication with the Cloud Run backend.
@@ -33,3 +34,5 @@ class ApiService {
     return await dio.post(path, data: data);
   }
 }
+
+final apiServiceProvider = Provider<ApiService>((ref) => ApiService());

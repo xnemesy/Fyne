@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/account.dart';
-import '../providers/budget_provider.dart'; // sharing common providers like api/crypto
+import '../services/api_service.dart';
+import '../services/crypto_service.dart';
+import '../providers/budget_provider.dart';
 
 class AccountNotifier extends AsyncNotifier<List<Account>> {
   @override

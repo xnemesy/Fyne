@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/account_provider.dart';
 import '../providers/budget_provider.dart';
 import '../providers/transaction_provider.dart';
+import '../services/api_service.dart';
 import '../services/categorization_service.dart';
 import '../services/crypto_service.dart';
 import '../providers/isar_provider.dart';

@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/transaction_provider.dart';
+import '../providers/account_provider.dart';
 import '../models/transaction.dart';
+import '../models/account.dart';
 import '../widgets/transaction_item.dart';
+import '../widgets/add_transaction_sheet.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {
   final String? accountId;
@@ -26,52 +29,85 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 
     Account? currentAccount;
     if (widget.accountId != null && accountsAsync.hasValue) {
-       currentAccount = accountsAsync.value!.firstWhere((acc) => acc.id == widget.accountId);
+       try {
+         currentAccount = accountsAsync.value!.firstWhere((acc) => acc.id == widget.accountId);
+       } catch (e) {
+         currentAccount = null;
+       }
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
+      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
-        title: Column(
-          children: [
-            Text(
-              currentAccount?.decryptedName ?? (widget.accountId != null ? "Transazioni Conto" : "Storico Totale"),
-              style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
-            ),
-            if (currentAccount != null)
-              Text(
-                "${currentAccount.decryptedBalance} ${currentAccount.currency}",
-                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741)),
-              ),
-          ],
-        ),
-        centerTitle: true,
+        toolbarHeight: 80,
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
+        leadingWidth: 70,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 15),
+          child: Center(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1A1A1A), size: 24),
+              ),
+            ),
+          ),
+        ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE9E9EB),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                currentAccount?.type == AccountType.cash ? LucideIcons.banknote : LucideIcons.landmark,
+                size: 20,
+                color: const Color(0xFF8E8E93),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  currentAccount?.decryptedName ?? "Transazioni",
+                  style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+                ),
+                Text(
+                  "${currentAccount?.decryptedBalance ?? '0.00'} €",
+                  style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFF34C759)),
+                ),
+              ],
+            ),
+          ],
+        ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(LucideIcons.moreHorizontal, size: 20),
-          ),
-          IconButton(
-            onPressed: () {
-               showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => const AddTransactionSheet(),
-              );
-            },
-            icon: const Icon(LucideIcons.plusCircle, color: Color(0xFF00A8FF), size: 28),
-          ),
+          _headerAction(LucideIcons.moreHorizontal, () {}),
           const SizedBox(width: 8),
+          _headerAction(LucideIcons.plus, () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => const AddTransactionSheet(),
+            );
+          }, isPrimary: true),
+          const SizedBox(width: 15),
         ],
       ),
       body: Column(
         children: [
-          _buildFilters(),
+          _buildSearchField(),
           _buildHintCard(),
           Expanded(
             child: transactionsAsync.when(
@@ -87,7 +123,6 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   return _buildEmptyState();
                 }
 
-                // Calculate Summary for the displayed list
                 double income = 0;
                 double expenses = 0;
                 for (var tx in filtered) {
@@ -95,18 +130,22 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   else expenses += tx.amount;
                 }
 
-                return Column(
-                  children: [
-                     _buildSummaryHeader(income, expenses),
-                     Expanded(
-                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                        itemCount: filtered.length,
-                        itemBuilder: (context, index) {
-                          return TransactionItem(transaction: filtered[index]);
-                        },
+                return CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: _buildSummaryHeader(income, expenses),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return TransactionItem(transaction: filtered[index]);
+                          },
+                          childCount: filtered.length,
+                        ),
                       ),
-                     ),
+                    ),
                   ],
                 );
               },
@@ -119,58 +158,58 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     );
   }
 
-  Widget _buildFilters() {
+  Widget _headerAction(IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isPrimary ? const Color(0xFF007AFF) : const Color(0xFFE9E9EB),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
+      ),
+    );
+  }
+
+  Widget _buildSearchField() {
     return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          TextField(
-            controller: _searchController,
-            onChanged: (val) => setState(() => _searchQuery = val),
-            style: GoogleFonts.inter(fontSize: 14),
-            decoration: InputDecoration(
-              hintText: "Cerca tra le transazioni...",
-              prefixIcon: const Icon(LucideIcons.search, size: 18, color: Color(0xFF4A6741)),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE9E9EB),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.search, size: 18, color: Color(0xFF8E8E93)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) => setState(() => _searchQuery = val),
+                style: GoogleFonts.inter(fontSize: 16),
+                decoration: const InputDecoration(
+                  hintText: "Cerca",
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Color(0xFF8E8E93)),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _categoryChip(null, "Tutte"),
-                _categoryChip("Alimentari", "🥘 Alimentari"),
-                _categoryChip("Shopping", "🛍️ Shopping"),
-                _categoryChip("Trasporti", "🚗 Trasporti"),
-                _categoryChip("Abbonamenti", "🔄 Abbonamenti"),
-                _categoryChip("Wellness", "🧘 Wellness"),
-                _categoryChip("Fast Food", "🍔 Fast Food"),
-                _categoryChip("Altro", "📦 Altro"),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHintCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2).withOpacity(0.8),
+        color: const Color(0xFFE9E9EB).withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -178,7 +217,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
-              color: Color(0xFF767680),
+              color: Color(0xFF8E8E93),
               shape: BoxShape.circle,
             ),
             child: const Icon(LucideIcons.arrowDown, color: Colors.white, size: 16),
@@ -187,84 +226,56 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           Expanded(
             child: Text(
               "Trascina verso il basso questa lista per aggiungere rapidamente una nuova transazione",
-              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.7), fontWeight: FontWeight.w500),
+              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.6), fontWeight: FontWeight.w500),
             ),
           ),
           const SizedBox(width: 8),
-          Icon(LucideIcons.xCircle, color: const Color(0xFF1A1A1A).withOpacity(0.4), size: 20),
+          Icon(LucideIcons.xCircle, color: const Color(0xFF1A1A1A).withOpacity(0.2), size: 20),
         ],
-      ),
-    );
-  }
-
-  Widget _categoryChip(String? category, String label) {
-    final isSelected = _selectedCategory == category;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = category),
-      child: Container(
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A6741) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF4A6741) : Colors.black.withOpacity(0.05),
-          ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : const Color(0xFF1A1A1A).withOpacity(0.5),
-          ),
-        ),
       ),
     );
   }
 
   Widget _buildSummaryHeader(double income, double expenses) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "QUESTO MESE",
+            "Questo mese",
             style: GoogleFonts.inter(
-              letterSpacing: 1.5,
-              fontSize: 11,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+              color: const Color(0xFF1A1A1A).withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              _summaryChip("Saldo: ${(income + expenses).toStringAsFixed(2)} €", Colors.black.withOpacity(0.05), const Color(0xFF1A1A1A)),
+              _summaryChip("Saldo: ${(income + expenses).toStringAsFixed(2)} €", const Color(0xFFE9E9EB)),
               const SizedBox(width: 8),
-              _summaryChip("${expenses.toStringAsFixed(2)} €", const Color(0xFFD63031).withOpacity(0.1), const Color(0xFFD63031)),
+              _summaryChip("${expenses.toStringAsFixed(2)} €", const Color(0xFFFFEBEB), textColor: const Color(0xFFFF3B30)),
               const SizedBox(width: 8),
-              _summaryChip("${income.toStringAsFixed(2)} €", const Color(0xFF4A6741).withOpacity(0.1), const Color(0xFF4A6741)),
+              _summaryChip("${income.toStringAsFixed(2)} €", const Color(0xFFE9FBF0), textColor: const Color(0xFF34C759)),
             ],
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _summaryChip(String label, Color bg, Color textColor) {
+  Widget _summaryChip(String label, Color bg, {Color textColor = const Color(0xFF8E8E93)}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         label,
         style: GoogleFonts.inter(
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: FontWeight.bold,
           color: textColor,
         ),
@@ -280,9 +291,9 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           Icon(LucideIcons.searchX, size: 48, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
           const SizedBox(height: 16),
           Text(
-            "Nessun risultato",
-            style: GoogleFonts.lora(
-              fontSize: 16,
+            "Nessuna transazione trovata",
+            style: GoogleFonts.inter(
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               color: const Color(0xFF1A1A1A).withOpacity(0.4),
             ),

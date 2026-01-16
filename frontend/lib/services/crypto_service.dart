@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:crypton/crypton.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /**
  * Service to handle Client-Side Encryption (Zero-Knowledge).
@@ -104,3 +105,5 @@ class CryptoService {
     return utf8.decode(clearText);
   }
 }
+
+final cryptoServiceProvider = Provider<CryptoService>((ref) => CryptoService());

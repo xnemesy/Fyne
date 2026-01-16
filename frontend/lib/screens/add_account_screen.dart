@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../models/account.dart';
 import '../providers/account_provider.dart';
-import '../providers/budget_provider.dart'; // sharing common providers
+import '../services/api_service.dart';
 import '../services/crypto_service.dart';
+import '../providers/budget_provider.dart';
 import 'bank_selection_screen.dart';
 
 class AddAccountScreen extends ConsumerStatefulWidget {
