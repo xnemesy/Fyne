@@ -142,7 +142,7 @@ class WalletScreen extends ConsumerWidget {
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               final account = accounts[index];
-                              return _buildAccountRow(context, account);
+                              return _buildAccountRow(context, account, ref);
                             },
                             childCount: accounts.length,
                           ),
@@ -243,50 +243,79 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAccountRow(BuildContext context, Account account) {
+  Widget _buildAccountRow(BuildContext context, Account account, WidgetRef ref) {
     IconData typeIcon = LucideIcons.landmark;
     if (account.type == AccountType.cash) typeIcon = LucideIcons.banknote;
     if (account.type == AccountType.credit) typeIcon = LucideIcons.creditCard;
 
     double bal = double.tryParse(account.decryptedBalance ?? '0') ?? 0;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
+    return Dismissible(
+      key: Key(account.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFF3B30),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(LucideIcons.trash2, color: Colors.white),
       ),
-      child: ListTile(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TransactionsScreen(accountId: account.id),
-            ),
-          );
-        },
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF2F2F7),
-            borderRadius: BorderRadius.circular(12),
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Elimina Conto"),
+            content: const Text("Sei sicuro di voler eliminare questo conto? Questa azione non può essere annullata."),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+            ],
           ),
-          child: Icon(typeIcon, size: 24, color: const Color(0xFF8E8E93)),
+        );
+      },
+      onDismissed: (direction) {
+        ref.read(accountsProvider.notifier).deleteAccount(account.id);
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          ],
         ),
-        title: Text(
-          account.decryptedName ?? "Conto",
-          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
-        ),
-        subtitle: Text(
-          "${bal.toStringAsFixed(2)} ${account.currency}",
-          style: GoogleFonts.inter(
-            fontSize: 15, 
-            fontWeight: FontWeight.bold, 
-            color: bal >= 0 ? const Color(0xFF34C759) : const Color(0xFFFF3B30)
+        child: ListTile(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TransactionsScreen(accountId: account.id),
+              ),
+            );
+          },
+          contentPadding: const EdgeInsets.all(16),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2F2F7),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(typeIcon, size: 24, color: const Color(0xFF8E8E93)),
+          ),
+          title: Text(
+            account.decryptedName ?? "Conto",
+            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+          ),
+          subtitle: Text(
+            "${bal.toStringAsFixed(2)} ${account.currency}",
+            style: GoogleFonts.inter(
+              fontSize: 15, 
+              fontWeight: FontWeight.bold, 
+              color: bal >= 0 ? const Color(0xFF34C759) : const Color(0xFFFF3B30)
+            ),
           ),
         ),
       ),

@@ -38,14 +38,23 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
         }
       }
     }
-
     return accounts;
   }
 
   Future<void> refresh() async {
     final masterKey = ref.read(masterKeyProvider);
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchAndDecryptAccounts(masterKey));
+  }
+
+  Future<void> deleteAccount(String accountId) async {
+    final api = ref.read(apiServiceProvider);
+    try {
+      await api.post('/api/accounts/delete', data: {'id': accountId});
+    } catch (e) {
+      print("Delete account error: $e");
+    }
+    ref.invalidateSelf();
+    ref.invalidate(budgetsProvider);
   }
 }
 

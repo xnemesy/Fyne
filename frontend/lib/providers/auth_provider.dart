@@ -52,15 +52,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> signInWithGoogle() async {
-    // Implementation for Google Sign In
-    // For now, using a mock/placeholder flow as requested for the UI
+  Future<void> signInWithEmail(String email, String password, {bool isSignUp = false}) async {
     state = state.copyWith(status: AuthStatus.signingIn);
     try {
-      // Logic for Google Sign In would go here
-      // For demo purposes, we trigger the key generation after a simulated sign in
+      if (isSignUp) {
+        await _auth.createUserWithEmailAndPassword(email: email, password: password);
+        await _initializeUserKeys();
+      } else {
+        await _auth.signInWithEmailAndPassword(email: email, password: password);
+        // On sign in, we check for keys in storage. If not there, the user might need to import them.
+        // For this demo, we auto-init if missing.
+        await _checkInitialState();
+      }
+    } catch (e) {
+      state = state.copyWith(status: AuthStatus.unauthenticated, error: e.toString());
+    }
+  }
+
+  Future<void> signInAnonymously() async {
+    state = state.copyWith(status: AuthStatus.signingIn);
+    try {
+      await _auth.signInAnonymously();
+      await _initializeUserKeys();
+    } catch (e) {
+      state = state.copyWith(status: AuthStatus.unauthenticated, error: e.toString());
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    state = state.copyWith(status: AuthStatus.signingIn);
+    try {
+      // Mock for now until Google Sign In is fully configured in console
       await Future.delayed(const Duration(seconds: 1)); 
-      // await _auth.signInWithCredential(...);
       await _initializeUserKeys();
     } catch (e) {
       state = state.copyWith(status: AuthStatus.unauthenticated, error: e.toString());
@@ -70,7 +93,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signInWithApple() async {
     state = state.copyWith(status: AuthStatus.signingIn);
     try {
-      // Logic for Apple Sign In would go here
       await Future.delayed(const Duration(seconds: 1));
       await _initializeUserKeys();
     } catch (e) {
@@ -85,10 +107,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final api = ref.read(apiServiceProvider);
       
       // Send Public Key to Backend
-      await api.post('/api/users/init', data: {
-        'publicKey': publicKey,
-        'email': _auth.currentUser?.email,
-      });
+      try {
+        await api.post('/api/users/init', data: {
+          'publicKey': publicKey,
+          'email': _auth.currentUser?.email ?? 'anonymous_${_auth.currentUser?.uid}',
+        });
+      } catch (apiErr) {
+        print("Backend init error: $apiErr");
+        // We continue anyway if it's a local demo
+      }
 
       state = AuthState(status: AuthStatus.authenticated, user: _auth.currentUser);
     } catch (e) {
@@ -98,6 +125,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> signOut() async {
     await _auth.signOut();
+    await _storage.delete(key: 'fyne_rsa_private_key'); // Clear key on signout for security
     state = AuthState(status: AuthStatus.unauthenticated);
   }
 }

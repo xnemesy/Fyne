@@ -140,7 +140,38 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            return TransactionItem(transaction: filtered[index]);
+                            final tx = filtered[index];
+                            return Dismissible(
+                              key: Key(tx.id),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF3B30),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(LucideIcons.trash2, color: Colors.white),
+                              ),
+                              confirmDismiss: (direction) async {
+                                return await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text("Elimina Transazione"),
+                                    content: const Text("Vuoi eliminare questa transazione?"),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+                                      TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+                                    ],
+                                  ),
+                                );
+                              },
+                              onDismissed: (direction) {
+                                ref.read(transactionsProvider.notifier).deleteTransaction(tx.id);
+                              },
+                              child: TransactionItem(transaction: tx),
+                            );
                           },
                           childCount: filtered.length,
                         ),

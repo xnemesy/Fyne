@@ -14,6 +14,7 @@ import 'providers/auth_provider.dart';
 import 'providers/sync_provider.dart';
 import 'widgets/privacy_blur_overlay.dart';
 import 'providers/budget_provider.dart';
+import 'providers/transaction_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,23 +88,38 @@ class AuthWrapper extends ConsumerWidget {
   }
 }
 
-class InitializationWrapper extends ConsumerWidget {
+class InitializationWrapper extends ConsumerStatefulWidget {
   final Widget child;
   const InitializationWrapper({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(syncProvider);
-    
-    // Inject a demo Master Key if not present (to allow testing encryption)
-    Future.microtask(() async {
-      final currentKey = ref.read(masterKeyProvider);
-      if (currentKey == null || currentKey is String) {
-        final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch"));
-        ref.read(masterKeyProvider.notifier).state = demoKey;
-      }
+  ConsumerState<InitializationWrapper> createState() => _InitializationWrapperState();
+}
+
+class _InitializationWrapperState extends ConsumerState<InitializationWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    // 1. Load ML Model after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+       await ref.read(categorizationServiceProvider).loadModel();
     });
 
-    return child;
+    // 2. Inject Demo Key for prototype
+    final currentKey = ref.read(masterKeyProvider);
+    if (currentKey == null) {
+      final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch"));
+      ref.read(masterKeyProvider.notifier).state = demoKey;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(syncProvider);
+    return widget.child;
   }
 }

@@ -66,7 +66,40 @@ class BudgetsScreen extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (context, index) => BudgetCard(budget: budgets[index]),
+                            (context, index) {
+                              final budget = budgets[index];
+                              return Dismissible(
+                                key: Key(budget.id),
+                                direction: DismissDirection.endToStart,
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF3B30),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: const Icon(LucideIcons.trash2, color: Colors.white),
+                                ),
+                                confirmDismiss: (direction) async {
+                                  return await showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text("Elimina Budget"),
+                                      content: const Text("Vuoi eliminare questo budget?"),
+                                      actions: [
+                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+                                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                onDismissed: (direction) {
+                                  ref.read(budgetsProvider.notifier).deleteBudget(budget.id);
+                                },
+                                child: BudgetCard(budget: budget),
+                              );
+                            },
                             childCount: budgets.length,
                           ),
                         ),

@@ -160,7 +160,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           onPressed: () => ref.read(authProvider.notifier).signInWithApple(),
           backgroundColor: const Color(0xFF1A1A1A),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _authButton(
           label: "ACCEDI CON GOOGLE",
           icon: LucideIcons.chrome,
@@ -169,7 +169,88 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           textColor: const Color(0xFF1A1A1A),
           border: BorderSide(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
         ),
+        const SizedBox(height: 12),
+        _authButton(
+          label: "ACCEDI CON EMAIL",
+          icon: LucideIcons.mail,
+          onPressed: () => _showEmailAuthSheet(),
+          backgroundColor: const Color(0xFF4A6741),
+        ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () => ref.read(authProvider.notifier).signInAnonymously(),
+          child: Text(
+            "ACCEDI ANONIMAMENTE",
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF4A6741),
+              letterSpacing: 1,
+            ),
+          ),
+        ),
       ],
+    );
+  }
+
+  void _showEmailAuthSheet() {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    bool isSignUp = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 40,
+            left: 32, right: 32, top: 32,
+          ),
+          decoration: const BoxDecoration(
+            color: Color(0xFFFBFBF9),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(isSignUp ? "Crea Account" : "Bentornato", style: GoogleFonts.lora(fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(hintText: "Email", border: OutlineInputBorder(borderRadius: BorderRadius.circular(16))),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(hintText: "Password", border: OutlineInputBorder(borderRadius: BorderRadius.circular(16))),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ref.read(authProvider.notifier).signInWithEmail(emailController.text, passwordController.text, isSignUp: isSignUp);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4A6741),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: Text(isSignUp ? "REGISTRATI" : "ACCEDI", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              TextButton(
+                onPressed: () => setModalState(() => isSignUp = !isSignUp),
+                child: Text(isSignUp ? "Hai già un account? Accedi" : "Nuovo qui? Crea un account"),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

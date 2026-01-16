@@ -38,10 +38,9 @@ class CategorizationService {
           isHealthFocus: name == 'Wellness',
         )
     };
-    _loadModel();
   }
 
-  Future<void> _loadModel() async {
+  Future<void> loadModel() async {
     try {
       _interpreter = await Interpreter.fromAsset('assets/models/category_model.tflite');
       _isModelLoaded = true;

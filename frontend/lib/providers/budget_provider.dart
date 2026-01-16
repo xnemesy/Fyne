@@ -46,8 +46,17 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
 
   Future<void> refresh() async {
     final masterKey = ref.read(masterKeyProvider);
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchAndDecryptBudgets(masterKey));
+  }
+
+  Future<void> deleteBudget(String budgetId) async {
+    final api = ref.read(apiServiceProvider);
+    try {
+      await api.post('/api/budgets/delete', data: {'id': budgetId});
+    } catch (e) {
+      print("Delete budget error: $e");
+    }
+    ref.invalidateSelf();
   }
 }
 
