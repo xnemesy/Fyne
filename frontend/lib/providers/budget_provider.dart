@@ -80,12 +80,23 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
 
   Future<void> deleteBudget(String budgetId) async {
     final api = ref.read(apiServiceProvider);
+    
+    // 1. Snapshot previous state
+    final previousState = state.value;
+    if (previousState == null) return;
+
+    // 2. Optimistic Update
+    final newState = previousState.where((b) => b.id != budgetId).toList();
+    state = AsyncData(newState);
+
     try {
+      // 3. API Call
       await api.post('/api/budgets/delete', data: {'id': budgetId});
     } catch (e) {
       print("Delete budget error: $e");
+      // 4. Rollback
+      state = AsyncData(previousState);
     }
-    ref.invalidateSelf();
   }
 }
 

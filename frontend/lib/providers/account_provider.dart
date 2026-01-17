@@ -48,13 +48,26 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
 
   Future<void> deleteAccount(String accountId) async {
     final api = ref.read(apiServiceProvider);
+    
+    // 1. Snapshot previous state
+    final previousState = state.value;
+    if (previousState == null) return;
+
+    // 2. Optimistic Update
+    final newState = previousState.where((a) => a.id != accountId).toList();
+    state = AsyncData(newState);
+
     try {
+      // 3. API Call
       await api.post('/api/accounts/delete', data: {'id': accountId});
+      
+      // 4. Invalidate related providers lazily
+      // ref.invalidate(budgetsProvider);
     } catch (e) {
       print("Delete account error: $e");
+      // 5. Rollback
+      state = AsyncData(previousState);
     }
-    ref.invalidateSelf();
-    ref.invalidate(budgetsProvider);
   }
 
   void updateLocalBalance(String accountId, String newDecryptedBalance) {

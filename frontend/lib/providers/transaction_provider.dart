@@ -158,14 +158,30 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
 
   Future<void> deleteTransaction(String transactionId) async {
     final api = ref.read(apiServiceProvider);
+    
+    // 1. Snapshot previous state for rollback
+    final previousState = state.value;
+    if (previousState == null) return;
+
+    // 2. Optimistic Update: Remove from local list immediately
+    final newState = previousState.where((t) => t.id != transactionId).toList();
+    state = AsyncData(newState);
+
     try {
+      // 3. Perform API Call
       await api.post('/api/transactions/delete', data: {'id': transactionId});
+      
+      // 4. Update related providers lazily or optimistically if critical
+      // ref.invalidate(accountsProvider); // Optional: avoid if possible to prevent flicker
+      // ref.invalidate(budgetsProvider);
+      
     } catch (e) {
       print("Delete transaction error: $e");
+      
+      // 5. Rollback on error
+      state = AsyncData(previousState);
+      // Optionally show a snackbar/toast via a side-effect provider or listener
     }
-    ref.invalidateSelf();
-    ref.invalidate(accountsProvider);
-    ref.invalidate(budgetsProvider);
   }
 
   Future<void> refresh() async {
