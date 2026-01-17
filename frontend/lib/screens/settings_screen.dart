@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/auth_provider.dart';
+import '../providers/transaction_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -12,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: const Color(0xFFFBFBF9),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -22,7 +26,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(LucideIcons.settings, size: 28, color: Color(0xFF8E8E93)),
+                    const Icon(LucideIcons.settings, size: 28, color: Color(0xFF4A6741)),
                     const SizedBox(height: 20),
                     Text(
                       "Impostazioni",
@@ -60,7 +64,7 @@ class SettingsScreen extends ConsumerWidget {
                     _buildTile(LucideIcons.coins, "Valuta", "EUR (€)", onTap: () => _showMsg(context, "Cambia valuta")),
                   ]),
                   _buildSection("SISTEMA", [
-                    _buildTile(LucideIcons.database, "Esporta Dati", "CSV, PDF", onTap: () => _showMsg(context, "Esportazione dati")),
+                    _buildTile(LucideIcons.database, "Esporta Dati", "CSV", onTap: () => _exportData(context, ref)),
                     _buildTile(LucideIcons.info, "Info su Fyne", "v1.0.0", onTap: () => _showMsg(context, "Fyne v1.0.0 Stable")),
                   ]),
                   const SizedBox(height: 20),
@@ -90,6 +94,29 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _exportData(BuildContext context, WidgetRef ref) async {
+    try {
+      final csv = await ref.read(transactionsProvider.notifier).exportToCsv();
+      if (csv.isEmpty) {
+        if (context.mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Nessun dato da esportare")));
+        }
+        return;
+      }
+
+      final directory = await getTemporaryDirectory();
+      final path = "${directory.path}/fyne_export_${DateTime.now().millisecondsSinceEpoch}.csv";
+      final file = File(path);
+      await file.writeAsString(csv);
+
+      await Share.shareXFiles([XFile(path)], text: 'Esportazione Transazioni Fyne');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore durante l'esportazione: $e")));
+      }
+    }
   }
 
   Widget _buildSection(String title, List<Widget> tiles) {

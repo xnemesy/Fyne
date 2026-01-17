@@ -61,7 +61,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               onTap: (index) => setState(() => _selectedIndex = index),
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.white,
-              selectedItemColor: const Color(0xFF007AFF),
+              selectedItemColor: const Color(0xFF4A6741),
               unselectedItemColor: const Color(0xFF8E8E93),
               selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold),
               unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),

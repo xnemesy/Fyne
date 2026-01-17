@@ -67,4 +67,32 @@ router.post('/transfer', verifyToken, async (req, res) => {
     }
 });
 
+/**
+ * @route POST /api/budgets/delete
+ * @desc Delete a budget
+ */
+router.post('/delete', verifyToken, async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'Missing budget ID' });
+    }
+
+    try {
+        const result = await db.query(
+            'DELETE FROM budgets WHERE id = $1 AND user_id = $2 RETURNING id',
+            [id, req.user.uid]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Budget not found or unauthorized' });
+        }
+
+        res.json({ message: 'Budget deleted successfully', id });
+    } catch (error) {
+        console.error('Delete Budget Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

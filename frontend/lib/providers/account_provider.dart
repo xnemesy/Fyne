@@ -56,6 +56,23 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
     ref.invalidateSelf();
     ref.invalidate(budgetsProvider);
   }
+
+  void updateLocalBalance(String accountId, String newDecryptedBalance) {
+    final currentState = state;
+    if (currentState is AsyncData<List<Account>>) {
+      final List<Account> currentList = currentState.value;
+      // Create a shallow copy of the list
+      final newList = List<Account>.from(currentList);
+      
+      for (var account in newList) {
+        if (account.id == accountId) {
+          account.decryptedBalance = newDecryptedBalance;
+          break;
+        }
+      }
+      state = AsyncData(newList);
+    }
+  }
 }
 
 final accountsProvider = AsyncNotifierProvider<AccountNotifier, List<Account>>(() {

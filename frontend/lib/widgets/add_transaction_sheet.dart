@@ -256,7 +256,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     return ElevatedButton(
       onPressed: _isSaving ? null : () => _saveTransaction(context),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF007AFF),
+        backgroundColor: const Color(0xFF4A6741),
         foregroundColor: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -330,7 +330,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: active ? const Color(0xFF007AFF) : Colors.black12,
+        color: active ? const Color(0xFF4A6741) : Colors.black12,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(label, style: GoogleFonts.inter(fontSize: 13, color: active ? Colors.white : Colors.black45, fontWeight: FontWeight.w500)),
@@ -416,9 +416,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       });
 
       // Update local state for immediate feedback
-      selectedAcc.decryptedBalance = newBal.toStringAsFixed(2);
+      // selectedAcc.decryptedBalance = newBal.toStringAsFixed(2);
+      ref.read(accountsProvider.notifier).updateLocalBalance(selectedAcc.id, newBal.toStringAsFixed(2));
       
-      ref.invalidate(accountsProvider);
+      // ref.invalidate(accountsProvider);
       ref.invalidate(budgetsProvider);
       ref.refresh(transactionsProvider);
 

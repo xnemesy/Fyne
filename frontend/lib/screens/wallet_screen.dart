@@ -10,6 +10,7 @@ import 'add_account_screen.dart';
 import 'transactions_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
+import '../services/currency_service.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -22,7 +23,7 @@ class WalletScreen extends ConsumerWidget {
     final formattedDate = DateFormat('dd MMM yyyy, HH:mm', 'it_IT').format(now);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: const Color(0xFFFBFBF9),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
@@ -32,7 +33,7 @@ class WalletScreen extends ConsumerWidget {
             builder: (context) => const AddTransactionSheet(),
           );
         },
-        backgroundColor: const Color(0xFF007AFF),
+        backgroundColor: const Color(0xFF4A6741),
         child: const Icon(LucideIcons.plus, color: Colors.white),
       ),
       body: SafeArea(
@@ -131,7 +132,7 @@ class WalletScreen extends ConsumerWidget {
               // Summary Card (Saldo Netto / Passivo)
               SliverToBoxAdapter(
                 child: accountsAsync.when(
-                  data: (accounts) => _buildSummaryCard(context, accounts),
+                  data: (accounts) => _buildSummaryCard(context, accounts, ref),
                   loading: () => const SizedBox(),
                   error: (_, __) => const SizedBox(),
                 ),
@@ -175,7 +176,7 @@ class WalletScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF007AFF) : const Color(0xFFE9E9EB),
+          color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
@@ -183,17 +184,22 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(BuildContext context, List<Account> accounts) {
+  Widget _buildSummaryCard(BuildContext context, List<Account> accounts, WidgetRef ref) {
+    final currencyService = ref.watch(currencyServiceProvider);
     double netBalance = 0;
     double liabilities = 0;
 
     for (var acc in accounts) {
       final balStr = acc.decryptedBalance?.replaceAll(',', '.') ?? '0';
       double bal = double.tryParse(balStr) ?? 0;
-      if (bal >= 0) {
-        netBalance += bal;
+      
+      // Convert everything to EUR for the total
+      double balInEur = currencyService.convertToEur(bal, acc.currency);
+      
+      if (balInEur >= 0) {
+        netBalance += balInEur;
       } else {
-        liabilities += bal.abs();
+        liabilities += balInEur.abs();
       }
     }
 
@@ -213,7 +219,7 @@ class WalletScreen extends ConsumerWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      Text("SALDO NETTO", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF007AFF), letterSpacing: 0.5)),
+                      Text("SALDO NETTO (EUR)", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741), letterSpacing: 0.5)),
                       const SizedBox(height: 4),
                       Text("${netBalance.toStringAsFixed(2)} €", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
                     ],
@@ -223,7 +229,7 @@ class WalletScreen extends ConsumerWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      Text("PASSIVO", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF007AFF), letterSpacing: 0.5)),
+                      Text("PASSIVO (EUR)", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741), letterSpacing: 0.5)),
                       const SizedBox(height: 4),
                       Text("${liabilities.toStringAsFixed(2)} €", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
                     ],

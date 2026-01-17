@@ -89,9 +89,9 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFF007AFF)),
+                  borderSide: const BorderSide(color: Color(0xFF4A6741)),
                 ),
-                prefixIcon: const Icon(LucideIcons.calendar, color: Color(0xFF007AFF), size: 18),
+                prefixIcon: const Icon(LucideIcons.calendar, color: Color(0xFF4A6741), size: 18),
               ),
             ),
             const SizedBox(height: 24),
@@ -115,7 +115,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _saveScheduled,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF007AFF),
+                  backgroundColor: const Color(0xFF4A6741),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 20),
@@ -140,7 +140,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFF007AFF) : Colors.white,
+            color: active ? const Color(0xFF4A6741) : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: active ? Colors.transparent : Colors.black.withOpacity(0.05)),
           ),

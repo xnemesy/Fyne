@@ -14,7 +14,7 @@ class BudgetsScreen extends ConsumerWidget {
     final budgetsAsync = ref.watch(budgetsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: const Color(0xFFFBFBF9),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(budgetsProvider.notifier).refresh(),
@@ -132,7 +132,7 @@ class BudgetsScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF007AFF) : const Color(0xFFE9E9EB),
+          color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),

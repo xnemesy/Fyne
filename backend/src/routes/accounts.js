@@ -54,4 +54,32 @@ router.post('/', verifyToken, async (req, res) => {
     }
 });
 
+/**
+ * @route POST /api/accounts/delete
+ * @desc Delete an account
+ */
+router.post('/delete', verifyToken, async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ error: 'Missing account ID' });
+    }
+
+    try {
+        const result = await db.query(
+            'DELETE FROM accounts WHERE id = $1 AND user_id = $2 RETURNING id',
+            [id, req.user.uid]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Account not found or unauthorized' });
+        }
+
+        res.json({ message: 'Account deleted successfully', id });
+    } catch (error) {
+        console.error('Delete Account Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

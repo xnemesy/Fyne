@@ -14,11 +14,11 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
     final scheduledAsync = ref.watch(scheduledProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: const Color(0xFFFBFBF9),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(scheduledProvider.notifier).refresh(),
-          color: const Color(0xFF007AFF),
+          color: const Color(0xFF4A6741),
           child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
@@ -30,7 +30,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(LucideIcons.calendar, size: 28, color: Color(0xFF007AFF)),
+                          const Icon(LucideIcons.calendar, size: 28, color: Color(0xFF4A6741)),
                           _headerAction(LucideIcons.plus, () {
                             showModalBottomSheet(
                               context: context,
@@ -81,7 +81,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                         ),
                       ),
                 loading: () => const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator(color: Color(0xFF007AFF))),
+                  child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
                 ),
                 error: (err, __) => SliverToBoxAdapter(
                   child: Center(child: Padding(
@@ -113,10 +113,10 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF007AFF).withOpacity(0.05),
+              color: const Color(0xFF4A6741).withOpacity(0.05),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(LucideIcons.calendarClock, size: 18, color: Color(0xFF007AFF)),
+            child: const Icon(LucideIcons.calendarClock, size: 18, color: Color(0xFF4A6741)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -149,7 +149,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF007AFF) : const Color(0xFFE9E9EB),
+          color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
