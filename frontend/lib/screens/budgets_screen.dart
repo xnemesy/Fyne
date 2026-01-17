@@ -65,57 +65,64 @@ class BudgetsScreen extends ConsumerWidget {
               
               const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-              budgetsAsync.when(
-                data: (budgets) => budgets.isEmpty
-                    ? SliverToBoxAdapter(child: _buildEmptyState())
-                    : SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final budget = budgets[index];
-                              return Dismissible(
-                                key: Key(budget.id),
-                                direction: DismissDirection.endToStart,
-                                background: Container(
-                                  alignment: Alignment.centerRight,
-                                  padding: const EdgeInsets.only(right: 20),
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF3B30),
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                  child: const Icon(LucideIcons.trash2, color: Colors.white),
-                                ),
-                                confirmDismiss: (direction) async {
-                                  return await showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text("Elimina Budget"),
-                                      content: const Text("Vuoi eliminare questo budget?"),
-                                      actions: [
-                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-                                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
-                                      ],
+              Consumer(
+                builder: (context, ref, child) {
+                  final budgetsAsync = ref.watch(budgetsProvider);
+                  final summaries = ref.watch(budgetSummaryProvider);
+
+                  return budgetsAsync.when(
+                    data: (budgets) => summaries.isEmpty
+                        ? SliverToBoxAdapter(child: _buildEmptyState())
+                        : SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final summary = summaries[index];
+                                  return Dismissible(
+                                    key: Key(summary.budget.id),
+                                    direction: DismissDirection.endToStart,
+                                    background: Container(
+                                      alignment: Alignment.centerRight,
+                                      padding: const EdgeInsets.only(right: 20),
+                                      margin: const EdgeInsets.only(bottom: 16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFF3B30),
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: const Icon(LucideIcons.trash2, color: Colors.white),
                                     ),
+                                    confirmDismiss: (direction) async {
+                                      return await showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text("Elimina Budget"),
+                                          content: const Text("Vuoi eliminare questo budget?"),
+                                          actions: [
+                                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+                                            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    onDismissed: (direction) {
+                                      ref.read(budgetsProvider.notifier).deleteBudget(summary.budget.id);
+                                    },
+                                    child: BudgetCard(status: summary),
                                   );
                                 },
-                                onDismissed: (direction) {
-                                  ref.read(budgetsProvider.notifier).deleteBudget(budget.id);
-                                },
-                                child: BudgetCard(budget: budget),
-                              );
-                            },
-                            childCount: budgets.length,
+                                childCount: summaries.length,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                loading: () => const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
-                ),
-                error: (err, __) => SliverToBoxAdapter(
-                  child: Center(child: Text("Errore: $err")),
-                ),
+                    loading: () => const SliverFillRemaining(
+                      child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                    ),
+                    error: (err, __) => SliverToBoxAdapter(
+                      child: Center(child: Text("Errore: $err")),
+                    ),
+                  );
+                },
               ),
               
               const SliverToBoxAdapter(child: SizedBox(height: 100)),

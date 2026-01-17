@@ -104,10 +104,12 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                     const SizedBox(height: 40),
                     Text("DISTRIBUZIONE SPESE", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.4))),
                     const SizedBox(height: 20),
-                    budgetsAsync.when(
-                      data: (budgets) => _buildTopCategoriesSection(budgets),
-                      loading: () => const LinearProgressIndicator(color: Color(0xFF4A6741), backgroundColor: Color(0xFFF2F2F0)),
-                      error: (_, __) => const Text("Impossibile caricare i dati"),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final summaries = ref.watch(budgetSummaryProvider);
+                        if (summaries.isEmpty) return const Text("Nessun dato disponibile");
+                        return _buildTopCategoriesSection(summaries);
+                      },
                     ),
                   ],
                 ),
@@ -206,37 +208,29 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
   }
 
   List<FlSpot> _generateDynamicSpots(double current, List<TransactionModel> transactions) {
-    if (transactions.isEmpty) {
-      return [
-        FlSpot(0, current * 0.98), FlSpot(1, current * 0.99),
-        FlSpot(2, current * 0.97), FlSpot(3, current * 0.98),
-        FlSpot(4, current * 0.99), FlSpot(5, current * 0.995),
-        FlSpot(6, current),
-      ];
-    }
-
-    // Sort transactions by date
-    final sortedTxs = List<TransactionModel>.from(transactions)
-      ..sort((a, b) => a.bookingDate.compareTo(b.bookingDate));
-
-    // Calculate historical net worth by subtracting transaction amounts backwards
-    List<FlSpot> spots = [];
-    double runningNetWorth = current;
-    spots.add(FlSpot(6, runningNetWorth));
-
+    // We want 7 spots, from 6 days ago (x=0) to today (x=6)
+    final List<FlSpot> spots = [];
+    double balanceAtTime = current;
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    // Most recent spot is today
+    spots.add(FlSpot(6, balanceAtTime));
+    
+    // Reverse historical days
     for (int i = 1; i <= 6; i++) {
-        final dayStart = now.subtract(Duration(days: i));
-        final dayEnd = now.subtract(Duration(days: i - 1));
-        
-        final daysTransactions = transactions.where((tx) => 
-          tx.bookingDate.isAfter(dayStart) && tx.bookingDate.isBefore(dayEnd));
-        
-        for (var tx in daysTransactions) {
-             // To go back in time, subtract income and add back expenses
-             runningNetWorth -= tx.amount;
-        }
-        spots.add(FlSpot((6 - i).toDouble(), runningNetWorth));
+      // Transactions that happened on the day we are "reversing" (moving back from current)
+      // Day being reversed: (i-1) days ago
+      final dayToReverse = today.subtract(Duration(days: i - 1));
+      final nextDay = dayToReverse.add(const Duration(days: 1));
+      
+      final dayTxs = transactions.where((tx) => 
+        tx.bookingDate.isAfter(dayToReverse) && tx.bookingDate.isBefore(nextDay));
+      
+      for (var tx in dayTxs) {
+        balanceAtTime -= tx.amount;
+      }
+      spots.add(FlSpot((6 - i).toDouble(), balanceAtTime));
     }
 
     return spots.reversed.toList();
@@ -426,15 +420,15 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     );
   }
 
-  Widget _buildTopCategoriesSection(List<Budget> budgets) {
-    final sortedBudgets = List<Budget>.from(budgets)..sort((a, b) => b.currentSpent.compareTo(a.currentSpent));
+  Widget _buildTopCategoriesSection(List<BudgetStatus> summaries) {
+    final sortedSummaries = List<BudgetStatus>.from(summaries)..sort((a, b) => b.spent.compareTo(a.spent));
     return Column(
-      children: sortedBudgets.take(5).map((budget) {
+      children: sortedSummaries.take(5).map((status) {
         return _categoryRow(
-          budget.decryptedCategoryName ?? "Sconosciuta",
-          "${budget.currentSpent.toStringAsFixed(0)} €",
-          budget.progress,
-          budget.isOverBudget ? const Color(0xFFD63031) : const Color(0xFF4A6741),
+          status.budget.decryptedCategoryName ?? "Sconosciuta",
+          "${status.spent.toStringAsFixed(0)} €",
+          status.progress,
+          status.isOverBudget ? const Color(0xFFD63031) : const Color(0xFF4A6741),
         );
       }).toList(),
     );

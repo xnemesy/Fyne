@@ -22,10 +22,10 @@ class Budget {
   factory Budget.fromJson(Map<String, dynamic> json) {
     return Budget(
       id: json['id'],
-      categoryUuid: json['category_uuid'],
-      encryptedCategoryName: json['encrypted_category_name'],
-      limitAmount: (json['limit_amount'] as num).toDouble(),
-      currentSpent: (json['current_spent'] as num).toDouble(),
+      categoryUuid: json['category_uuid'] ?? json['categoryUuid'] ?? json['category_id'] ?? '',
+      encryptedCategoryName: json['encrypted_category_name'] ?? json['encryptedCategoryName'] ?? '',
+      limitAmount: (json['limit_amount'] ?? json['limitAmount'] ?? json['amount'] ?? 0.0 as num).toDouble(),
+      currentSpent: (json['current_spent'] ?? json['currentSpent'] ?? 0.0 as num).toDouble(),
     );
   }
 

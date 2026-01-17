@@ -116,7 +116,7 @@ final dailyAllowanceProvider = Provider<double>((ref) {
   final now = DateTime.now();
   final firstOfMonth = DateTime(now.year, now.month, 1);
   final spentThisMonth = transactions
-      .where((tx) => tx.bookingDate.isAfter(firstOfMonth))
+      .where((tx) => tx.bookingDate.isAfter(firstOfMonth) && tx.amount < 0)
       .fold(0.0, (sum, tx) => sum + tx.amount.abs());
   
   final remainingBudget = totalBudget - spentThisMonth;
@@ -131,4 +131,33 @@ final dailyAllowanceProvider = Provider<double>((ref) {
 
 final budgetsProvider = AsyncNotifierProvider<BudgetNotifier, List<Budget>>(() {
   return BudgetNotifier();
+});
+
+class BudgetStatus {
+  final Budget budget;
+  final double spent;
+  BudgetStatus({required this.budget, required this.spent});
+
+  double get progress => budget.limitAmount > 0 ? (spent / budget.limitAmount) : 0;
+  double get remaining => budget.limitAmount - spent;
+  bool get isOverBudget => spent > budget.limitAmount;
+}
+
+final budgetSummaryProvider = Provider<List<BudgetStatus>>((ref) {
+  final budgets = ref.watch(budgetsProvider).value ?? [];
+  final transactions = ref.watch(transactionsProvider).value ?? [];
+  
+  final now = DateTime.now();
+  final firstOfMonth = DateTime(now.year, now.month, 1);
+  
+  return budgets.map((budget) {
+    final categorySpent = transactions
+        .where((tx) => 
+          tx.categoryUuid == budget.categoryUuid && 
+          tx.bookingDate.isAfter(firstOfMonth) &&
+          tx.amount < 0)
+        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+        
+    return BudgetStatus(budget: budget, spent: categorySpent);
+  }).toList();
 });
