@@ -23,7 +23,7 @@ class ScheduledTransaction {
   factory ScheduledTransaction.fromJson(Map<String, dynamic> json) {
     return ScheduledTransaction(
       id: json['id'] ?? '',
-      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      amount: (json['amount'] is String ? double.tryParse(json['amount']) : (json['amount'] as num?))?.toDouble() ?? 0.0,
       frequency: json['frequency'] ?? 'MONTHLY',
       nextOccurrence: DateTime.parse(json['next_occurrence'] ?? DateTime.now().toIso8601String()),
       encryptedDescription: json['encrypted_description'],
@@ -65,7 +65,7 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
       return list;
     } catch (e) {
       print("Scheduled fetch error: $e");
-      return _mockScheduled();
+      return [];
     }
   }
 

@@ -105,11 +105,11 @@ class CategorizationService {
   }
 
   List<dynamic> _preprocess(String text) {
-    // Basic text to tensor conversion (Placeholder logic)
-    // Most TFLite text models expect a fixed-size sequence of ints
+    // Basic text to tensor conversion
+    // Clamping to 255 to prevent 'gather index out of bounds' if model vocab is small
     List<double> tensor = List.filled(50, 0.0);
     for (int i = 0; i < text.length && i < 50; i++) {
-      tensor[i] = text.codeUnitAt(i).toDouble();
+      tensor[i] = (text.codeUnitAt(i) % 255).toDouble();
     }
     return [tensor];
   }

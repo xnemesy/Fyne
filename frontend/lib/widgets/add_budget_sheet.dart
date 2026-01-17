@@ -135,7 +135,7 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
       // Use dynamic UUID generation based on the category name
       final categoryUuid = categorizationService.getCategoryId(_categoryController.text); 
 
-      await api.post('/api/budgets', data: {
+      await api.post('/api/budgets/create', data: {
         'category_uuid': categoryUuid, // Ensure we use snake_case for consistency with backend
         'encrypted_category_name': encryptedName,
         'limit_amount': amount,
