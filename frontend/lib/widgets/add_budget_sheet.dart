@@ -6,6 +6,7 @@ import '../providers/budget_provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/crypto_service.dart';
 import '../services/api_service.dart';
+import '../services/categorization_service.dart';
 
 class AddBudgetSheet extends ConsumerStatefulWidget {
   const AddBudgetSheet({super.key});
@@ -130,14 +131,15 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
       final amount = double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0.0;
       final encryptedName = await crypto.encrypt(_categoryController.text, masterKey);
       
-      // Mock category UUID or use a real one if categorization is available
-      final categoryUuid = "550e8400-e29b-41d4-a716-446655440000"; 
+      final categorizationService = ref.read(categorizationServiceProvider);
+      // Use dynamic UUID generation based on the category name
+      final categoryUuid = categorizationService.getCategoryId(_categoryController.text); 
 
       await api.post('/api/budgets', data: {
-        'category_id': categoryUuid,
+        'category_uuid': categoryUuid, // Ensure we use snake_case for consistency with backend
         'encrypted_category_name': encryptedName,
-        'amount': amount,
-        'period': 'MONTHLY',
+        'limit_amount': amount,
+        'current_spent': 0.0, // Init with 0
       });
 
       ref.read(budgetsProvider.notifier).refresh();

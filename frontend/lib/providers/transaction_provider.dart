@@ -10,7 +10,7 @@ import 'privacy_provider.dart';
 
 import 'package:csv/csv.dart';
 
-final categorizationServiceProvider = Provider((ref) => CategorizationService());
+
 
 // Global flag for testing
 bool useMockData = false;

@@ -47,30 +47,9 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
       }
     } catch (e) {
       print("Budget fetch error: $e");
-      return _mockBudgets();
+      return [];
     }
-
-    if (budgets.isEmpty) return _mockBudgets();
     return budgets;
-  }
-
-  List<Budget> _mockBudgets() {
-    return [
-      Budget(
-        id: "b1",
-        categoryUuid: "c1",
-        encryptedCategoryName: "mock_Cibo",
-        limitAmount: 500.0,
-        currentSpent: 125.40,
-      )..decryptedCategoryName = "Cibo",
-      Budget(
-        id: "b2",
-        categoryUuid: "c2",
-        encryptedCategoryName: "mock_Trasporti",
-        limitAmount: 200.0,
-        currentSpent: 180.0,
-      )..decryptedCategoryName = "Trasporti",
-    ];
   }
 
   Future<void> refresh() async {

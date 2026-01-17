@@ -7,6 +7,7 @@ import '../providers/transaction_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter/services.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -57,6 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                   _buildSection("ACCOUNT", [
                     _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? (authState.user?.isAnonymous == true ? "Utente Verificato" : "utente@fyne.it"), onTap: () => _showMsg(context, "Profilo utente")),
                     _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Zero-Knowledge attivo", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
+                    _buildTile(LucideIcons.key, "Backup Chiave", "Richiesto", onTap: () => _showPrivateKey(context, ref)),
                   ]),
                   _buildSection("PREFERENZE", [
                     _buildTile(LucideIcons.palette, "Tema", "Segui sistema", onTap: () => _showMsg(context, "Cambia tema")),
@@ -117,6 +119,49 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore durante l'esportazione: $e")));
       }
     }
+  }
+
+  Future<void> _showPrivateKey(BuildContext context, WidgetRef ref) async {
+    final key = await ref.read(authProvider.notifier).exportPrivateKey();
+    if (key == null) {
+      if (context.mounted) _showMsg(context, "Nessuna chiave trovata");
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Backup Chiave Privata"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Questa chiave serve per recuperare i tuoi dati crittografati. Salvala in un luogo sicuro!"),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: Colors.grey[200],
+              child: Text(key.substring(0, 50) + "...", style: GoogleFonts.robotoMono(fontSize: 12)),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("CHIUDI"),
+          ),
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: key));
+              Navigator.pop(context);
+              _showMsg(context, "Chiave copiata negli appunti");
+            },
+            child: const Text("COPIA"),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSection(String title, List<Widget> tiles) {

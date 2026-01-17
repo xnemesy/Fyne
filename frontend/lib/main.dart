@@ -12,6 +12,7 @@ import 'package:cryptography/cryptography.dart';
 import 'dart:convert';
 import 'providers/auth_provider.dart';
 import 'providers/sync_provider.dart';
+import 'services/categorization_service.dart';
 import 'widgets/privacy_blur_overlay.dart';
 import 'providers/budget_provider.dart';
 import 'providers/transaction_provider.dart';

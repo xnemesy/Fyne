@@ -109,7 +109,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final publicKey = await _crypto.getOrGeneratePublicKey();
       final api = ref.read(apiServiceProvider);
       
-      // Send Public Key to Backend
       try {
         await api.post('/api/users/init', data: {
           'publicKey': publicKey,
@@ -117,7 +116,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         });
       } catch (apiErr) {
         print("Backend init error: $apiErr");
-        // We continue anyway if it's a local demo
+        state = state.copyWith(status: AuthStatus.unauthenticated, error: "Errore sincronizzazione chiavi. Riprova: $apiErr");
+        return; 
       }
 
       state = AuthState(status: AuthStatus.authenticated, user: _auth.currentUser);
@@ -134,6 +134,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void clearError() {
     state = state.copyWith(error: null);
+  }
+
+  Future<String?> exportPrivateKey() async {
+    return await _storage.read(key: 'fyne_rsa_private_key');
   }
 }
 

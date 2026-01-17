@@ -1,8 +1,10 @@
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Category {
+// ... (imports and class start)
   final String id;
   final String name;
   final bool isHealthFocus;
@@ -160,3 +162,5 @@ class CategorizationService {
     return _categoryMap[id] ?? _categoryMap[getCategoryId('Altro')]!;
   }
 }
+
+final categorizationServiceProvider = Provider<CategorizationService>((ref) => CategorizationService());
