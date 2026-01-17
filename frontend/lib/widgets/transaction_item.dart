@@ -55,7 +55,7 @@ class TransactionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    transaction.decryptedDescription ?? "Transazione",
+                    "${transaction.decryptedDescription ?? 'Transazione'}${transaction.decryptedCounterParty != null && transaction.decryptedCounterParty!.isNotEmpty ? ' (${transaction.decryptedCounterParty})' : ''}",
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,

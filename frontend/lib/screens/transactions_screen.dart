@@ -131,64 +131,81 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   else expenses += tx.amount;
                 }
 
-                return CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: _buildSummaryHeader(income, expenses),
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final tx = filtered[index];
-                            return Dismissible(
-                              key: Key(tx.id),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 20),
-                                margin: const EdgeInsets.symmetric(vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFF3B30),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: const Icon(LucideIcons.trash2, color: Colors.white),
-                              ),
-                              confirmDismiss: (direction) async {
-                                return await showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text("Elimina Transazione"),
-                                    content: const Text("Vuoi eliminare questa transazione?"),
-                                    actions: [
-                                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-                                      TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
-                                    ],
+                return NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification is ScrollUpdateNotification) {
+                      if (notification.metrics.pixels < -100) {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const AddTransactionSheet(),
+                        );
+                        return true; 
+                      }
+                    }
+                    return false;
+                  },
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _buildSummaryHeader(income, expenses),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final tx = filtered[index];
+                              return Dismissible(
+                                key: Key(tx.id),
+                                direction: DismissDirection.endToStart,
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF3B30),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                );
-                              },
-                              onDismissed: (direction) {
-                                ref.read(transactionsProvider.notifier).deleteTransaction(tx.id);
-                              },
-                              child: TransactionItem(
-                                transaction: tx,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TransactionDetailScreen(transaction: tx),
+                                  child: const Icon(LucideIcons.trash2, color: Colors.white),
+                                ),
+                                confirmDismiss: (direction) async {
+                                  return await showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text("Elimina Transazione"),
+                                      content: const Text("Vuoi eliminare questa transazione?"),
+                                      actions: [
+                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+                                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+                                      ],
                                     ),
                                   );
                                 },
-                              ),
-                            );
-                          },
-                          childCount: filtered.length,
+                                onDismissed: (direction) {
+                                  ref.read(transactionsProvider.notifier).deleteTransaction(tx.id);
+                                },
+                                child: TransactionItem(
+                                  transaction: tx,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TransactionDetailScreen(transaction: tx),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            childCount: filtered.length,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
