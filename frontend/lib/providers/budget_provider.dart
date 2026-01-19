@@ -46,7 +46,6 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
           budget.decryptedCategoryName = "Spesa";
         }
       }
-      }
     } catch (e) {
       debugPrint("Budget fetch error: $e");
       return [];

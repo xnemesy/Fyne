@@ -62,7 +62,6 @@ class BudgetsScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                ),
               ),
               
               const SliverToBoxAdapter(

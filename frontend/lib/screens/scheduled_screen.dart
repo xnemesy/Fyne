@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import '../widgets/add_scheduled_sheet.dart';
 import '../widgets/transaction_item.dart'; // Reusing helper methods from here or similar 
 import '../providers/scheduled_provider.dart';
 import '../services/categorization_service.dart'; // Need this if we use Category model directly? No, string based.

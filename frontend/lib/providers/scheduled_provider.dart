@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/categorization_service.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
 import 'budget_provider.dart';

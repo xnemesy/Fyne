@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../services/crypto_service.dart';
 import '../services/api_service.dart';
 import '../providers/budget_provider.dart';
+import '../providers/scheduled_provider.dart';
 
 class AddScheduledTransactionSheet extends ConsumerStatefulWidget {
   const AddScheduledTransactionSheet({super.key});

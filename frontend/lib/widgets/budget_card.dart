@@ -26,12 +26,27 @@ class BudgetCard extends StatelessWidget {
     final daysPassed = now.day;
     
     // Projected spend at end of month
+    // Projected spend at end of month
     final projectedSpend = (spent / daysPassed) * daysInMonth;
-    final willExceed = projectedSpend > effectiveBudget.limitAmount && !isOver;
+    final willExceed = effectiveBudget != null && effectiveBudget.limitAmount > 0 
+        ? projectedSpend > effectiveBudget.limitAmount && !isOver
+        : false;
+
+    Color progressColor;
+    if (progress >= 1.0) {
+      progressColor = const Color(0xFFD63031);
+    } else if (progress >= 0.8) {
+      progressColor = const Color(0xFFE6A23C);
+    } else {
+      progressColor = const Color(0xFF4A6741);
+    }
+
+    if (effectiveBudget == null) {
+      return const SizedBox.shrink();
+    }
 
     return GestureDetector(
       onTap: () {
-        if (effectiveBudget == null) return;
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,

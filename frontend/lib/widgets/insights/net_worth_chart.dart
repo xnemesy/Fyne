@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../widgets/decrypted_value.dart';
+import '../decrypted_value.dart';
 
 class NetWorthChart extends StatelessWidget {
   final double netWorth;

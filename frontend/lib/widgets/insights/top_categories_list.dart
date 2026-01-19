@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../models/budget.dart';
+import '../../providers/budget_provider.dart';
+
 
 class TopCategoriesList extends StatelessWidget {
   final List<BudgetStatus> categories;

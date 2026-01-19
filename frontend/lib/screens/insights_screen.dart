@@ -141,13 +141,11 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF2F2F0),
         borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
         children: [
-          Row(
-            children: [
-              _toggleBtn("Current", !_showPreviousWeek),
-              _toggleBtn("Prev", _showPreviousWeek),
-            ],
-          ),
+          _toggleBtn("Current", !_showPreviousWeek),
+          _toggleBtn("Prev", _showPreviousWeek),
         ],
       ),
     );

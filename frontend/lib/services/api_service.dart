@@ -44,6 +44,10 @@ class ApiService {
   Future<Response> post(String path, {dynamic data}) async {
     return await dio.post(path, data: data);
   }
+
+  Future<Response> put(String path, {dynamic data}) async {
+    return await dio.put(path, data: data);
+  }
 }
 
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
