@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../services/crypto_service.dart';
 import '../services/api_service.dart';
+import 'budget_provider.dart';
 
 enum AuthStatus {
   unauthenticated,
@@ -106,7 +107,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _initializeUserKeys() async {
     state = state.copyWith(status: AuthStatus.initializingKeys);
     try {
+      // 1. Initialize RSA Keys for Sync
       final publicKey = await _crypto.getOrGeneratePublicKey();
+      
+      // 2. Initialize AES Master Key for Local Encryption
+      final masterKey = await _crypto.getOrGenerateMasterKey();
+      ref.read(masterKeyProvider.notifier).state = masterKey;
+
       final api = ref.read(apiServiceProvider);
       
       try {
@@ -128,7 +135,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> signOut() async {
     await _auth.signOut();
-    await _storage.delete(key: 'fyne_rsa_private_key'); // Clear key on signout for security
+    await _storage.delete(key: 'fyne_rsa_private_key'); // Clear RSA key
+    // We do NOT delete the AES master key from storage as it encrypts local data which persists.
+    // However, we clear it from memory.
+    ref.read(masterKeyProvider.notifier).state = null;
+    
     state = AuthState(status: AuthStatus.unauthenticated);
   }
 

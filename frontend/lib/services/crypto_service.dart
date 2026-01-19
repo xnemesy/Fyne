@@ -86,6 +86,26 @@ class CryptoService {
     return _rsaPrivateKey!.publicKey.encrypt(text);
   }
 
+  static const _masterKeyIdentifier = 'fyne_master_key';
+
+  /// Retrieves or generates a persistent AES Master Key for local encryption.
+  Future<SecretKey> getOrGenerateMasterKey() async {
+    // 1. Try to load from SecureStorage
+    final storedKeyBase64 = await _storage.read(key: _masterKeyIdentifier);
+    if (storedKeyBase64 != null) {
+      final keyBytes = base64.decode(storedKeyBase64);
+      return SecretKey(keyBytes);
+    }
+
+    // 2. Generate random 32-byte key if not found
+    final keyBytes = (await SecretKeyData.random(length: 32)).bytes;
+    
+    // 3. Save to SecureStorage
+    await _storage.write(key: _masterKeyIdentifier, value: base64.encode(keyBytes));
+    
+    return SecretKey(keyBytes);
+  }
+
   /// Decrypts a Base64 string using a derived key.
   Future<String> decrypt(String base64Data, SecretKey secretKey) async {
     final data = base64.decode(base64Data);

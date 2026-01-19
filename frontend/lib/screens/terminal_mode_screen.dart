@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/account.dart';
 import '../widgets/decrypted_value.dart';
+import '../providers/wallet_provider.dart';
 
-class TerminalModeScreen extends StatefulWidget {
+class TerminalModeScreen extends ConsumerStatefulWidget {
   final List<Account> accounts;
   const TerminalModeScreen({super.key, required this.accounts});
 
   @override
-  State<TerminalModeScreen> createState() => _TerminalModeScreenState();
+  ConsumerState<TerminalModeScreen> createState() => _TerminalModeScreenState();
 }
 
-class _TerminalModeScreenState extends State<TerminalModeScreen> {
+class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
   String _timeframe = '1Y';
 
   @override
   Widget build(BuildContext context) {
-    double totalNetWorth = 0;
-    for (var acc in widget.accounts) {
-      totalNetWorth += double.tryParse(acc.decryptedBalance ?? '0') ?? 0;
-    }
+    final summary = ref.watch(walletSummaryProvider);
+    final totalNetWorth = summary.netWorth;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBF9),
@@ -169,6 +169,7 @@ class _TerminalModeScreenState extends State<TerminalModeScreen> {
 
   List<FlSpot> _generateHistoricalSpots(double current) {
     // Mocking historical data based on current net worth
+    // Ideally this should come from historical snapshots if available
     return [
       FlSpot(0, current * 0.8),
       FlSpot(1, current * 0.82),

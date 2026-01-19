@@ -8,8 +8,6 @@ import 'services/notification_service.dart';
 import 'services/fcm_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cryptography/cryptography.dart';
-import 'dart:convert';
 import 'providers/auth_provider.dart';
 import 'providers/sync_provider.dart';
 import 'services/categorization_service.dart';
@@ -110,15 +108,6 @@ class _InitializationWrapperState extends ConsumerState<InitializationWrapper> {
        
        // 2. Initialize FCM now that we are authenticated
        await FcmService().init();
-    });
-
-    // 3. Inject Demo Key for prototype - use Future.microtask to avoid build phase error
-    Future.microtask(() {
-      final currentKey = ref.read(masterKeyProvider);
-      if (currentKey == null) {
-        final demoKey = SecretKey(utf8.encode("fyne_demo_super_secret_key_32_ch"));
-        ref.read(masterKeyProvider.notifier).state = demoKey;
-      }
     });
   }
 

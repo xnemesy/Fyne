@@ -10,7 +10,7 @@ import 'add_account_screen.dart';
 import 'transactions_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
-import '../services/currency_service.dart';
+import '../widgets/wallet/wallet_summary_card.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -130,12 +130,8 @@ class WalletScreen extends ConsumerWidget {
               ),
 
               // Summary Card (Saldo Netto / Passivo)
-              SliverToBoxAdapter(
-                child: accountsAsync.when(
-                  data: (accounts) => _buildSummaryCard(context, accounts, ref),
-                  loading: () => const SizedBox(),
-                  error: (_, __) => const SizedBox(),
-                ),
+              const SliverToBoxAdapter(
+                child: WalletSummaryCard(),
               ),
 
               // List of Accounts
@@ -180,77 +176,6 @@ class WalletScreen extends ConsumerWidget {
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
-      ),
-    );
-  }
-
-  Widget _buildSummaryCard(BuildContext context, List<Account> accounts, WidgetRef ref) {
-    final currencyService = ref.watch(currencyServiceProvider);
-    double netBalance = 0;
-    double liabilities = 0;
-
-    for (var acc in accounts) {
-      final balStr = acc.decryptedBalance?.replaceAll(',', '.') ?? '0';
-      double bal = double.tryParse(balStr) ?? 0;
-      
-      // Convert everything to EUR for the total
-      double balInEur = currencyService.convertToEur(bal, acc.currency);
-      
-      if (balInEur >= 0) {
-        netBalance += balInEur;
-      } else {
-        liabilities += balInEur.abs();
-      }
-    }
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9E9EB).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text("SALDO NETTO (EUR)", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741), letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text("${netBalance.toStringAsFixed(2)} €", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
-                    ],
-                  ),
-                ),
-                Container(height: 40, width: 1, color: Colors.black.withOpacity(0.05)),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text("PASSIVO (EUR)", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741), letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text("${liabilities.toStringAsFixed(2)} €", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1, indent: 0, endIndent: 0),
-          ListTile(
-            onTap: () {
-               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TransactionsScreen()),
-              );
-            },
-            dense: true,
-            leading: const Icon(LucideIcons.list, size: 18, color: Color(0xFF1A1A1A)),
-            title: Text("Tutte le transazioni", style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))),
-          ),
-        ],
       ),
     );
   }
