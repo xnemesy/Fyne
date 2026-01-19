@@ -22,6 +22,39 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   final _balanceController = TextEditingController();
   final _cryptoIdController = TextEditingController(); // For crypto symbol/id
   bool _isSaving = false;
+  String _selectedGroup = 'Personale';
+
+  Widget _buildGroupChip(String label, IconData icon) {
+    final isSelected = _selectedGroup == label;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedGroup = label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF4A6741) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? Colors.transparent : Colors.black.withOpacity(0.05)),
+          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF4A6741).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: isSelected ? Colors.white : const Color(0xFF1A1A1A)),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.white : const Color(0xFF1A1A1A),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   final Map<AccountType, IconData> _typeIcons = {
     AccountType.checking: LucideIcons.landmark,
@@ -200,14 +233,24 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           ),
           const SizedBox(height: 24),
 
-          if (_selectedType == AccountType.crypto) ...[
-            _buildInputLabel("COINGECKO ID (es: bitcoin, ethereum)"),
-            TextField(
-              controller: _cryptoIdController,
-              decoration: _inputDecoration("id dalla url di coingecko"),
+          const SizedBox(height: 24),
+
+          _buildInputLabel("GRUPPO"),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildGroupChip("Personale", LucideIcons.user),
+                const SizedBox(width: 8),
+                _buildGroupChip("Lavoro", LucideIcons.briefcase),
+                const SizedBox(width: 8),
+                _buildGroupChip("Famiglia", LucideIcons.users),
+                const SizedBox(width: 8),
+                _buildGroupChip("Vacanza", LucideIcons.plane),
+              ],
             ),
-            const SizedBox(height: 24),
-          ],
+          ),
 
           const SizedBox(height: 40),
           SizedBox(
@@ -292,6 +335,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         'currency': 'EUR',
         'type': _selectedType!.name,
         'provider_id': _selectedType == AccountType.crypto ? _cryptoIdController.text : null,
+        'group_name': _selectedGroup, // Pass selected group
       });
 
       ref.invalidate(accountsProvider);

@@ -26,6 +26,7 @@ class Account {
   final String currency;
   final AccountType type;
   final String? providerId;
+  final String group; // New field for grouping
   
   String? decryptedName;
   String? decryptedBalance;
@@ -37,6 +38,7 @@ class Account {
     required this.currency,
     required this.type,
     this.providerId,
+    this.group = 'Personale', // Default group
     this.decryptedName,
     this.decryptedBalance,
   });
@@ -49,6 +51,7 @@ class Account {
       currency: json['currency'],
       type: AccountType.fromString(json['type'] ?? 'checking'),
       providerId: json['provider_id'],
+      group: json['group_name'] ?? 'Personale',
     );
   }
 }

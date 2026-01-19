@@ -10,8 +10,13 @@ const db = require('../utils/db');
 router.get('/', verifyToken, async (req, res) => {
     try {
         await db.ensureUser(req.user.uid);
+        // Ensure group_name column exists (migration)
+        await db.query(`
+            ALTER TABLE accounts ADD COLUMN IF NOT EXISTS group_name VARCHAR(50) DEFAULT 'Personale'
+        `);
+
         const result = await db.query(
-            'SELECT id, encrypted_name, encrypted_balance, currency, type, provider_id FROM accounts WHERE user_id = $1',
+            'SELECT id, encrypted_name, encrypted_balance, currency, type, provider_id, group_name FROM accounts WHERE user_id = $1',
             [req.user.uid]
         );
         res.json(result.rows);
@@ -36,8 +41,8 @@ router.post('/', verifyToken, async (req, res) => {
     try {
         await db.ensureUser(req.user.uid);
         const result = await db.query(
-            `INSERT INTO accounts (user_id, encrypted_name, encrypted_balance, currency, type, provider_id)
-       VALUES ($1, $2, $3, $4, $5, $6)
+            `INSERT INTO accounts (user_id, encrypted_name, encrypted_balance, currency, type, provider_id, group_name)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id`,
             [
                 req.user.uid,
@@ -45,7 +50,8 @@ router.post('/', verifyToken, async (req, res) => {
                 encrypted_balance,
                 currency,
                 type || 'checking',
-                provider_id
+                provider_id,
+                req.body.group_name || 'Personale'
             ]
         );
         res.json({ id: result.rows[0].id, message: 'Account created successfully' });
