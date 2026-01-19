@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../models/budget.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
@@ -45,8 +46,9 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
           budget.decryptedCategoryName = "Spesa";
         }
       }
+      }
     } catch (e) {
-      print("Budget fetch error: $e");
+      debugPrint("Budget fetch error: $e");
       return [];
     }
     return budgets;
@@ -72,7 +74,7 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
       // 3. API Call
       await api.post('/api/budgets/delete', data: {'id': budgetId});
     } catch (e) {
-      print("Delete budget error: $e");
+      debugPrint("Delete budget error: $e");
       // 4. Rollback
       state = AsyncData(previousState);
     }
@@ -95,7 +97,10 @@ final dailyAllowanceProvider = Provider<double>((ref) {
   final now = DateTime.now();
   final firstOfMonth = DateTime(now.year, now.month, 1);
   final spentThisMonth = transactions
-      .where((tx) => tx.bookingDate.isAfter(firstOfMonth) && tx.amount < 0)
+      .where((tx) {
+        final date = tx.bookingDate;
+        return (date.isAfter(firstOfMonth) || date.isAtSameMomentAs(firstOfMonth)) && tx.amount < 0;
+      })
       .fold(0.0, (sum, tx) => sum + tx.amount.abs());
   
   final remainingBudget = totalBudget - spentThisMonth;

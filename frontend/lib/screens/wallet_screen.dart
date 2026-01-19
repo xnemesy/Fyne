@@ -11,6 +11,7 @@ import 'transactions_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
 import '../widgets/wallet/wallet_summary_card.dart';
+import '../widgets/daily_allowance_card.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -104,30 +105,15 @@ class WalletScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Search Bar
-              SliverToBoxAdapter(
+              // Daily Allowance Card
+              const SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE3E3E8),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(LucideIcons.search, size: 18, color: Color(0xFF8E8E93)),
-                        const SizedBox(width: 10),
-                        Text(
-                          "Cerca",
-                          style: GoogleFonts.inter(color: const Color(0xFF8E8E93), fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                  child: DailyAllowanceCard(),
                 ),
               ),
+              
+              const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
               // Summary Card (Saldo Netto / Passivo)
               const SliverToBoxAdapter(

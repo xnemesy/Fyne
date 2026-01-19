@@ -1,29 +1,32 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/budget_provider.dart';
-import '../providers/auth_provider.dart';
-import '../services/crypto_service.dart';
 import '../services/api_service.dart';
-import '../services/categorization_service.dart';
+import '../models/budget.dart';
 
-class AddBudgetSheet extends ConsumerStatefulWidget {
-  const AddBudgetSheet({super.key});
+class EditBudgetSheet extends ConsumerStatefulWidget {
+  final Budget budget;
+  const EditBudgetSheet({super.key, required this.budget});
 
   @override
-  ConsumerState<AddBudgetSheet> createState() => _AddBudgetSheetState();
+  ConsumerState<EditBudgetSheet> createState() => _EditBudgetSheetState();
 }
 
-class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
-  final _amountController = TextEditingController();
+class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
+  late TextEditingController _amountController;
   bool _isSaving = false;
-  String? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController(text: widget.budget.limitAmount.toStringAsFixed(2));
+  }
 
   @override
   Widget build(BuildContext context) {
-    final categories = ref.read(categorizationServiceProvider).supportedCategories;
-
     return Container(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 40,
@@ -46,12 +49,15 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Nuovo Budget",
-                  style: GoogleFonts.lora(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A1A1A),
+                Expanded(
+                  child: Text(
+                    "Modifica ${widget.budget.decryptedCategoryName ?? 'Budget'}",
+                    style: GoogleFonts.lora(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1A1A1A),
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 IconButton(
@@ -76,30 +82,6 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
                 border: InputBorder.none,
               ),
             ),
-            const SizedBox(height: 32),
-            DropdownButtonFormField<String>(
-              value: _selectedCategory,
-              decoration: InputDecoration(
-                labelText: "CATEGORIA",
-                labelStyle: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
-                filled: true,
-                fillColor: Colors.white,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFF4A6741)),
-                ),
-                prefixIcon: const Icon(LucideIcons.tag, color: Color(0xFF4A6741), size: 18),
-              ),
-              items: categories.map((cat) => DropdownMenuItem(
-                value: cat,
-                child: Text(cat, style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
-              )).toList(),
-              onChanged: (val) => setState(() => _selectedCategory = val),
-            ),
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
@@ -114,7 +96,7 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
                 ),
                 child: _isSaving 
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : Text("SALVA BUDGET", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
+                    : Text("AGGIORNA BUDGET", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
               ),
             ),
           ],
@@ -124,32 +106,25 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
   }
 
   Future<void> _saveBudget() async {
-    if (_amountController.text.isEmpty || _selectedCategory == null) return;
+    if (_amountController.text.isEmpty) return;
     setState(() => _isSaving = true);
 
     try {
-      final crypto = ref.read(cryptoServiceProvider);
       final api = ref.read(apiServiceProvider);
-      final masterKey = ref.read(masterKeyProvider);
-
-      if (masterKey == null) throw Exception("Master key not found");
-
       final amount = double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0.0;
-      final encryptedName = await crypto.encrypt(_selectedCategory!, masterKey);
-      
-      final categorizationService = ref.read(categorizationServiceProvider);
-      // Ensure we use the exact same logic as transaction categorization
-      final categoryUuid = categorizationService.getCategoryId(_selectedCategory!); 
 
-      await api.post('/api/budgets/create', data: {
-        'category_uuid': categoryUuid,
-        'encrypted_category_name': encryptedName,
-        'limit_amount': amount,
-        'current_spent': 0.0,
+      await api.put('/api/budgets/${widget.budget.id}', data: {
+        'limitAmount': amount, 
       });
+      // Note: backend route in budgets.js uses "limitAmount" (camelCase) in destructuring: const { limitAmount } = req.body;
+      // But let's check the previous step view_file of budgets.js content:
+      // router.put('/:id', verifyToken, async (req, res) => {
+      //     const { limitAmount } = req.body;
+      
+      // So we send 'limitAmount'.
 
       ref.read(budgetsProvider.notifier).refresh();
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore: $e")));
     } finally {

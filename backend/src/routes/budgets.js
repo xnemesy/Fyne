@@ -20,6 +20,36 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 /**
+ * @route POST /api/budgets/create
+ * @desc Create a new budget manually (e.g. from app UI)
+ */
+router.post('/create', verifyToken, async (req, res) => {
+    // 1. Destructure fields using snake_case as sent by Flutter
+    // OR map from camelCase if you prefer standardizing API to camelCase.
+    // The Flutter code sends: category_uuid, encrypted_category_name, limit_amount, current_spent
+    const { category_uuid, encrypted_category_name, limit_amount, current_spent } = req.body;
+
+    if (!category_uuid || !encrypted_category_name) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        await db.query(
+            `INSERT INTO budgets (user_id, category_uuid, encrypted_category_name, limit_amount, current_spent)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (user_id, category_uuid) DO UPDATE SET
+               encrypted_category_name = EXCLUDED.encrypted_category_name,
+               limit_amount = EXCLUDED.limit_amount`,
+            [req.user.uid, category_uuid, encrypted_category_name, limit_amount || 0, current_spent || 0]
+        );
+        res.json({ message: 'Budget created successfully' });
+    } catch (error) {
+        console.error("Create Budget Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
  * @route PUT /api/budgets/:id
  * @desc Update budget limit (useful for transfers)
  */

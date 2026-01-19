@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/budget_provider.dart';
 import '../widgets/budget_card.dart';
 import '../widgets/add_budget_sheet.dart';
+import '../widgets/daily_allowance_card.dart';
 
 class BudgetsScreen extends ConsumerWidget {
   const BudgetsScreen({super.key});
@@ -61,9 +62,17 @@ class BudgetsScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+                ),
               ),
               
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: DailyAllowanceCard(),
+                ),
+              ),
+              
+              const SliverToBoxAdapter(child: SizedBox(height: 10)),
 
               Consumer(
                 builder: (context, ref, child) {

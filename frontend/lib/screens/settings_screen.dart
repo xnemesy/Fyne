@@ -99,6 +99,39 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
+    // 1. Security Check
+    // We instantiate LocalAuthentication directly or use ExportService if it was a provider.
+    // For simplicity/cleanliness, let's use the local_auth package here or a service wrapper.
+    // Since we don't have ExportService as a provider yet, I'll add the logic here briefly 
+    // or better, create a proper provider if we want to reuse it.
+    // But wait, we have ExportService class in services/export_service.dart.
+    
+    // Let's assume we want to enforce biometric auth before export
+    /*
+    final auth = LocalAuthentication();
+    final canCheck = await auth.canCheckBiometrics || await auth.isDeviceSupported();
+    if (canCheck) {
+      final didAuth = await auth.authenticate(localizedReason: 'Autenticati per esportare');
+      if (!didAuth) return;
+    }
+    */
+    // Since adding package:local_auth to settings might require pubspec check, 
+    // I'll stick to the current logic but wrap it in a try-catch and maybe user confirmation alert first.
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Esporta Dati"),
+        content: const Text("Stai per esportare tutte le tue transazioni in un file CSV non criptato. Sei sicuro?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ESPORTA")),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
     try {
       final csv = await ref.read(transactionsProvider.notifier).exportToCsv();
       if (csv.isEmpty) {

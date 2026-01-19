@@ -18,7 +18,7 @@ class CategorizationService {
   bool _isModelLoaded = false;
 
   // Categories Mapping (Order must match Model output indices)
-  final List<String> _labelOrder = [
+  List<String> get supportedCategories => [
     'Abbonamenti',
     'Alimentari',
     'Altro',
@@ -33,7 +33,7 @@ class CategorizationService {
 
   CategorizationService() {
     _categoryMap = {
-      for (var name in _labelOrder)
+      for (var name in supportedCategories)
         _uuid.v5(Uuid.NAMESPACE_URL, name): Category(
           id: _uuid.v5(Uuid.NAMESPACE_URL, name),
           name: name,
@@ -83,7 +83,7 @@ class CategorizationService {
     // Simple preprocessing: char-level or dummy tokenization for the placeholder
     // In a real scenario, this would match the training preprocessing
     var input = _preprocess(text);
-    var output = List<double>.filled(_labelOrder.length, 0).reshape([1, _labelOrder.length]);
+    var output = List<double>.filled(supportedCategories.length, 0).reshape([1, supportedCategories.length]);
 
     _interpreter!.run(input, output);
 
@@ -99,7 +99,7 @@ class CategorizationService {
     }
 
     return {
-      'label': _labelOrder[maxIndex],
+      'label': supportedCategories[maxIndex],
       'confidence': maxProb
     };
   }

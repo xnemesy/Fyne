@@ -8,8 +8,10 @@ class ScheduledTransaction {
   final double amount;
   final String frequency;
   final DateTime nextOccurrence;
-  final String? encryptedDescription;
+  String? encryptedDescription;
   String? decryptedDescription;
+  String? categoryName;
+  String? categoryUuid;
 
   ScheduledTransaction({
     required this.id,
@@ -18,6 +20,8 @@ class ScheduledTransaction {
     required this.nextOccurrence,
     this.encryptedDescription,
     this.decryptedDescription,
+    this.categoryName,
+    this.categoryUuid,
   });
 
   factory ScheduledTransaction.fromJson(Map<String, dynamic> json) {
@@ -57,6 +61,12 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
              } else {
                 tx.decryptedDescription = await crypto.decrypt(tx.encryptedDescription!, masterKey);
              }
+             
+             // Run categorization
+             final category = await ref.read(categorizationServiceProvider).categorize(tx.decryptedDescription!);
+             tx.categoryName = category.name;
+             tx.categoryUuid = category.id;
+             
           } catch (e) {
             tx.decryptedDescription = "Programmata";
           }

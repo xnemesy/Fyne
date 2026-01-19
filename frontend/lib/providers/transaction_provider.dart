@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:math';
 import 'budget_provider.dart';
 import 'account_provider.dart';
@@ -31,7 +32,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
       final response = await api.get('/api/transactions');
       data = response.data;
     } catch (e) {
-      print("API Error: $e");
+      debugPrint("API Error: $e");
     }
 
     if (data.isEmpty) {
@@ -40,7 +41,12 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
 
     // Process transactions in parallel
     final List<Future<TransactionModel>> futures = data.map((json) => _processSingleTransaction(json, masterKey)).toList();
-    return await Future.wait(futures);
+    final results = await Future.wait(futures);
+    
+    // Sort by date descending (newest first)
+    results.sort((a, b) => b.bookingDate.compareTo(a.bookingDate));
+    
+    return results;
   }
 
   Future<TransactionModel> _processSingleTransaction(dynamic json, dynamic masterKey) async {
@@ -176,7 +182,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
       // ref.invalidate(budgetsProvider);
       
     } catch (e) {
-      print("Delete transaction error: $e");
+      debugPrint("Delete transaction error: $e");
       
       // 5. Rollback on error
       state = AsyncData(previousState);

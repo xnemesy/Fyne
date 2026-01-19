@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 
 /**
  * Service to handle communication with the Cloud Run backend.
@@ -19,18 +20,18 @@ class ApiService {
         if (user != null) {
           final token = await user.getIdToken();
           options.headers['Authorization'] = 'Bearer $token';
-          print("➡️ API Request: ${options.method} ${options.path} [Auth Token Present]");
+          debugPrint("➡️ API Request: ${options.method} ${options.path} [Auth Token Present]");
         } else {
-          print("➡️ API Request: ${options.method} ${options.path} [Anonymous/No User]");
+          debugPrint("➡️ API Request: ${options.method} ${options.path} [Anonymous/No User]");
         }
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        print("⬅️ API Response: ${response.statusCode} ${response.requestOptions.path}");
+        debugPrint("⬅️ API Response: ${response.statusCode} ${response.requestOptions.path}");
         return handler.next(response);
       },
       onError: (error, handler) {
-        print("❌ API Error: ${error.response?.statusCode} ${error.requestOptions.path} - ${error.message}");
+        debugPrint("❌ API Error: ${error.response?.statusCode} ${error.requestOptions.path} - ${error.message}");
         return handler.next(error);
       },
     ));

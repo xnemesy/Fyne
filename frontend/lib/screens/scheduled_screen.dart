@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
-import '../widgets/add_scheduled_sheet.dart';
+import '../widgets/transaction_item.dart'; // Reusing helper methods from here or similar 
 import '../providers/scheduled_provider.dart';
+import '../services/categorization_service.dart'; // Need this if we use Category model directly? No, string based.
 
 class ScheduledTransactionsScreen extends ConsumerWidget {
   const ScheduledTransactionsScreen({super.key});
@@ -113,10 +114,14 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A6741).withOpacity(0.05),
+              color: const Color(0xFFE9E9EB),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(LucideIcons.calendarClock, size: 18, color: Color(0xFF4A6741)),
+            child: Icon(
+              _getCategoryIcon(tx.categoryName),
+              size: 20, 
+              color: const Color(0xFF1A1A1A)
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -178,5 +183,29 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String? categoryName) {
+    if (categoryName == null) return LucideIcons.calendarClock;
+    
+    switch (categoryName.toUpperCase()) {
+      case 'CIBO':
+      case 'ALIMENTARI':
+      case 'FAST FOOD':
+        return LucideIcons.utensils;
+      case 'TRASPORTI':
+        return LucideIcons.car;
+      case 'ABBONAMENTI':
+        return LucideIcons.creditCard;
+      case 'SHOPPING':
+        return LucideIcons.shoppingBag;
+      case 'VIZI':
+        return LucideIcons.wine;
+      case 'WELLNESS':
+        return LucideIcons.activity;
+      case 'ALTRO':
+      default:
+        return LucideIcons.calendarClock;
+    }
   }
 }

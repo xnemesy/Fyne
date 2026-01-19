@@ -4,7 +4,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:share_plus/share_plus.dart';
 
-class ExportService {
+import 'package:flutter/foundation.dart';
+
+ class ExportService {
   final LocalAuthentication auth = LocalAuthentication();
 
   Future<bool> authenticate() async {
@@ -22,7 +24,7 @@ class ExportService {
         ),
       );
     } catch (e) {
-      print("Export Auth Error: $e");
+      debugPrint("Export Auth Error: $e");
       return false;
     }
   }
@@ -50,6 +52,6 @@ class ExportService {
     await file.writeAsString(csvData);
 
     // Using Share to let user save/send the file
-    await Share.shareFiles([file.path], text: 'Esportazione dati Fyne');
+    await Share.shareXFiles([XFile(file.path)], text: 'Esportazione dati Fyne');
   }
 }

@@ -19,6 +19,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
   final _descriptionController = TextEditingController();
   String _frequency = 'MONTHLY';
   bool _isSaving = false;
+  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +97,35 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
             ),
             const SizedBox(height: 24),
             Text(
+              "INIZIO",
+              style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: _pickDate,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.black.withOpacity(0.05)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.calendarDays, size: 18, color: Color(0xFF4A6741)),
+                    const SizedBox(width: 12),
+                    Text(
+                      "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 14),
+                    ),
+                    const Spacer(),
+                    const Icon(LucideIcons.chevronDown, size: 16, color: Color(0xFF8E8E93)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
               "FREQUENZA",
               style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
             ),
@@ -154,6 +184,29 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
     );
   }
 
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF4A6741),
+              onPrimary: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
   Future<void> _saveScheduled() async {
     if (_amountController.text.isEmpty || _descriptionController.text.isEmpty) return;
     setState(() => _isSaving = true);
@@ -170,18 +223,19 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
 
       await api.post('/api/scheduled-transactions', data: {
         'encrypted_description': encryptedDesc,
-        'amount': -amount, // Assuming it's an expense
+        'amount': -amount.abs(), // Always store as negative for expenses
         'currency': 'EUR',
         'frequency': _frequency,
-        'next_occurrence': DateTime.now().add(const Duration(days: 30)).toIso8601String(),
+        'next_occurrence': _selectedDate.toIso8601String(),
       });
 
+      ref.read(scheduledProvider.notifier).refresh();
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Transazione programmata correttamente!")));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore: $e")));
     } finally {
-      setState(() => _isSaving = false);
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 }
