@@ -161,9 +161,28 @@ class BudgetsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            const Icon(LucideIcons.box, size: 48, color: Color(0xFF8E8E93)),
-            const SizedBox(height: 16),
-            Text("Nessun budget configurato", style: GoogleFonts.inter(color: const Color(0xFF8E8E93))),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A6741).withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(LucideIcons.box, size: 40, color: Color(0xFF4A6741)),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Nessun budget attivo",
+              style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "Crea un budget dopo aver aggiunto le tue spese principali per mantenere il controllo.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),

@@ -57,17 +57,18 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   _buildSection("ACCOUNT", [
                     _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? (authState.user?.isAnonymous == true ? "Utente Verificato" : "utente@fyne.it"), onTap: () => _showMsg(context, "Profilo utente")),
-                    _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Zero-Knowledge attivo", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
+                    _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Gestisci", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
                     _buildTile(LucideIcons.key, "Backup Chiave", "Richiesto", onTap: () => _showPrivateKey(context, ref)),
                   ]),
-                  _buildSection("PREFERENZE", [
-                    _buildTile(LucideIcons.palette, "Tema", "Segui sistema", onTap: () => _showMsg(context, "Cambia tema")),
-                    _buildTile(LucideIcons.bell, "Notifiche", "Attive", onTap: () => _showMsg(context, "Preferenze notifiche")),
-                    _buildTile(LucideIcons.coins, "Valuta", "EUR (€)", onTap: () => _showMsg(context, "Cambia valuta")),
+                  _buildSection("STATO DELLA SICUREZZA", [
+                    _buildSecurityTile("Crittografia locale attiva"),
+                    _buildSecurityTile("Zero-Knowledge server"),
+                    _buildSecurityTile("AI locale (TFLite)"),
+                    _buildSecurityTile("Nessuna sincronizzazione automatica"),
                   ]),
                   _buildSection("SISTEMA", [
                     _buildTile(LucideIcons.database, "Esporta Dati", "CSV", onTap: () => _exportData(context, ref)),
-                    _buildTile(LucideIcons.info, "Info su Fyne", "v1.0.0", onTap: () => _showMsg(context, "Fyne v1.0.0 Stable")),
+                    _buildTile(LucideIcons.info, "Info", "v1.0.0", onTap: () => _showMsg(context, "Fyne v1.0.0 Stable")),
                   ]),
                   const SizedBox(height: 20),
                   Padding(
@@ -241,7 +242,28 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSecurityTile(String label) {
+    return ListTile(
+      dense: true,
+      leading: const Icon(LucideIcons.check, color: Color(0xFF4A6741), size: 16),
+      title: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF1A1A1A).withOpacity(0.7),
+        ),
+      ),
+    );
+  }
+
   void _showMsg(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }

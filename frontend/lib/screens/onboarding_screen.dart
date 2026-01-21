@@ -17,24 +17,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   final List<OnboardingData> _pages = [
     OnboardingData(
-      title: "Privacy Radicale",
-      description: "Architettura Zero-Knowledge. Nemmeno noi possiamo vedere i tuoi dati. La crittografia avviene sul tuo dispositivo.",
+      title: "Benvenuto in Fyne",
+      description: "La gestione finanziaria per chi pretende controllo, non compromessi.",
+      icon: LucideIcons.sparkles,
+    ),
+    OnboardingData(
+      title: "Privacy radicale",
+      description: "I tuoi dati non lasciano mai il tuo dispositivo. Nemmeno noi possiamo accedervi.",
+      microCopy: "Architettura Zero-Knowledge nativa.",
       icon: LucideIcons.shieldCheck,
     ),
     OnboardingData(
-      title: "Intelligence Locale",
-      description: "L'AI corre sul tuo silicio. Analisi delle spese e suggerimenti senza mai inviare i tuoi dati in cloud.",
+      title: "Intelligence locale",
+      description: "L'analisi avviene sul tuo dispositivo. Nessun cloud. Nessuna condivisione.",
+      microCopy: "AI privata, sempre offline.",
       icon: LucideIcons.brainCircuit,
     ),
     OnboardingData(
       title: "I tuoi dati, le tue regole",
-      description: "Controlla il tuo patrimonio con estetica e precisione. Fyne è la custodia digitale dei tuoi risparmi.",
+      description: "Inserisci solo ciò che scegli. Nessuna sincronizzazione automatica. Nessuna dipendenza da terze parti.",
       icon: LucideIcons.key,
     ),
     OnboardingData(
-      title: "Benvenuto in Fyne",
-      description: "Il futuro della finanza personale è privato, bello e intelligente. Accedi ora per iniziare.",
-      icon: LucideIcons.sparkles,
+      title: "Tutto è pronto",
+      description: "Fyne è progettata per funzionare in silenzio, lasciando parlare solo i numeri.",
+      icon: LucideIcons.checkCircle,
     ),
   ];
 
@@ -97,12 +104,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               );
             },
             child: Container(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A6741).withOpacity(0.05),
+                color: const Color(0xFF1A1A1A).withOpacity(0.03),
                 shape: BoxShape.circle,
               ),
-              child: Icon(page.icon, size: 80, color: const Color(0xFF4A6741)),
+              child: Icon(page.icon, size: 48, color: const Color(0xFF1A1A1A).withOpacity(0.7)),
             ),
           ),
           const SizedBox(height: 60),
@@ -121,10 +128,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 16,
-              color: const Color(0xFF1A1A1A).withOpacity(0.6),
+              color: const Color(0xFF1A1A1A).withOpacity(0.8),
               height: 1.6,
             ),
           ),
+          if (page.microCopy != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              page.microCopy!,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
           const SizedBox(height: 120), // Spacer for bottom buttons
         ],
       ),
@@ -362,6 +382,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 class OnboardingData {
   final String title;
   final String description;
+  final String? microCopy;
   final IconData icon;
-  OnboardingData({required this.title, required this.description, required this.icon});
+  OnboardingData({required this.title, required this.description, this.microCopy, required this.icon});
 }

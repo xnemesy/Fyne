@@ -31,89 +31,105 @@ class DailyAllowanceWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "DISPONIBILITÀ GIORNALIERA",
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                  color: const Color(0xFF4A6741).withOpacity(0.6),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A6741).withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  "Ottimale",
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF4A6741),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                currencyFormat.format(allowance).split(',')[0],
-                style: GoogleFonts.lora(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF4A6741),
-                ),
-              ),
-              Text(
-                ",${currencyFormat.format(allowance).split(',')[1]}",
-                style: GoogleFonts.lora(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF4A6741).withOpacity(0.5),
-                ),
-              ),
-            ],
+          Text(
+            "DISPONIBILITÀ GIORNALIERA",
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: const Color(0xFF1A1A1A).withOpacity(0.4),
+            ),
           ),
           const SizedBox(height: 24),
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  currencyFormat.format(allowance).split(',')[0],
+                  style: GoogleFonts.lora(
+                    fontSize: 56,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1A1A1A),
+                    letterSpacing: -1,
+                  ),
+                ),
+                Text(
+                  ",${currencyFormat.format(allowance).split(',')[1]}",
+                  style: GoogleFonts.lora(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: (allowance > 0 ? const Color(0xFF4A6741) : const Color(0xFFFF3B30)).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                allowance > 0 ? "RITMO SOSTENIBILE" : "BUDGET SUPERATO",
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: allowance > 0 ? const Color(0xFF4A6741) : const Color(0xFFFF3B30),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
           Stack(
             children: [
               Container(
-                height: 6,
+                height: 4,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A6741).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(3),
+                  color: const Color(0xFF1A1A1A).withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
               FractionallySizedBox(
-                widthFactor: (allowance / (totalBudget / 30)).clamp(0.0, 1.0),
+                widthFactor: totalBudget > 0 ? (allowance / (totalBudget / 30)).clamp(0.0, 1.0) : 0,
                 child: Container(
-                  height: 6,
+                  height: 4,
                   decoration: BoxDecoration(
                     color: const Color(0xFF4A6741),
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            "Spendi con consapevolezza oggi per mantenere il tuo equilibrio finanziario.",
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              height: 1.5,
-              color: const Color(0xFF1A1A1A).withOpacity(0.5),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Calcolato su ${DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day - DateTime.now().day + 1} giorni rimanenti",
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                allowance > 0 ? "In equilibrio" : "Revisione necessaria",
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                ),
+              ),
+            ],
           ),
         ],
       ),

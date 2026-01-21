@@ -12,6 +12,7 @@ import 'providers/auth_provider.dart';
 import 'providers/sync_provider.dart';
 import 'services/categorization_service.dart';
 import 'widgets/privacy_blur_overlay.dart';
+import 'widgets/milestone_listener.dart';
 import 'providers/budget_provider.dart';
 import 'providers/transaction_provider.dart';
 
@@ -78,7 +79,11 @@ class AuthWrapper extends ConsumerWidget {
 
     if (authState.status == AuthStatus.authenticated) {
       return const PrivacyBlurOverlay(
-        child: InitializationWrapper(child: DashboardScreen()),
+        child: InitializationWrapper(
+          child: MilestoneListener(
+            child: DashboardScreen(),
+          ),
+        ),
       );
     } else {
       return const OnboardingScreen();

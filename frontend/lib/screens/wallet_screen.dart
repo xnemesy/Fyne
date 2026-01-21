@@ -249,12 +249,50 @@ class WalletScreen extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
         child: Column(
           children: [
-            const Icon(LucideIcons.wallet, size: 48, color: Color(0xFF8E8E93)),
-            const SizedBox(height: 16),
-            Text("Nessun conto configurato", style: GoogleFonts.inter(color: const Color(0xFF8E8E93))),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A6741).withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(LucideIcons.wallet, size: 40, color: Color(0xFF4A6741)),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "Inizia dal tuo primo conto",
+              style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "Aggiungi un conto per vedere il tuo patrimonio prendere forma.\nNessuna sincronizzazione automatica. Inserisci solo ciò che vuoi.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddAccountScreen()),
+                );
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF4A6741),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                "Aggiungi conto",
+                style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+            ),
           ],
         ),
       ),

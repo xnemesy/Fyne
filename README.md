@@ -4,60 +4,85 @@ Fyne is a premium personal finance application designed with a **Privacy-First, 
 
 ---
 
-## 🤖 Overview for External Agents / Developers
+# 🤖 Developer & Agent Documentation
 
-Fyne is built on the principle that **financial data should never be visible to the service provider**. All sensitive information is encrypted on the client device before reaching the cloud.
+> **Note for AI Agents**: This repository is optimized for autonomous coding. Read this section carefully before modifying code.
 
-### 🏛️ Core Architecture
-- **Frontend**: Flutter (Cross-platform iOS/Android).
-- **Backend**: Node.js/Express service deployed on **Google Cloud Run** (`europe-west8`).
-- **Auth**: **Firebase Authentication** (Handles user identity only; strictly decoupled from financial data).
-- **Security Logic**: Client-side encryption using a hybrid model:
-  - **AES-256 (PBKDF2)**: Used for manually entered accounts and transactions. Derived from a local "Master Key".
-  - **RSA-2048**: Used for banking synchronization. Public keys are stored on the server to allow the backend to encrypt bank feeds, which only the client can decrypt with the local private key.
+## 🧠 System Architecture
 
-### 🔐 Security & Privacy Implementation
-- **Zero-Knowledge Sync**: The server stores only encrypted blobs. Even a full server breach would reveal no transaction details, balance amounts, or account names.
-- **Local Intelligence**: Transaction categorization (ML-based) runs locally on-device using **TFLite**. No clear-text transaction descriptions are ever sent to a cloud logic engine.
-- **Biometric Protection**: Includes a `PrivacyBlurOverlay` to protect sensitive data from prying eyes/screenshots by applying a cinematic blur when the app is in the background or locked.
+Fyne follows a strict **Privacy-by-Design** philosophy. The backend is "blind"; it sees only encrypted blobs. All business logic requiring clear-text data (categorization, budget calc, heuristics) happens **locally on the device**.
 
----
+### 🔧 Tech Stack (Frontend)
+- **Framework**: Flutter (Dart 3.x)
+- **State Management**: **Riverpod 2.0** (with `riverpod_generator`)
+- **Local Database**: **Isar** (NoSQL, Typed, Async)
+- **Cryptography**: `cryptography` package (AES-GCM for data, RSA for sharing)
+- **ML Engine**: `tflite_flutter` (Local inference)
+- **UI Framework**: Custom "Neo-Minimalist" Design System (Glassmorphism, Lora/Inter typography)
 
-## 🚀 Key Features & UI/UX
+### 📂 Project Structure Map (`/frontend`)
+| Directory | Purpose | Agent Rule |
+| :--- | :--- | :--- |
+| `lib/models/` | Data definitions & Isar Collections | **Must** be properly typed. |
+| `lib/providers/` | Riverpod State Logic | Use `@riverpod` annotations. Run `build_runner` after edits. |
+| `lib/services/` | Core logic (Auth, Crypto, API) | **CRITICAL**: Use `CryptoService` for all sensitive I/O. |
+| `lib/screens/` | Feature pages | Ensure "Premium" feel. No standard Material placeholders. |
+| `lib/widgets/` | Reusable components | Maintain design consistency (Colors, Spacing). |
 
-- **Editorial UI**: A "Neo-Minimalist" aesthetic leveraging `Lora` for serif elegance and `Inter` for technical precision.
-- **Dynamic Net Worth**: Real-time asset tracking with historical charts calculated locally from encrypted transaction logs.
-- **Budget Intelligence**: Daily allowance calculations and burn-rate analysis to help users reach their savings goals.
-- **MoneyWiz Dynamics**: Atomic balance updates. Manual expenses are subtracted locally, re-encrypted, and synced to ensure immediate consistency of the account balance.
-
----
-
-## 🛠️ Project Structure
-
-- `/frontend`: Flutter app. State managed via **Riverpod**.
-- `/backend`: Banking Abstraction Layer. Orchestrates encrypted bank feeds and data indexing.
-- `/infrastructure`: Terraform/Bash scripts for GCP deployment.
+### 🧩 Available Skills (Agent Capabilities)
+This repository includes specialized skill definitions in `.agent/skills/`. **Usage is mandatory** for the relevant tasks:
+- `flutter-clean-architecture`: Validating layer separation.
+- `flutter-riverpod-architecture`: implementing new providers.
+- `flutter-secure-storage-pattern`: Managing secure tokens/keys.
+- `node-express-backend`: Modifying the `/backend` service.
 
 ---
 
-## 📝 Latest Stability Updates (v1.2.0)
-- ✅ **Optimized Startup**: ML Model loading deferred to after the first frame to ensure zero splash-screen lag.
-- ✅ **Multi-Auth**: Support for Email/Password and Anonymous login with automatic cryptographic vault initialization.
-- ✅ **Interactive UI**: Gesture-based management (swipe-to-delete) for accounts, budgets, and transactions.
-- ✅ **Localization**: Support for European decimal formats (comma/dot) in all financial inputs.
+## ⚡ Quick Start & Commands
 
----
-
-## 🏗️ Getting Started
-
+### 1. Setup Environment
 ```bash
-# Clone and enter the project
+# Clone
 git clone [repo-url]
 cd Fyne/frontend
 
-# Install dependencies and build
+# Install Dependencies
 flutter pub get
+```
+
+### 2. Code Generation (Riverpod/Isar)
+Since we use code generation, **you must run this command** after creating/editing models or providers:
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### 3. Run Application
+```bash
+flutter run
+# Specific to iOS Simulator (if issues arise)
 flutter build ios --debug --no-codesign --simulator
 ```
 
-**Developer Note**: Always use the `CryptoService` wrapper for API interactions. Never pass clear-text `description` or `amount` fields to the `ApiService`.
+---
+
+## �️ Security & Privacy Protocols (NON-NEGOTIABLE)
+
+1.  **Zero-Knowledge Integrity**: 
+    - The server **never** receives `amount`, `title`, or `description` in plain text.
+    - Encryption happens in `CryptoService` **before** API calls.
+    - Decryption happens **only** at render time on the client.
+
+2.  **Sensitive Data Logging**:
+    - **FORBIDDEN**: `print(transaction.amount)`
+    - **ALLOWED**: `print('Transaction sync completed: ${ids.length} items')`
+
+3.  **Local ML**:
+    - Transaction categorization is performed by `tflite`.
+    - Do **not** send transaction strings to external analysis APIs (e.g. OpenAI) unless explicitly anonymized.
+
+---
+
+## 🎨 Design Guidelines
+- **Typography**: Headers = `Lora` (Serif), Body/Numbers = `Inter` (Sans).
+- **Colors**: Use the defined `AppTheme` palette. Avoid hardcoding hex values.
+- **Interactions**: Prefer clear, gestural interactions (Swipe, Tap, Long Press).
