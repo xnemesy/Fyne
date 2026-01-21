@@ -34,6 +34,7 @@ router.post('/create', verifyToken, async (req, res) => {
     }
 
     try {
+        await db.ensureUser(req.user.uid);
         await db.query(
             `INSERT INTO budgets (user_id, category_uuid, encrypted_category_name, limit_amount, current_spent)
              VALUES ($1, $2, $3, $4, $5)
@@ -42,6 +43,7 @@ router.post('/create', verifyToken, async (req, res) => {
                limit_amount = EXCLUDED.limit_amount`,
             [req.user.uid, category_uuid, encrypted_category_name, limit_amount || 0, current_spent || 0]
         );
+        console.log(`✅ Budget saved/updated for user: ${req.user.uid}`);
         res.json({ message: 'Budget created successfully' });
     } catch (error) {
         console.error("Create Budget Error:", error);

@@ -10,10 +10,6 @@ const db = require('../utils/db');
 router.get('/', verifyToken, async (req, res) => {
     try {
         await db.ensureUser(req.user.uid);
-        // Ensure group_name column exists (migration)
-        await db.query(`
-            ALTER TABLE accounts ADD COLUMN IF NOT EXISTS group_name VARCHAR(50) DEFAULT 'Personale'
-        `);
 
         const result = await db.query(
             'SELECT id, encrypted_name, encrypted_balance, currency, type, provider_id, group_name FROM accounts WHERE user_id = $1',
@@ -54,6 +50,7 @@ router.post('/', verifyToken, async (req, res) => {
                 req.body.group_name || 'Personale'
             ]
         );
+        console.log(`✅ Account created for user: ${req.user.uid}, ID: ${result.rows[0].id}`);
         res.json({ id: result.rows[0].id, message: 'Account created successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });

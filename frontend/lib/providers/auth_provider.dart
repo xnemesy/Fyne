@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
 import '../services/crypto_service.dart';
 import '../services/api_service.dart';
 import 'master_key_provider.dart';
@@ -129,13 +130,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final api = ref.read(apiServiceProvider);
       
       try {
+        debugPrint("[Auth] Sending init request to backend...");
         await api.post('/api/users/init', data: {
           'publicKey': publicKey,
           'email': _auth.currentUser?.email ?? 'anonymous_${_auth.currentUser?.uid}',
         });
+        debugPrint("[Auth] Backend init successful.");
       } catch (apiErr) {
-        print("Backend init error: $apiErr");
-        state = state.copyWith(status: AuthStatus.unauthenticated, error: "Errore sincronizzazione chiavi. Riprova: $apiErr");
+        debugPrint("[Auth] Backend init FAILED: $apiErr");
+        String errorMessage = apiErr.toString();
+        if (apiErr is DioException) {
+          errorMessage = apiErr.response?.data?['error'] ?? apiErr.message;
+        }
+        state = state.copyWith(status: AuthStatus.unauthenticated, error: "Sync Error: $errorMessage");
         return; 
       }
 

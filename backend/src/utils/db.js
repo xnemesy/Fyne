@@ -27,7 +27,6 @@ module.exports = {
             } catch (e) {
                 console.warn('⚠️ Could not ensure pgcrypto (might lack superuser), continuing...', e.message);
             }
-
             // 2. Users table (Uniform ID: uid VARCHAR 128 as PK)
             await pool.query(`
                 CREATE TABLE IF NOT EXISTS users (
@@ -40,11 +39,24 @@ module.exports = {
             `);
             console.log('✅ Users table verified');
 
+            // 2.1 Migration for email in users
+            try {
+                const checkCol = await pool.query(
+                    "SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='email'"
+                );
+                if (checkCol.rows.length === 0) {
+                    await pool.query("ALTER TABLE users ADD COLUMN email TEXT");
+                    console.log('✅ Added column email to users');
+                }
+            } catch (e) {
+                console.error('❌ Error migraton email for users:', e.message);
+            }
+
             // 3. Banking Connections table
             await pool.query(`
                 CREATE TABLE IF NOT EXISTS banking_connections (
                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                    user_uid VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
+                    user_id VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
                     provider VARCHAR(50),
                     provider_requisition_id TEXT UNIQUE,
                     provider_account_id TEXT,
@@ -84,10 +96,24 @@ module.exports = {
                     currency VARCHAR(3) NOT NULL,
                     type VARCHAR(20) DEFAULT 'checking',
                     provider_id VARCHAR(50),
+                    group_name VARCHAR(50) DEFAULT 'Personale',
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                 )
             `);
             console.log('✅ Accounts table verified');
+
+            // 4.1 Migration for group_name
+            try {
+                const checkCol = await pool.query(
+                    "SELECT 1 FROM information_schema.columns WHERE table_name='accounts' AND column_name='group_name'"
+                );
+                if (checkCol.rows.length === 0) {
+                    await pool.query("ALTER TABLE accounts ADD COLUMN group_name VARCHAR(50) DEFAULT 'Personale'");
+                    console.log('✅ Added column group_name to accounts');
+                }
+            } catch (e) {
+                console.error('❌ Error migraton group_name for accounts:', e.message);
+            }
 
             // 5. Transactions table verified
             await pool.query(`
@@ -122,12 +148,18 @@ module.exports = {
                     if (checkCol.rows.length === 0) {
                         // If user_uid exists but user_id doesn't, rename it
                         if (col.name === 'user_id') {
-                            const checkUid = await pool.query("SELECT 1 FROM information_schema.columns WHERE table_name='transactions' AND column_name='user_uid'");
-                            if (checkUid.rows.length > 0) {
-                                await pool.query('ALTER TABLE transactions RENAME COLUMN user_uid TO user_id');
-                                console.log('✅ Renamed user_uid to user_id in transactions');
-                                continue;
+                            const checkTables = ['transactions', 'banking_connections'];
+                            for (const t of checkTables) {
+                                const checkUid = await pool.query(
+                                    "SELECT 1 FROM information_schema.columns WHERE table_name=$1 AND column_name='user_uid'",
+                                    [t]
+                                );
+                                if (checkUid.rows.length > 0) {
+                                    await pool.query(`ALTER TABLE ${t} RENAME COLUMN user_uid TO user_id`);
+                                    console.log(`✅ Renamed user_uid to user_id in ${t}`);
+                                }
                             }
+                            continue;
                         }
                         await pool.query(`ALTER TABLE transactions ADD COLUMN ${col.name} ${col.type}`);
                         console.log(`✅ Added column ${col.name} to transactions`);
