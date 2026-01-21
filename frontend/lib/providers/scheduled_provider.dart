@@ -3,6 +3,7 @@ import '../services/categorization_service.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
 import 'budget_provider.dart';
+import 'master_key_provider.dart';
 
 class ScheduledTransaction {
   final String id;
@@ -80,26 +81,7 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
     }
   }
 
-  List<ScheduledTransaction> _mockScheduled() {
-    return [
-      ScheduledTransaction(
-        id: "s1",
-        amount: -850.00,
-        frequency: "MONTHLY",
-        nextOccurrence: DateTime.now().add(const Duration(days: 15)),
-        encryptedDescription: "mock_Affitto Casa",
-        decryptedDescription: "Affitto Casa",
-      ),
-      ScheduledTransaction(
-        id: "s2",
-        amount: -15.99,
-        frequency: "MONTHLY",
-        nextOccurrence: DateTime.now().add(const Duration(days: 5)),
-        encryptedDescription: "mock_Netflix Premium",
-        decryptedDescription: "Netflix Premium",
-      ),
-    ];
-  }
+  List<ScheduledTransaction> _mockScheduled() => [];
 
   Future<void> refresh() async {
     final masterKey = ref.read(masterKeyProvider);

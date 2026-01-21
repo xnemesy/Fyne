@@ -37,7 +37,8 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
     }
 
     if (data.isEmpty) {
-       return _mockTransactions();
+       debugPrint("No transactions found in DB.");
+       return [];
     }
 
     // Process transactions in parallel

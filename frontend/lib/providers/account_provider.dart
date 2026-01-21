@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../models/account.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
@@ -16,30 +17,42 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
     final api = ref.read(apiServiceProvider);
     final crypto = ref.read(cryptoServiceProvider);
 
-    if (masterKey == null) return [];
+    if (masterKey == null) {
+      debugPrint("[AccountProvider] MasterKey is NULL, returning early.");
+      return [];
+    }
 
-    final response = await api.get('/api/accounts');
-    final List<dynamic> data = response.data;
-    
-    final List<Account> accounts = data.map((json) => Account.fromJson(json)).toList();
+    try {
+      debugPrint("[AccountProvider] Fetching accounts from API...");
+      final response = await api.get('/api/accounts');
+      final List<dynamic> data = response.data;
+      debugPrint("[AccountProvider] API returned ${data.length} accounts.");
+      
+      final List<Account> accounts = data.map((json) => Account.fromJson(json)).toList();
 
-    for (var account in accounts) {
-      try {
-        // 1. Try AES (Manual accounts)
-        account.decryptedName = await crypto.decrypt(account.encryptedName, masterKey);
-        account.decryptedBalance = await crypto.decrypt(account.encryptedBalance, masterKey);
-      } catch (e) {
+      for (var account in accounts) {
         try {
-          // 2. Try RSA (Synced accounts)
-          account.decryptedName = await crypto.decryptWithPrivateKey(account.encryptedName);
-          account.decryptedBalance = await crypto.decryptWithPrivateKey(account.encryptedBalance);
-        } catch (e2) {
-          account.decryptedName = "Account Criptato";
-          account.decryptedBalance = "0.00";
+          // 1. Try AES (Manual accounts)
+          account.decryptedName = await crypto.decrypt(account.encryptedName, masterKey);
+          account.decryptedBalance = await crypto.decrypt(account.encryptedBalance, masterKey);
+        } catch (e) {
+          debugPrint("[AccountProvider] Decryption failed for account ${account.id}, trying RSA...");
+          try {
+            // 2. Try RSA (Synced accounts)
+            account.decryptedName = await crypto.decryptWithPrivateKey(account.encryptedName);
+            account.decryptedBalance = await crypto.decryptWithPrivateKey(account.encryptedBalance);
+          } catch (e2) {
+            debugPrint("[AccountProvider] RSA Decryption failed too.");
+            account.decryptedName = "Account Criptato";
+            account.decryptedBalance = "0.00";
+          }
         }
       }
+      return accounts;
+    } catch (e) {
+      debugPrint("[AccountProvider] ERROR in _fetchAndDecryptAccounts: $e");
+      return [];
     }
-    return accounts;
   }
 
   Future<void> refresh() async {

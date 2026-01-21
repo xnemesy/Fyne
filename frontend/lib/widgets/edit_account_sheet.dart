@@ -24,7 +24,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.account.decryptedName);
-    _selectedGroup = widget.account.groupName ?? 'Personale';
+    _selectedGroup = widget.account.group ?? 'Personale';
   }
 
   @override

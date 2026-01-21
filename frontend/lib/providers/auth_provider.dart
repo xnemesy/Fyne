@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
 import '../services/crypto_service.dart';
 import '../services/api_service.dart';
 import 'master_key_provider.dart';
@@ -41,20 +42,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> _checkInitialState() async {
     final user = _auth.currentUser;
+    debugPrint("[Auth] Checking initial state. Current user: ${user?.uid ?? 'None'}");
+    
     if (user != null) {
       final hasKey = await _storage.read(key: 'fyne_rsa_private_key') != null;
+      debugPrint("[Auth] RSA Key present: $hasKey");
+      
       if (hasKey) {
         // Restore Master Key to Riverpod state for decryption
         final masterKey = await _crypto.getOrGenerateMasterKey();
-        ref.read(masterKeyProvider.notifier).state = masterKey;
+        final masterKeyFound = await _storage.read(key: 'fyne_master_key') != null;
+        debugPrint("[Auth] MasterKey restored. Found in storage: $masterKeyFound");
         
+        ref.read(masterKeyProvider.notifier).state = masterKey;
         state = AuthState(status: AuthStatus.authenticated, user: user);
       } else {
-        // User is logged in but local keys are missing (e.g. app reinstalled)
-        // Auto-initialize for demo/smooth recovery
+        debugPrint("[Auth] Key missing, forcing re-initialization.");
         await _initializeUserKeys();
       }
     } else {
+      debugPrint("[Auth] No user found.");
       state = AuthState(status: AuthStatus.unauthenticated);
     }
   }

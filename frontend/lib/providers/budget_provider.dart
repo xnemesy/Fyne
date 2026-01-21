@@ -80,7 +80,7 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
   }
 }
 
-final totalMonthlyBudgetProvider = StateProvider<double>((ref) => 2500.0); // Example budget
+final totalMonthlyBudgetProvider = StateProvider<double>((ref) => 0.0);
 
 final dailyAllowanceProvider = Provider<double>((ref) {
   final transactions = ref.watch(transactionsProvider).value ?? [];
@@ -91,6 +91,8 @@ final dailyAllowanceProvider = Provider<double>((ref) {
   final totalBudget = budgets.isEmpty 
       ? stateBudget 
       : budgets.fold(0.0, (sum, b) => sum + b.limitAmount);
+  
+  if (totalBudget <= 0) return 0.0;
   
   // Calculate total spent this month
   final now = DateTime.now();
