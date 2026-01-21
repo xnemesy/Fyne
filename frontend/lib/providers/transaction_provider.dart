@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 import 'budget_provider.dart';
+import 'master_key_provider.dart';
 import 'account_provider.dart';
 import '../services/categorization_service.dart';
 import '../models/transaction.dart';

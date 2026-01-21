@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/account_provider.dart';
+import '../providers/master_key_provider.dart';
 import '../providers/budget_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../services/api_service.dart';

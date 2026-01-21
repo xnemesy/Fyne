@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/budget_provider.dart';
+import '../providers/master_key_provider.dart';
 import '../services/api_service.dart';
 import '../models/budget.dart';
 
@@ -99,10 +100,64 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
                     : Text("AGGIORNA BUDGET", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
               ),
             ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: _isSaving ? null : _deleteBudget,
+                icon: const Icon(LucideIcons.trash2, size: 18, color: Color(0xFFFF3B30)),
+                label: Text(
+                  "ELIMINA BUDGET",
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    fontSize: 13,
+                    color: const Color(0xFFFF3B30),
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: const Color(0xFFFF3B30).withOpacity(0.2)),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _deleteBudget() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Elimina Budget"),
+        content: const Text("Sei sicuro di voler eliminare questo budget?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true), 
+            child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30))),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() => _isSaving = true);
+      try {
+        await ref.read(budgetsProvider.notifier).deleteBudget(widget.budget.id);
+        if (mounted) Navigator.pop(context);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore: $e")));
+          setState(() => _isSaving = false);
+        }
+      }
+    }
   }
 
   Future<void> _saveBudget() async {

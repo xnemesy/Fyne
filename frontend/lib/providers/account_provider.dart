@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/account.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
+import 'master_key_provider.dart';
 import '../providers/budget_provider.dart';
 
 class AccountNotifier extends AsyncNotifier<List<Account>> {
@@ -44,6 +45,20 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
   Future<void> refresh() async {
     final masterKey = ref.read(masterKeyProvider);
     state = await AsyncValue.guard(() => _fetchAndDecryptAccounts(masterKey));
+  }
+
+  Future<void> updateAccount(String accountId, {String? encryptedName, String? groupName}) async {
+    final api = ref.read(apiServiceProvider);
+    
+    try {
+      await api.put('/api/accounts/$accountId', data: {
+        if (encryptedName != null) 'encrypted_name': encryptedName,
+        if (groupName != null) 'group_name': groupName,
+      });
+      refresh();
+    } catch (e) {
+      print("Update account error: $e");
+    }
   }
 
   Future<void> deleteAccount(String accountId) async {

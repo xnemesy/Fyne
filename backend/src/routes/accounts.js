@@ -61,6 +61,45 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 /**
+ * @route PUT /api/accounts/:id
+ * @desc Update account details (Encrypted name, group, etc.)
+ */
+router.put('/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { encrypted_name, group_name } = req.body;
+
+    try {
+        await db.ensureUser(req.user.uid);
+
+        let query = 'UPDATE accounts SET id = id'; // No-op start
+        const params = [id, req.user.uid];
+        let paramIndex = 3;
+
+        if (encrypted_name) {
+            query += `, encrypted_name = $${paramIndex++}`;
+            params.push(encrypted_name);
+        }
+        if (group_name) {
+            query += `, group_name = $${paramIndex++}`;
+            params.push(group_name);
+        }
+
+        query += ' WHERE id = $1 AND user_id = $2 RETURNING id';
+
+        const result = await db.query(query, params);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Account not found or unauthorized' });
+        }
+
+        res.json({ message: 'Account updated successfully', id });
+    } catch (error) {
+        console.error('Update Account Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
  * @route POST /api/accounts/delete
  * @desc Delete an account
  */

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../services/crypto_service.dart';
 import '../services/api_service.dart';
+import 'master_key_provider.dart';
 import 'budget_provider.dart';
 
 enum AuthStatus {
@@ -43,6 +44,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (user != null) {
       final hasKey = await _storage.read(key: 'fyne_rsa_private_key') != null;
       if (hasKey) {
+        // Restore Master Key to Riverpod state for decryption
+        final masterKey = await _crypto.getOrGenerateMasterKey();
+        ref.read(masterKeyProvider.notifier).state = masterKey;
+        
         state = AuthState(status: AuthStatus.authenticated, user: user);
       } else {
         // User is logged in but local keys are missing (e.g. app reinstalled)

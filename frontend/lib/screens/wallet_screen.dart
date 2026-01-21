@@ -10,6 +10,7 @@ import 'add_account_screen.dart';
 import 'transactions_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
+import '../widgets/edit_account_sheet.dart';
 import '../widgets/wallet/wallet_summary_card.dart';
 import '../widgets/daily_allowance_card.dart';
 
@@ -218,6 +219,14 @@ class WalletScreen extends ConsumerWidget {
               MaterialPageRoute(
                 builder: (context) => TransactionsScreen(accountId: account.id),
               ),
+            );
+          },
+          onLongPress: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => EditAccountSheet(account: account),
             );
           },
           contentPadding: const EdgeInsets.all(16),

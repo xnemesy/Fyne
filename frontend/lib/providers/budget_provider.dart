@@ -4,9 +4,9 @@ import '../models/budget.dart';
 import '../services/api_service.dart';
 import '../services/crypto_service.dart';
 import 'transaction_provider.dart';
+import 'master_key_provider.dart';
 
-// The master key provider (in a real app, this is derived once at login and kept in secure memory)
-final masterKeyProvider = StateProvider<dynamic>((ref) => null);
+// The master key provider is now in lib/providers/master_key_provider.dart
 
 /**
  * Async Notifier for Budgets.
