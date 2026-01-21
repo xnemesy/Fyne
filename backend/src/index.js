@@ -13,6 +13,7 @@ const transactionsRouter = require('./routes/transactions');
 const budgetsRouter = require('./routes/budgets');
 const scheduledRouter = require('./routes/scheduled_transactions');
 const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth');
 const testRouter = require('./routes/test');
 
 app.use(cors());
@@ -25,6 +26,7 @@ app.use('/api/transactions', transactionsRouter);
 app.use('/api/budgets', budgetsRouter);
 app.use('/api/scheduled-transactions', scheduledRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/auth', authRouter);
 app.use('/api/test', testRouter);
 
 app.get('/', (req, res) => {
