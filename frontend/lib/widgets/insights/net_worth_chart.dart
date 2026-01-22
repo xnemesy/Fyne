@@ -90,6 +90,15 @@ class NetWorthChart extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          Text(
+            "Variazione dovuta a una spesa programmata",
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ],
       ),
     );

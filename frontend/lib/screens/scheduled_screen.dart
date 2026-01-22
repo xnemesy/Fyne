@@ -45,7 +45,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        "Programmate",
+                        "Spese future",
                         style: GoogleFonts.lora(
                           fontSize: 34,
                           fontWeight: FontWeight.bold,

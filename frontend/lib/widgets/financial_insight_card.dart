@@ -52,47 +52,63 @@ class FinancialInsightCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isNegative ? "Sei in disavanzo" : "Risparmio Netto",
-                      style: GoogleFonts.inter(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 13,
+              _infoItem("Entrate", incomings),
+              _infoItem("Uscite", outgoings),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isNegative ? "Scostamento rispetto al saldo ideale" : "Differenza del mese",
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 11,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "${(incomings - outgoings).toStringAsFixed(2)} €",
-                      style: GoogleFonts.lora(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 4),
+                      Text(
+                        "${(incomings - outgoings).toStringAsFixed(2)} €",
+                        style: GoogleFonts.lora(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  "$savingRate%",
-                  style: GoogleFonts.inter(
-                    color: isNegative ? const Color(0xFFD63031) : const Color(0xFF4A6741),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    ],
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "$savingRate%",
+                    style: GoogleFonts.inter(
+                      color: isNegative ? const Color(0xFFD63031) : const Color(0xFF4A6741),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 20),
           Text(
@@ -107,6 +123,17 @@ class FinancialInsightCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _infoItem(String label, double amount) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label.toUpperCase(), style: GoogleFonts.inter(letterSpacing: 1, fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withOpacity(0.4))),
+        const SizedBox(height: 4),
+        Text("${amount.toStringAsFixed(2)} €", style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+      ],
     );
   }
 }

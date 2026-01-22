@@ -48,7 +48,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Programma Spesa",
+                  "Nuova spesa futura",
                   style: GoogleFonts.lora(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -75,6 +75,16 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
                 hintText: "0.00 €",
                 hintStyle: TextStyle(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
                 border: InputBorder.none,
+              ),
+            ),
+            Center(
+              child: Text(
+                "Inserisci solo se ha senso per te",
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             const SizedBox(height: 32),

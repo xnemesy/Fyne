@@ -67,8 +67,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
               items: const [
                 BottomNavigationBarItem(
-                  icon: Icon(LucideIcons.creditCard),
-                  label: "Conti",
+                  icon: Icon(LucideIcons.home),
+                  label: "Home",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(LucideIcons.box),
@@ -76,7 +76,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(LucideIcons.calendar),
-                  label: "Programmate",
+                  label: "Spese future",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(LucideIcons.pieChart),

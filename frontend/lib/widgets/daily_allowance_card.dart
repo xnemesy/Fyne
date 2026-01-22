@@ -54,14 +54,25 @@ class DailyAllowanceCard extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            dailyAllowance <= 0 ? "Budget esaurito" : "${dailyAllowance.toStringAsFixed(2)} €",
+            dailyAllowance <= 0 ? "Limite raggiunto" : "${dailyAllowance.toStringAsFixed(2)} €",
             style: GoogleFonts.lora(
-              fontSize: 36,
+              fontSize: dailyAllowance <= 0 ? 28 : 36,
               fontWeight: FontWeight.bold,
               color: Colors.white,
               height: 1.0,
             ),
           ),
+          if (dailyAllowance <= 0) ...[
+            const SizedBox(height: 4),
+            Text(
+              "Spazio disponibile oggi: 0 €",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.9),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
           Text(
             "Puoi spendere questo importo ogni giorno per il resto del mese senza sforare il budget totale.",

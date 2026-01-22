@@ -107,6 +107,17 @@ class CompactCashFlowChart extends StatelessWidget {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Text(
+              "Questo andamento include anche spese future",
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: Colors.black38,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
         ],
       ),
     );

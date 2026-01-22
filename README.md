@@ -29,14 +29,21 @@ Fyne follows a strict **Privacy-by-Design** philosophy. The backend is "blind"; 
 
 ---
 
-## 🧭 UX Philosophy: The Rule of Silence
+## 🧭 UX Philosophy: Orientation over Information
 
-Fyne follows a "Digital Luxury" UX model where the app only speaks when necessary.
+Fyne follows a "Digital Luxury" UX model where the app focuses on **state and orientation** rather than raw data and noise.
 
-- **Journey Guidance**: Managed via `guidanceProvider`. It determines if the user is in *Onboarding*, *Data Collection*, *Budgeting*, or *Mature* stage.
-- **The Rule of Silence**: Once in the *Mature* stage, all "intelligence" messages and empty states disappear. The absence of noise is a premium feature.
-- **Milestone Feedback**: Persistent micro-feedback (e.g., "System Initialized") is shown only once per device using `preferencesProvider` backended by `FlutterSecureStorage`.
-- **Power User First**: No hand-holding, no generic Material icons. Every interaction must feel intentional and technical.
+- **The Fyne Home (The Compass)**: The entry point of the app is designed to answer a single question: *"Am I in balance, or should I pay attention?"*. 
+    - **Block 1: State**: A clear, textual assessment of the user's financial status (e.g., *Stable Balance*, *Settling Phase*).
+    - **Block 2: The Compass**: A primary metric—**Average Daily Space**—used as a reference, not a rigid limit.
+    - **Block 3: Context**: Minimal, one-line insights to avoid misinterpretation of data (e.g., *"Includes future expenses"*).
+- **The Rule of Silence**: Intelligence messages and intrusive UI elements are minimized. The app only speaks when it adds true value to the user's awareness.
+- **Neutral Language**: Fyne avoids punitive or judgment-heavy terms. 
+    - "Budget Exceeded" → **"Limit Reached"**.
+    - "Burn Rate" → **"Spending Pace"** (*Ritmo di spesa*).
+    - "Scheduled Transactions" → **"Future Expenses"** (*Spese future*).
+- **Micro-Awareness**: Features like real-time impact analysis on the daily budget during transaction entry help build consciousness without manual reporting.
+- **Power User First**: No hand-holding, no generic Material icons. Every interaction must feel intentional, high-end, and technical.
 
 ---
 
@@ -87,5 +94,5 @@ Fyne supports real-world connections via **GoCardless** and **Tink**.
 
 ## 🎨 Design Guidelines
 - **Typography**: Headers/Hero Numbers = `Lora` (Serif), Technical Body = `Inter` (Sans).
-- **Aesthetics**: High contrast, subtle glassmorphism, minimal use of color (only for state, e.g., Green/Red/Gold).
-- **Hierarchy**: The data (numbers) is the protagonist. Status labels are secondary.
+- **Aesthetics**: High contrast, subtle glassmorphism, minimal use of color (only for status orientation).
+- **Hierarchy**: **Orientation (State)** is the protagonist on the Home screen. Technical data (numbers/lists) is secondary and lives in dedicated details views.

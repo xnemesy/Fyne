@@ -13,6 +13,8 @@ import '../widgets/add_transaction_sheet.dart';
 import '../widgets/edit_account_sheet.dart';
 import '../widgets/wallet/wallet_summary_card.dart';
 import '../widgets/daily_allowance_card.dart';
+import '../widgets/home_compass_widget.dart';
+import '../providers/home_state_provider.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -85,14 +87,7 @@ class WalletScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      Text(
-                        "Conti",
-                        style: GoogleFonts.lora(
-                          fontSize: 34,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A1A),
-                        ),
-                      ),
+                      // Removed "Conti" title as per Home philosophy
                       Text(
                         "${authState.user?.email ?? (authState.user?.isAnonymous == true ? 'Utente Verificato' : 'utente@fyne.it')} / $formattedDate",
                         style: GoogleFonts.inter(
@@ -106,22 +101,38 @@ class WalletScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Daily Allowance Card
+              // BLOCK 1, 2, 3: THE COMPASS
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                  child: DailyAllowanceCard(),
+                  padding: EdgeInsets.only(top: 40, bottom: 40),
+                  child: HomeCompassWidget(),
                 ),
               ),
-              
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-              // Summary Card (Saldo Netto / Passivo)
+              // Dettagli Conti (Sotto i 3 blocchi principali)
               const SliverToBoxAdapter(
-                child: WalletSummaryCard(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Divider(color: Colors.black12),
+                ),
               ),
 
-              // List of Accounts
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: Text(
+                    "I TUOI CONTI",
+                    style: GoogleFonts.inter(
+                      letterSpacing: 2,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                    ),
+                  ),
+                ),
+              ),
+
+              // List of Accounts (Minimal)
               accountsAsync.when(
                 data: (accounts) => accounts.isEmpty 
                     ? SliverToBoxAdapter(child: _buildEmptyState(context))

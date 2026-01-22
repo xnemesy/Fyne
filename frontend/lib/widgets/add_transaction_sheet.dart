@@ -34,6 +34,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   bool _isSaving = false;
   bool _isExpense = true;
   DateTime _selectedDate = DateTime.now();
+  
+  @override
+  void initState() {
+    super.initState();
+    _amountController.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
@@ -144,6 +152,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       ],
                     ),
                   ),
+                  
+                  _awarenessHint(),
                   
                   const SizedBox(height: 16),
                   
@@ -292,16 +302,70 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           const Icon(LucideIcons.plusCircle, size: 20, color: Colors.black26),
           const SizedBox(width: 16),
           Expanded(
-            child: TextField(
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
-              decoration: const InputDecoration(hintText: "0,00", border: InputBorder.none),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _amountController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
+                  decoration: const InputDecoration(
+                    hintText: "0,00", 
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                Text(
+                  "Anche una stima va bene",
+                  style: GoogleFonts.inter(fontSize: 10, color: Colors.black26),
+                ),
+              ],
             ),
           ),
           Text("EUR", style: GoogleFonts.inter(color: Colors.black26)),
           const SizedBox(width: 8),
           const Icon(LucideIcons.chevronRight, size: 16, color: Colors.black26),
+        ],
+      ),
+    );
+  }
+
+  Widget _awarenessHint() {
+    final dailyAllowance = ref.watch(dailyAllowanceProvider);
+    final amountStr = _amountController.text.replaceAll(',', '.');
+    final amount = double.tryParse(amountStr) ?? 0.0;
+
+    if (amount <= 0 || !_isExpense) {
+      return const SizedBox.shrink();
+    }
+
+    String message = "Rientra nel tuo equilibrio mensile";
+    if (dailyAllowance > 0) {
+      final percentage = (amount / dailyAllowance) * 100;
+      if (percentage > 50) {
+        message = "Incide per il ${percentage.toStringAsFixed(0)}% sul budget giornaliero";
+      } else if (percentage > 10) {
+        message = "Incide per il ${percentage.toStringAsFixed(0)}% sul budget giornaliero";
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(LucideIcons.sparkles, size: 12, color: const Color(0xFF4A6741).withOpacity(0.5)),
+          const SizedBox(width: 8),
+          Text(
+            message,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: const Color(0xFF4A6741).withOpacity(0.7),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -317,7 +381,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           Expanded(
             child: TextField(
               controller: controller,
-              onChanged: onChanged,
+              onChanged: (val) {
+                if (onChanged != null) onChanged(val);
+                setState(() {}); // Trigger hint rebuild
+              },
               decoration: InputDecoration(hintText: hint, hintStyle: GoogleFonts.inter(color: Colors.black26), border: InputBorder.none),
             ),
           ),

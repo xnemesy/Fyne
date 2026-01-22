@@ -62,9 +62,9 @@ class _RecoveryKeyScreenState extends State<RecoveryKeyScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              "Nessuno, nemmeno Fyne, può recuperare i tuoi dati senza queste 24 parole. Scrivile o salva il PDF.",
+              "Nessuno, nemmeno Fyne, può recuperare i tuoi dati senza queste 24 parole. Scrivile o salva il PDF.\n\nServe solo per non perdere l’accesso. Mai per leggere i tuoi dati.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.6)),
+              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
             ),
             const SizedBox(height: 32),
             Expanded(
