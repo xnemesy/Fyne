@@ -77,9 +77,9 @@ class CashFlowCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Differenza del mese: ${savings.toStringAsFixed(2)} €", 
+                    Text("${savings < 0 ? 'Deficit' : 'Differenza'} del mese: ${savings.abs().toStringAsFixed(2)} €", 
                       style: GoogleFonts.inter(color: Colors.white.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w600)),
-                    Text(income > 0 ? "${(savingsRate * 100).toStringAsFixed(0)}%" : "0%", 
+                    Text(income > 0 ? "${(savingsRate * 100).abs().toStringAsFixed(0)}%" : "0%", 
                       style: GoogleFonts.inter(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                   ],
                 ),

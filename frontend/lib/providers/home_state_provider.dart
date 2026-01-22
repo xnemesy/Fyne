@@ -42,13 +42,13 @@ final homeStateProvider = Provider<HomeState>((ref) {
     subtitle = "Stai definendo il passo del mese";
   } 
   // 2. Check for attention (allowance is significantly lower than average burn or very low)
-  else if (dailyAllowance < 5 || (insights.burnRate > 0 && dailyAllowance < insights.burnRate * 0.5)) {
+  else if (dailyAllowance < 10) {
     fyneState = FyneState.lightAttention;
     title = "Attenzione leggera";
     subtitle = "Qualche attenzione nei prossimi giorni";
   }
   // 3. Stable balance (allowance is healthy)
-  else if (dailyAllowance >= insights.burnRate * 0.9) {
+  else if (dailyAllowance >= 20) {
     fyneState = FyneState.stableBalance;
     title = "Equilibrio stabile";
     subtitle = "Nessuna azione necessaria";

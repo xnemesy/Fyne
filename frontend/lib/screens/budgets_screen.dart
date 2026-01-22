@@ -176,7 +176,7 @@ class BudgetsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "Crea un budget dopo aver aggiunto le tue spese principali per mantenere il controllo.",
+              "Definisci i tuoi limiti di spesa quando sei pronto",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: const Color(0xFF1A1A1A).withOpacity(0.5),

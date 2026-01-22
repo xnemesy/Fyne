@@ -91,7 +91,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _circularBtn(LucideIcons.x, () => Navigator.pop(context)),
-                _typeSelector(),
                 _saveBtn(),
               ],
             ),
@@ -102,8 +101,21 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
-                  Text(_isExpense ? "Spesa" : "Entrata", style: GoogleFonts.lora(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () => setState(() => _isExpense = !_isExpense),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _isExpense ? "Spesa" : "Entrata", 
+                          style: GoogleFonts.lora(fontSize: 24, fontWeight: FontWeight.bold)
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(LucideIcons.chevronDown, size: 16, color: Colors.black26),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   
                   // Main Input Group
@@ -138,16 +150,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                         const Divider(height: 1, indent: 50),
                         _fieldRow(
                           icon: LucideIcons.layoutGrid,
-                          label: _suggestedCategoryName,
+                          label: _suggestedCategoryName == "SELEZIONA CATEGORIA" ? "Varie" : _suggestedCategoryName,
                           onTap: () {}, // Category picker
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("Frazionata", style: GoogleFonts.inter(fontSize: 13, color: Colors.black26)),
-                              const SizedBox(width: 4),
-                              const Icon(LucideIcons.split, size: 14, color: Colors.black26),
-                            ],
-                          ),
                         ),
                       ],
                     ),
@@ -225,40 +229,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
         child: Icon(icon, size: 20),
-      ),
-    );
-  }
-
-  Widget _typeSelector() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9E9EB).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _typeIcon(LucideIcons.minus, _isExpense, () => setState(() => _isExpense = true)),
-          _typeIcon(LucideIcons.plus, !_isExpense, () => setState(() => _isExpense = false)),
-          _typeIcon(LucideIcons.arrowLeftRight, false, () {}),
-          _typeIcon(LucideIcons.equal, false, () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _typeIcon(IconData icon, bool active, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: active ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)] : [],
-        ),
-        child: Icon(icon, size: 18, color: active ? const Color(0xFFFA2C5F) : Colors.black45),
       ),
     );
   }

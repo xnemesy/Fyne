@@ -25,52 +25,58 @@ class WalletSummaryCard extends ConsumerWidget {
       );
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9E9EB).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
-      ),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text("SALDO NETTO (EUR)", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741), letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text("${summary.netWorth.toStringAsFixed(2)} €", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
-                    ],
-                  ),
-                ),
-                Container(height: 40, width: 1, color: Colors.black.withOpacity(0.05)),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text("PASSIVO (EUR)", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF4A6741), letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text("${summary.liabilities.toStringAsFixed(2)} €", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
-                    ],
-                  ),
-                ),
-              ],
+          Expanded(
+            child: _summaryCard(
+              label: "SALDO NETTO",
+              value: "${summary.netWorth.toStringAsFixed(2)} €",
+              color: const Color(0xFF4A6741),
             ),
           ),
-          const Divider(height: 1, indent: 0, endIndent: 0),
-          ListTile(
-            onTap: () {
-               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TransactionsScreen()),
-              );
-            },
-            dense: true,
-            leading: const Icon(LucideIcons.list, size: 18, color: Color(0xFF1A1A1A)),
-            title: Text("Tutte le transazioni", style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _summaryCard(
+              label: "PASSIVO",
+              value: "${summary.liabilities.toStringAsFixed(2)} €",
+              color: const Color(0xFFA0665F),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryCard({required String label, required String value, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withOpacity(0.04)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 9, 
+              fontWeight: FontWeight.bold, 
+              color: color.withOpacity(0.6), 
+              letterSpacing: 1.0
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.lora( // Use Lora for harmony
+              fontSize: 18, 
+              fontWeight: FontWeight.w500, // Regular-ish weight
+              color: const Color(0xFF1A1A1A)
+            ),
           ),
         ],
       ),

@@ -73,12 +73,29 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                 ? const SizedBox(height: 300, child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))))
                 : (insightsState.netWorth == 0 && insightsState.income == 0 && insightsState.expenses == 0)
                   ? _buildEmptyState()
-                  : Column(
+                    : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${insightsState.netWorth.toStringAsFixed(2)} €",
+                                style: GoogleFonts.lora(fontSize: 40, fontWeight: FontWeight.w300, color: const Color(0xFF1A1A1A)),
+                              ),
+                              Text(
+                                "patrimonio netto",
+                                style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                           child: Container(
-                            height: 380,
+                            height: 240, // Reduced from 380
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(24),
@@ -92,6 +109,26 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                             ),
                           ),
                         ),
+                        if (insightsState.expenses > insightsState.income)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFA0665F).withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                "Questo mese stai spendendo più di quanto guadagni. Il patrimonio si sta riducendo.",
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  height: 1.5,
+                                  color: const Color(0xFFA0665F),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
                         Padding(
                           padding: const EdgeInsets.all(24),
                           child: Column(
