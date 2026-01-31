@@ -159,7 +159,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                             (context, index) {
                               final tx = filtered[index];
                               return Dismissible(
-                                key: Key(tx.id),
+                                key: Key(tx.uuid),
                                 direction: DismissDirection.endToStart,
                                 background: Container(
                                   alignment: Alignment.centerRight,
@@ -185,7 +185,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                                   );
                                 },
                                 onDismissed: (direction) {
-                                  ref.read(transactionsProvider.notifier).deleteTransaction(tx.id);
+                                  ref.read(transactionsProvider.notifier).deleteTransaction(tx.uuid);
                                 },
                                 child: TransactionItem(
                                   transaction: tx,

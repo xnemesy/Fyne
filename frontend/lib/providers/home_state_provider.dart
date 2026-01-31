@@ -35,20 +35,28 @@ final homeStateProvider = Provider<HomeState>((ref) {
   String title;
   String subtitle;
 
-  // 1. Check for settling phase (first week of the month)
-  if (now.day <= 7) {
+  // 1. Check for settling phase (first 7 days of the budget month)
+  // For now, budget month aligns with calendar month, but logic is ready for custom start dates.
+  final startOfBudgetMonth = DateTime(now.year, now.month, 1);
+  final daysSinceStart = now.difference(startOfBudgetMonth).inDays;
+  
+  if (daysSinceStart < 7) {
     fyneState = FyneState.settlingPhase;
     title = "Fase di assestamento";
     subtitle = "Stai definendo il passo del mese";
   } 
-  // 2. Check for attention (allowance is significantly lower than average burn or very low)
-  else if (dailyAllowance < 10) {
+  // Dynamic thresholds based on Burn Rate (velocity of spending)
+  // If no history, assume a base daily burn of 30.0 for calculations
+  final baseBurnRate = insights.burnRate > 0 ? insights.burnRate : 30.0;
+  
+  // 2. Check for attention (allowance < 50% of typical daily spend)
+  if (dailyAllowance < (baseBurnRate * 0.5)) {
     fyneState = FyneState.lightAttention;
     title = "Attenzione leggera";
     subtitle = "Qualche attenzione nei prossimi giorni";
   }
-  // 3. Stable balance (allowance is healthy)
-  else if (dailyAllowance >= 20) {
+  // 3. Stable balance (allowance >= 90% of typical daily spend)
+  else if (dailyAllowance >= (baseBurnRate * 0.9)) {
     fyneState = FyneState.stableBalance;
     title = "Equilibrio stabile";
     subtitle = "Nessuna azione necessaria";

@@ -58,10 +58,14 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
 
     try {
       // Decrypt Description
-      if (tx.encryptedDescription.startsWith('mock_')) {
-        tx.decryptedDescription = tx.encryptedDescription.replaceFirst('mock_', '');
+      if (tx.encryptedDescription != null) {
+        if (tx.encryptedDescription!.startsWith('mock_')) {
+          tx.decryptedDescription = tx.encryptedDescription!.replaceFirst('mock_', '');
+        } else {
+          tx.decryptedDescription = await crypto.decrypt(tx.encryptedDescription!, masterKey);
+        }
       } else {
-        tx.decryptedDescription = await crypto.decrypt(tx.encryptedDescription, masterKey);
+        tx.decryptedDescription = "Transazione sconosciuta";
       }
       
       // Decrypt CounterParty
@@ -74,7 +78,9 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
       }
     } catch (e) {
       try {
-        tx.decryptedDescription = await crypto.decryptWithPrivateKey(tx.encryptedDescription);
+        if (tx.encryptedDescription != null) {
+          tx.decryptedDescription = await crypto.decryptWithPrivateKey(tx.encryptedDescription!);
+        }
         if (tx.encryptedCounterParty != null) {
           tx.decryptedCounterParty = await crypto.decryptWithPrivateKey(tx.encryptedCounterParty!);
         }
@@ -113,7 +119,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
 
     for (var tx in transactions) {
       rows.add([
-        tx.id,
+        tx.uuid,
         tx.bookingDate.toIso8601String(),
         tx.decryptedDescription ?? "",
         tx.decryptedCounterParty ?? "",
@@ -129,7 +135,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
   List<TransactionModel> _mockTransactions() {
     return [
       TransactionModel(
-        id: "1",
+        uuid: "1",
         accountId: "a1",
         amount: -45.50,
         currency: "EUR",
@@ -140,7 +146,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
         categoryUuid: "mock_cat_1",
       ),
       TransactionModel(
-        id: "2",
+        uuid: "2",
         accountId: "a1",
         amount: -12.00,
         currency: "EUR",
@@ -151,7 +157,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
         categoryUuid: "mock_cat_2",
       ),
       TransactionModel(
-        id: "3",
+        uuid: "3",
         accountId: "a1",
         amount: 2500.00,
         currency: "EUR",
@@ -172,7 +178,7 @@ class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
     if (previousState == null) return;
 
     // 2. Optimistic Update: Remove from local list immediately
-    final newState = previousState.where((t) => t.id != transactionId).toList();
+    final newState = previousState.where((t) => t.uuid != transactionId).toList();
     state = AsyncData(newState);
 
     try {

@@ -14,7 +14,8 @@ class CryptoService {
   factory CryptoService() => _instance;
   CryptoService._internal();
 
-  final _algorithm = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
+  // Use AES-GCM with 256-bit keys for authenticated encryption
+  final _algorithm = AesGcm.with256bits();
 
   /// Derives a 256-bit key from a password and salt using PBKDF2.
   Future<SecretKey> deriveKey(String password, String salt) async {
@@ -110,7 +111,7 @@ class CryptoService {
   Future<String> decrypt(String base64Data, SecretKey secretKey) async {
     final data = base64.decode(base64Data);
     
-    // The concatenation format for AesCbc in 'cryptography' package includes nonce and MAC
+    // The concatenation format for AesGcm includes nonce and MAC (Authentication Tag)
     final secretBox = SecretBox.fromConcatenation(
       data,
       nonceLength: _algorithm.nonceLength,

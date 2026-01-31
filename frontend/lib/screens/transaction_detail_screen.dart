@@ -206,7 +206,7 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
     );
 
     if (confirm == true) {
-      await ref.read(transactionsProvider.notifier).deleteTransaction(widget.transaction.id);
+      await ref.read(transactionsProvider.notifier).deleteTransaction(widget.transaction.uuid);
       if (mounted) Navigator.pop(context);
     }
   }

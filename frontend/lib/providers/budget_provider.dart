@@ -110,8 +110,17 @@ final dailyAllowanceProvider = Provider<double>((ref) {
   final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
   final daysRemaining = lastDayOfMonth - now.day + 1;
   
-  if (daysRemaining <= 0) return remainingBudget;
-  return remainingBudget / daysRemaining;
+  // Safe Division & Edge Cases
+  if (daysRemaining <= 0) {
+    // If it's the last day (or calculation anomaly), all remaining budget is available today.
+    // Clamp to 0 to avoid negative allowance if overbudget.
+    return remainingBudget < 0 ? 0.0 : remainingBudget;
+  }
+  
+  final daily = remainingBudget / daysRemaining;
+  
+  // Return 0 if negative (overbudget), otherwise the calculated daily amount
+  return daily < 0 ? 0.0 : daily;
 });
 
 final budgetsProvider = AsyncNotifierProvider<BudgetNotifier, List<Budget>>(() {
