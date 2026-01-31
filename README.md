@@ -1,98 +1,133 @@
 # Fyne: Zero-Knowledge Financial Intelligence 🛡️🏛️
 
-Fyne is a premium personal finance application designed with a **Privacy-First, Zero-Knowledge architecture**. It provides a high-end editorial user experience for managing assets, budgets, and transactions while ensuring that financial data remains strictly under the user's control.
+**Fyne** is a premium personal finance application built on a radical premise: **Total Privacy** meets **Digital Luxury**. It is designed for users who demand control without compromise, offering a high-end editorial experience for asset management, budgeting, and financial planning.
+
+The architecture is **Zero-Knowledge**: the backend is "blind," storing only encrypted blobs. All intelligence, categorization, and analysis happen locally on the device.
 
 ---
 
-# 🤖 Developer & Agent Documentation
+## 🧭 Product Philosophy: Orientation over Information
 
-> **Note for AI Agents**: This repository is optimized for autonomous coding and "Power User" UX patterns. Read this section carefully before modifying code.
+Fyne rejects the dashboard anxiety of traditional finance apps. We do not just show data; we provide **orientation**.
 
-## 🧠 System Architecture
+### 1. The Home Compass (State, Not Stats)
+The `Home` screen answers a single question: *"Am I in balance?"*
+- **State Block**: A computed textual status (e.g., *Stable Balance*, *Settling Phase*).
+- **The Compass**: The **Average Daily Space** metric. It is a reference point, not a rigid limit.
+- **Context**: Minimal insights (e.g., *"Includes 3 future expenses"*).
 
-Fyne follows a strict **Privacy-by-Design** philosophy. The backend is "blind"; it sees only encrypted blobs.
+### 2. The Rule of Silence
+Fyne only speaks when necessary.
+- **No Engagement Spam**: No gamification badges, no "daily streak" notifications.
+- **Micro-Awareness**: Instead of monthly reports, Fyne provides real-time feedback during transaction entry (e.g., *"This affects 15% of your daily space"*).
 
-### 🔐 Cryptographic Models
-1.  **Local AES-256 (GCM)**: Used for manually entered data. Keys are derived/stored on-device in Secure Storage.
-2.  **Hybrid RSA-2048 Sync**: Used for Banking Sync. 
-    - The client generates an RSA key pair.
-    - The Public Key is shared with the backend.
-    - The backend (via GoCardless/Tink) encrypts incoming bank feeds using the user's Public Key.
-    - **Result**: Even the backend developer cannot read bank transactions; only the original device holds the Private Key.
+### 3. Neo-Minimalism
+- **Typography**: `Lora` (Serif) for human numbers/headers, `Inter` (Sans) for technical data.
+- **Hierarchy**: The **Status** is the protagonist; raw data is secondary.
+- **Color**: Used semantically (Olive for Balance, Amber for Attention, Terra Cotta for Critical), never decoratively.
 
-### 🔧 Tech Stack (Frontend)
+---
+
+## 🏗️ System Architecture
+
+### 🔧 Tech Stack
 - **Framework**: Flutter (Dart 3.x)
-- **State Management**: **Riverpod 2.0** (with `riverpod_generator`)
-- **Local Database**: **Isar** (NoSQL, Typed, Async)
-- **ML Engine**: `tflite_flutter` (Local inference for categorization)
-- **UI Framework**: Custom "Neo-Minimalist" Design System (Glassmorphism, Lora/Inter typography)
+- **State Management**: **Riverpod 2.0** (with `riverpod_generator` & `freezed` patterns).
+- **Local Database**: **Isar** (NoSQL, Typed, Async).
+- **Encryption**: `AES-256-GCM` (Local), `RSA-2048` (Sync).
+- **ML Engine**: `tflite_flutter` (Local inference for categorization).
+
+### 🔐 Security & Privacy (Zero-Knowledge)
+This is the core invariant of the system.
+1.  **Local Encryption**: All sensitive fields (`amount`, `description`, `balance`) are encrypted with a device-generated **Master Key** (stored in Secure Storage) *before* touching the disk or network.
+2.  **Blind Backend**: The server receives only `encryptedBlob`. It cannot see user data.
+3.  **Hybrid Sync**:
+    -   Client generates RSA Keypair.
+    -   Public Key is shared with the backend.
+    -   Banking providers (GoCardless/Tink) encrypt data via Backend using the Public Key.
+    -   Only the device (Private Key) can decrypt the bank feed.
 
 ---
 
-## 🧭 UX Philosophy: Orientation over Information
+## 🧠 Key Logic Modules
 
-Fyne follows a "Digital Luxury" UX model where the app focuses on **state and orientation** rather than raw data and noise.
+### 1. The Home State Engine (`home_state_provider.dart`)
+Determines the user's financial "weather" based on:
+- **Settling Phase**: First 7 days of the month.
+- **Stable Balance**: Daily Allowance >= 90% of Burn Rate.
+- **Light Attention**: Allowance < 50% of Burn Rate.
+- **Critical**: Allowance <= 0.
 
-- **The Fyne Home (The Compass)**: The entry point of the app is designed to answer a single question: *"Am I in balance, or should I pay attention?"*. 
-    - **Block 1: State**: A clear, textual assessment of the user's financial status (e.g., *Stable Balance*, *Settling Phase*).
-    - **Block 2: The Compass**: A primary metric—**Average Daily Space**—used as a reference, not a rigid limit.
-    - **Block 3: Context**: Minimal, one-line insights to avoid misinterpretation of data (e.g., *"Includes future expenses"*).
-- **The Rule of Silence**: Intelligence messages and intrusive UI elements are minimized. The app only speaks when it adds true value to the user's awareness.
-- **Neutral Language**: Fyne avoids punitive or judgment-heavy terms. 
-    - "Budget Exceeded" → **"Limit Reached"**.
-    - "Burn Rate" → **"Spending Pace"** (*Ritmo di spesa*).
-    - "Scheduled Transactions" → **"Future Expenses"** (*Spese future*).
-- **Micro-Awareness**: Features like real-time impact analysis on the daily budget during transaction entry help build consciousness without manual reporting.
-- **Power User First**: No hand-holding, no generic Material icons. Every interaction must feel intentional, high-end, and technical.
+### 2. Dynamic Budgeting (`budget_provider.dart`)
+Budgets in Fyne are **Soft Limits**.
+- Logic calculates a **Daily Allowance** based on `(Total Budget - Spent) / Days Remaining`.
+- Allows for flexible spending: saving today increases space tomorrow.
+
+### 3. Financial Insights (`insights_provider.dart`)
+Separates **Information** (Income vs Expenses) from **Evaluation** (Net Difference).
+- **Burn Rate**: Tracks the velocity of spending over the last 30 days.
+- **Net Worth History**: Dynamic calculation based on transaction ledger.
 
 ---
 
-## 📂 Project Structure Map (`/frontend`)
+## 📂 Project Structure (`lib/`)
 
-| Directory | Purpose | Agent Rule |
+| Directory | Role | Key Files |
 | :--- | :--- | :--- |
-| `lib/models/` | Data definitions & Isar Collections | **Must** be properly typed. |
-| `lib/providers/` | Riverpod State & Guidance Logic | Use `@riverpod` annotations. |
-| `lib/services/` | Core logic (Auth, Crypto, Banking) | Use `CryptoService` for all sensitive I/O. |
-| `lib/screens/` | Feature pages | Editorial UI focus. No placeholders. |
-| `lib/widgets/` | Reusable components | Maintain "Neo-Minimalist" consistency. |
+| **`providers/`** | **Business Logic & State**. The brain of the app. | `home_state_provider.dart`, `budget_provider.dart`, `account_provider.dart` |
+| **`services/`** | **Infrastucture**. Crypto, API, IO. | `crypto_service.dart`, `api_service.dart`, `categorization_service.dart` |
+| **`models/`** | **Data Structure**. Isar collections. | `account.dart`, `transaction.dart`, `budget.dart` |
+| **`screens/`** | **Views**. Page-level composition. | `wallet_screen.dart` (Home), `insights_screen.dart` |
+| **`widgets/`** | **Components**. Reusable UI elements. | `home_compass_widget.dart`, `transaction_item.dart` |
 
 ---
 
-## ⚡ Quick Start & Commands
+## 👨‍💻 Developer Protocols
 
-### 1. Setup Environment
+### State Management (Riverpod)
+- **Prefer `AsyncNotifier`**: For all data fetching/mutating states (Accounts, Budgets).
+- **Use `Provider`**: For computed/derived state (like `HomeState` or `DailyAllowance`).
+- **Immutable State**: Always use `.copyWith()` patterns.
+
+### Coding Standards
+- **Strict Typing**: No `dynamic` unless absolutely necessary (e.g. JSON parsing).
+- **Absolute Paths**: Imports should use project-absolute paths.
+- **English Code, Italian UI**: Code comments and variable names in English. UI strings in Italian.
+
+### Design Implementation
+- **Spacing**: Use standard grid multiples (4, 8, 16, 24, 32).
+- **Text Styles**: Use `GoogleFonts.lora` for hero/display, `GoogleFonts.inter` for UI/body.
+- **Colors**: Define colors in constants (or use the designated hex codes consistent with the theme).
+
+---
+
+## 🚀 Setup & Commands
+
+### Prerequisites
+- Flutter SDK 3.x
+- Backend running (for Sync features) or Local Mode.
+
+### 1. Install Dependencies
 ```bash
 flutter pub get
-# Copy .env.example to .env for backend if working on banking
 ```
 
-### 2. Code Generation (Riverpod/Isar)
+### 2. Run Code Generation
 **Mandatory** after editing any provider or model:
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### 3. Banking Setup
-Fyne supports real-world connections via **GoCardless** and **Tink**.
-- Backend keys are required in `backend/.env`.
-- Ensure RSA keys are initialized via `authProvider` before attempting a sync.
+### 3. Run App
+```bash
+flutter run
+```
+
+### 4. Build for Release (iOS)
+```bash
+flutter build ios --release --no-codesign
+```
 
 ---
 
-## 🛡️ Security & Privacy Protocols (NON-NEGOTIABLE)
-
-1.  **Zero-Knowledge Integrity**: 
-    - The server **never** receives `amount`, `title`, or `description` in plain text.
-    - Encryption happens **locally** before network transmission.
-2.  **Silent Analytics**:
-    - No external trackers (Firebase Analytics/Sentry) should log PII (Personally Identifiable Information).
-3.  **Local ML Only**:
-    - Do **not** send transaction strings to external analysis APIs (e.g. OpenAI) unless explicitly anonymized.
-
----
-
-## 🎨 Design Guidelines
-- **Typography**: Headers/Hero Numbers = `Lora` (Serif), Technical Body = `Inter` (Sans).
-- **Aesthetics**: High contrast, subtle glassmorphism, minimal use of color (only for status orientation).
-- **Hierarchy**: **Orientation (State)** is the protagonist on the Home screen. Technical data (numbers/lists) is secondary and lives in dedicated details views.
+*> "Complexity involves a lot of moving parts. Simplicity involves a lot of moving parts that move as one."*
