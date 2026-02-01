@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/onboarding_screen.dart';
+import 'presentation/screens/dashboard_screen.dart';
+import 'presentation/screens/onboarding_screen.dart';
 import 'services/notification_service.dart';
 import 'services/fcm_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,10 +11,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'providers/auth_provider.dart';
 import 'providers/sync_provider.dart';
 import 'services/categorization_service.dart';
-import 'widgets/privacy_blur_overlay.dart';
-import 'widgets/milestone_listener.dart';
+import 'presentation/widgets/privacy_blur_overlay.dart';
+import 'presentation/widgets/milestone_listener.dart';
 import 'providers/budget_provider.dart';
-import 'providers/transaction_provider.dart';
+import 'presentation/providers/transaction_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -122,3 +122,5 @@ class _InitializationWrapperState extends ConsumerState<InitializationWrapper> {
     return widget.child;
   }
 }
+
+

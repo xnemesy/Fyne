@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/account.dart';
-import '../widgets/decrypted_value.dart';
+import '../presentation/widgets/decrypted_value.dart';
 import '../providers/wallet_provider.dart';
 
 class TerminalModeScreen extends ConsumerStatefulWidget {
@@ -186,3 +186,4 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
     ];
   }
 }
+

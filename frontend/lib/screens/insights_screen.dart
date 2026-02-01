@@ -5,13 +5,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../providers/account_provider.dart';
 import '../providers/budget_provider.dart';
-import '../providers/transaction_provider.dart';
+import '../presentation/providers/transaction_provider.dart';
 import '../providers/insights_provider.dart';
 
-import '../widgets/insights/net_worth_chart.dart';
-import '../widgets/insights/burn_rate_card.dart';
-import '../widgets/insights/cash_flow_card.dart';
-import '../widgets/insights/top_categories_list.dart';
+import '../presentation/widgets/insights/net_worth_chart.dart';
+import '../presentation/widgets/insights/burn_rate_card.dart';
+import '../presentation/widgets/insights/cash_flow_card.dart';
+import '../presentation/widgets/insights/top_categories_list.dart';
 
 class InsightsScreen extends ConsumerStatefulWidget {
   const InsightsScreen({super.key});
@@ -250,3 +250,5 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     );
   }
 }
+
+

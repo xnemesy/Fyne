@@ -2,7 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../models/account.dart';
-import '../models/transaction.dart';
+import '../domain/models/transaction.dart';
 import '../models/budget.dart';
 import 'account_provider.dart';
 import 'transaction_provider.dart';
@@ -187,3 +187,4 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
 final insightsProvider = StateNotifierProvider<InsightsNotifier, InsightsState>((ref) {
   return InsightsNotifier(ref);
 });
+

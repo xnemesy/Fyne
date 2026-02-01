@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../providers/transaction_provider.dart';
+import '../presentation/providers/transaction_provider.dart';
 
 class HealthAlertWidget extends ConsumerWidget {
   const HealthAlertWidget({super.key});
@@ -78,3 +78,4 @@ class HealthAlertWidget extends ConsumerWidget {
     );
   }
 }
+

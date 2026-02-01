@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/transaction.dart';
+import '../domain/models/transaction.dart';
 
 class CompactCashFlowChart extends StatelessWidget {
   final List<TransactionModel> transactions;
@@ -123,3 +123,4 @@ class CompactCashFlowChart extends StatelessWidget {
     );
   }
 }
+

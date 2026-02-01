@@ -9,11 +9,11 @@ import '../models/account.dart';
 import 'add_account_screen.dart';
 import 'transactions_screen.dart';
 import 'settings_screen.dart';
-import '../widgets/add_transaction_sheet.dart';
-import '../widgets/edit_account_sheet.dart';
-import '../widgets/wallet/wallet_summary_card.dart';
-import '../widgets/daily_allowance_card.dart';
-import '../widgets/home_compass_widget.dart';
+import '../presentation/widgets/add_transaction_sheet.dart';
+import '../presentation/widgets/edit_account_sheet.dart';
+import '../presentation/widgets/wallet/wallet_summary_card.dart';
+import '../presentation/widgets/daily_allowance_card.dart';
+import '../presentation/widgets/home_compass_widget.dart';
 import '../providers/home_state_provider.dart';
 
 class WalletScreen extends ConsumerWidget {
@@ -408,3 +408,4 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../models/transaction.dart';
+import '../domain/models/transaction.dart';
 import 'package:intl/intl.dart';
 
 class SubscriptionList extends StatelessWidget {
@@ -113,3 +113,4 @@ class SubscriptionList extends StatelessWidget {
     );
   }
 }
+

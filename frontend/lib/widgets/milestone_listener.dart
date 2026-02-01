@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/account_provider.dart';
-import '../providers/transaction_provider.dart';
+import '../presentation/providers/transaction_provider.dart';
 import '../providers/budget_provider.dart';
 import '../providers/preferences_provider.dart';
 
@@ -78,3 +78,4 @@ class MilestoneListener extends ConsumerWidget {
     );
   }
 }
+

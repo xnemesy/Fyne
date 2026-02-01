@@ -1,0 +1,27 @@
+{
+  "models": [
+    {
+      "title": "Ollama Local (DeepSeek)",
+      "provider": "ollama",
+      "model": "deepseek-coder:6.7b"
+    },
+    {
+      "title": "Ollama Local (CodeLlama)",
+      "provider": "ollama",
+      "model": "codellama:7b-code"
+    },
+    {
+      "title": "Antigravity Bridge (Kimi)",
+      "provider": "openai",
+      "apiKey": "INSERISCI_LA_TUA_KEY_QUI",
+      "apiBase": "https://api.moonshot.cn/v1",
+      "model": "moonshot-v1-8k"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Starcoder Local",
+    "provider": "ollama",
+    "model": "starcoder2:3b"
+  },
+  "allowAnonymousTelemetry": false
+}

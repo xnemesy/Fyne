@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/budget_provider.dart';
-import '../widgets/budget_card.dart';
-import '../widgets/add_budget_sheet.dart';
-import '../widgets/daily_allowance_card.dart';
+import '../presentation/widgets/budget_card.dart';
+import '../presentation/widgets/add_budget_sheet.dart';
+import '../presentation/widgets/daily_allowance_card.dart';
 
 class BudgetsScreen extends ConsumerWidget {
   const BudgetsScreen({super.key});
@@ -189,3 +189,4 @@ class BudgetsScreen extends ConsumerWidget {
     );
   }
 }
+

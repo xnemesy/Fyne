@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../models/transaction.dart';
+import '../domain/models/transaction.dart';
 
 class FinancialInsightCard extends StatelessWidget {
   final List<TransactionModel> transactions;
@@ -137,3 +137,4 @@ class FinancialInsightCard extends StatelessWidget {
     );
   }
 }
+

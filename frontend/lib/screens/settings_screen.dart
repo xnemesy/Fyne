@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/auth_provider.dart';
-import '../providers/transaction_provider.dart';
+import '../presentation/providers/transaction_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -267,3 +267,4 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
+
