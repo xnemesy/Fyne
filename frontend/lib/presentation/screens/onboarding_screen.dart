@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../providers/auth_provider.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/security_provider.dart';
+import '../../../providers/preferences_provider.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -37,6 +39,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       title: "I tuoi dati, le tue regole",
       description: "Inserisci solo ciò che scegli. Nessuna sincronizzazione automatica. Nessuna dipendenza da terze parti.",
       icon: LucideIcons.key,
+    ),
+    OnboardingData(
+      title: "Vault Blindato",
+      description: "Proteggi il tuo archivio con la biometria del tuo dispositivo. I tuoi dati restano tuoi.",
+      microCopy: "Supporto FaceID, TouchID e Impronta.",
+      icon: LucideIcons.fingerprint,
+      isSecurityPage: true,
     ),
     OnboardingData(
       title: "Tutto è pronto",
@@ -145,6 +154,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
           ],
+          if (page.isSecurityPage) ...[
+            const SizedBox(height: 32),
+            _buildBiometricsToggle(),
+          ],
           const SizedBox(height: 120), // Spacer for bottom buttons
         ],
       ),
@@ -197,18 +210,44 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => _showEmailAuthSheet(),
+            onPressed: () => ref.read(authProvider.notifier).signInAnonymously(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A1A1A),
+              backgroundColor: const Color(0xFF4A6741),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 20),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 0,
             ),
-            child: Text("ACCEDI CON EMAIL", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
+            child: Text("INIZIA COME OSPITE", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
           ),
         ),
         const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(height: 1, width: 40, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text("OPPURE", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3))),
+            ),
+            Container(height: 1, width: 40, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: () => _showEmailAuthSheet(),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF1A1A1A),
+              padding: const EdgeInsets.symmetric(vertical: 18),
+              side: BorderSide(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: Text("ACCEDI CON EMAIL", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
+          ),
+        ),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
@@ -377,6 +416,53 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     );
   }
+
+  Widget _buildBiometricsToggle() {
+    final prefs = ref.watch(preferencesProvider);
+    final security = ref.watch(securityProvider);
+
+    if (!security.isSupported) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.shield, size: 20, color: Color(0xFF4A6741)),
+              const SizedBox(width: 12),
+              Text(
+                "Attiva Biometria",
+                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          Switch.adaptive(
+            value: prefs.useBiometrics,
+            activeColor: const Color(0xFF4A6741),
+            onChanged: (val) async {
+              if (val) {
+                final success = await ref.read(securityProvider.notifier).authenticate(
+                  reason: 'Conferma per attivare la protezione biometrica',
+                );
+                if (success) {
+                  ref.read(preferencesProvider.notifier).toggleBiometrics(true);
+                }
+              } else {
+                ref.read(preferencesProvider.notifier).toggleBiometrics(false);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class OnboardingData {
@@ -384,5 +470,12 @@ class OnboardingData {
   final String description;
   final String? microCopy;
   final IconData icon;
-  OnboardingData({required this.title, required this.description, this.microCopy, required this.icon});
+  final bool isSecurityPage;
+  OnboardingData({
+    required this.title, 
+    required this.description, 
+    this.microCopy, 
+    required this.icon,
+    this.isSecurityPage = false,
+  });
 }

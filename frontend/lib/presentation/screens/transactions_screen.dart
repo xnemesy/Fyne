@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../providers/transaction_provider.dart';
-import '../presentation/widgets/transaction_item.dart';
+import '../../providers/transaction_provider.dart';
+import '../widgets/transaction_item.dart';
 import 'transaction_detail_screen.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {

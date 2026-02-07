@@ -8,8 +8,10 @@ import 'budgets_screen.dart';
 import 'scheduled_screen.dart';
 import 'settings_screen.dart';
 import 'terminal_mode_screen.dart';
-import '../providers/account_provider.dart';
-import '../models/account.dart';
+import '../widgets/fyne_bottom_nav.dart';
+import '../widgets/add_transaction_sheet.dart';
+import '../../providers/account_provider.dart';
+import '../../models/account.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -22,11 +24,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const WalletScreen(), // Conti
-    const BudgetsScreen(), // Bilanci
-    const ScheduledTransactionsScreen(), // Programmate
-    const InsightsScreen(), // Rapporti
-    const SettingsScreen(), // Impostazioni
+    const WalletScreen(), // 0: Home
+    const InsightsScreen(), // 1: Stats
+    const SizedBox.shrink(), // 2: Placeholder per il tasto centrale
+    const ScheduledTransactionsScreen(), // 3: Vault / Programmate
+    const SettingsScreen(), // 4: Impostazioni
   ];
 
   @override
@@ -46,48 +48,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             index: _selectedIndex,
             children: _pages,
           ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: (index) => setState(() => _selectedIndex = index),
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
-              selectedItemColor: const Color(0xFF4A6741),
-              unselectedItemColor: const Color(0xFF8E8E93),
-              selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold),
-              unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(LucideIcons.home),
-                  label: "Home",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(LucideIcons.box),
-                  label: "Bilanci",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(LucideIcons.calendar),
-                  label: "Spese future",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(LucideIcons.pieChart),
-                  label: "Rapporti",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(LucideIcons.settings),
-                  label: "Impostazioni",
-                ),
-              ],
-            ),
+          bottomNavigationBar: FyneBottomNav(
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              if (index == 2) {
+                // Tasto centrale: Mostra AddTransactionSheet
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const AddTransactionSheet(),
+                );
+              } else {
+                setState(() => _selectedIndex = index);
+              }
+            },
           ),
         );
       },

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
-import '../../domain/models/transaction.dart';
-import '../../presentation/providers/transaction_provider.dart';
+import '../../../models/transaction.dart';
+import '../../../providers/transaction_provider.dart';
 
 class TransactionDetailScreen extends ConsumerWidget {
   final String uuid;

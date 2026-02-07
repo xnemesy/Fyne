@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:cryptography/cryptography.dart';
-import '../../domain/models/transaction.dart';
+import '../../models/transaction.dart';
 import '../../services/crypto_service.dart';
 
 class TransactionRepository {
@@ -129,6 +129,8 @@ Future<List<TransactionSummary>> _decryptBatchWorker(_BatchDecryptionParams para
       amount: decrypted.amount ?? 0.0,
       bookingDate: decrypted.bookingDate,
       categoryName: decrypted.categoryName,
+      categoryUuid: decrypted.categoryUuid,
+      description: decrypted.description,
       accountId: decrypted.accountId,
     ));
   }

@@ -1,4 +1,5 @@
-import 'package:tflite_flutter/tflite_flutter.dart';
+import '../models/categorization_rule.dart';
+import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +15,8 @@ class Category {
 
 class CategorizationService {
   final _uuid = const Uuid();
-  Interpreter? _interpreter;
-  bool _isModelLoaded = false;
+  // Interpreter? _interpreter;
+  // bool _isModelLoaded = false;
 
   // Categories Mapping (Order must match Model output indices)
   List<String> get supportedCategories => [
@@ -43,76 +44,38 @@ class CategorizationService {
   }
 
   Future<void> loadModel() async {
-    try {
-      _interpreter = await Interpreter.fromAsset('assets/models/category_model.tflite');
-      _isModelLoaded = true;
-      print("✅ TFLite Model loaded successfully");
-    } catch (e) {
-      print("⚠️ TFLite Model load failed, using keyword fallback: $e");
-    }
+    print("ℹ️ Categorization: Dynamic Rules Mode (No AI)");
   }
 
   String getCategoryId(String name) {
     return _uuid.v5(Uuid.NAMESPACE_URL, name);
   }
 
-  Future<Category> categorize(String description) async {
+  Future<Category> categorize(String description, {List<CategorizationRule>? customRules}) async {
     final desc = description.toLowerCase();
 
-    // 1. Try TFLite Inference if loaded
-    if (_isModelLoaded && _interpreter != null) {
-      try {
-        final result = _runInference(desc);
-        final prediction = result['label'] as String;
-        final confidence = result['confidence'] as double;
-
-        if (confidence >= 0.75) {
-          print("🤖 TFLite Match: $prediction ($confidence)");
-          return _getByName(prediction);
+    // 1. Check Custom User Rules (Priority)
+    if (customRules != null) {
+      for (var rule in customRules) {
+        if (desc.contains(rule.pattern.toLowerCase())) {
+          return _getByName(rule.categoryName);
         }
-      } catch (e) {
-        print("🤖 TFLite Inference Error: $e");
       }
     }
 
-    // 2. Keyword Fallback (Confidence < 75% or Model fail)
+    // 2. Fallback to Hardcoded Rules
     return _keywordCategorize(desc);
   }
 
+/*
   Map<String, dynamic> _runInference(String text) {
-    // Simple preprocessing: char-level or dummy tokenization for the placeholder
-    // In a real scenario, this would match the training preprocessing
-    var input = _preprocess(text);
-    var output = List<double>.filled(supportedCategories.length, 0).reshape([1, supportedCategories.length]);
-
-    _interpreter!.run(input, output);
-
-    List<double> probabilities = List<double>.from(output[0]);
-    int maxIndex = 0;
-    double maxProb = 0;
-
-    for (int i = 0; i < probabilities.length; i++) {
-      if (probabilities[i] > maxProb) {
-        maxProb = probabilities[i];
-        maxIndex = i;
-      }
-    }
-
-    return {
-      'label': supportedCategories[maxIndex],
-      'confidence': maxProb
-    };
+    // ...
   }
 
   List<dynamic> _preprocess(String text) {
-    // Basic text to tensor conversion
-    // Clamping to 255 to prevent 'gather index out of bounds' if model vocab is small
-    List<double> tensor = List.filled(50, 0.0);
-    for (int i = 0; i < text.length && i < 50; i++) {
-      tensor[i] = (text.codeUnitAt(i) % 255).toDouble();
-    }
-    return [tensor];
+    // ...
   }
+*/
 
   Category _keywordCategorize(String desc) {
     // 1. Alimentari

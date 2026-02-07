@@ -2,7 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../models/account.dart';
-import '../domain/models/transaction.dart';
+import '../models/transaction.dart';
 import '../models/budget.dart';
 import 'account_provider.dart';
 import 'transaction_provider.dart';
@@ -70,7 +70,7 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
   void _init() {
     // Listen to changes in dependencies and re-calculate
     ref.listen<AsyncValue<List<Account>>>(accountsProvider, (_, next) => _recalculate());
-    ref.listen<AsyncValue<List<TransactionModel>>>(transactionsProvider, (_, next) => _recalculate());
+    ref.listen<AsyncValue<List<TransactionSummary>>>(transactionsProvider, (_, next) => _recalculate());
     ref.listen<List<BudgetStatus>>(budgetSummaryProvider, (_, next) => _recalculate());
     
     // Initial calculation
@@ -149,7 +149,7 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
     );
   }
 
-  List<FlSpot> _generateDynamicSpots(double current, List<TransactionModel> transactions) {
+  List<FlSpot> _generateDynamicSpots(double current, List<TransactionSummary> transactions) {
     // We want 7 spots, from 6 days ago (x=0) to today (x=6)
     final List<FlSpot> spots = [];
     double balanceAtTime = current;

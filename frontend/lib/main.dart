@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'core/theme/fyne_theme.dart';
 import 'presentation/screens/dashboard_screen.dart';
 import 'presentation/screens/onboarding_screen.dart';
 import 'services/notification_service.dart';
@@ -14,7 +15,10 @@ import 'services/categorization_service.dart';
 import 'presentation/widgets/privacy_blur_overlay.dart';
 import 'presentation/widgets/milestone_listener.dart';
 import 'providers/budget_provider.dart';
-import 'presentation/providers/transaction_provider.dart';
+import 'providers/transaction_provider.dart';
+
+import 'services/analytics_service.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,9 +27,25 @@ void main() async {
 
   try {
     await Firebase.initializeApp();
-    print("Firebase initialized successfully");
+    
+    // Inizializza Analytics & Crashlytics (Hardening)
+    final analytics = AnalyticsService();
+    await analytics.init();
+    
+    // Catch Flutter errors
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+    
+    // Catch platform errors
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+
+    print("Firebase + Hardening initialized successfully");
   } catch (e) {
-    print("‼️ Firebase Initialization Error: $e");
+    print("‼️ Initialization Error: $e");
   }
 
   await NotificationService().init();
@@ -45,26 +65,9 @@ class FyneApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fyne Banking',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFFBFBF9),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4A6741),
-          primary: const Color(0xFF4A6741),
-          surface: const Color(0xFFFFFFFF),
-          brightness: Brightness.light,
-        ),
-        textTheme: GoogleFonts.interTextTheme(
-          ThemeData.light().textTheme,
-        ).copyWith(
-          displayLarge: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
-          displayMedium: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
-          headlineMedium: GoogleFonts.lora(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A)),
-          titleLarge: GoogleFonts.lora(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A)),
-          bodyLarge: GoogleFonts.inter(color: const Color(0xFF1A1A1A)),
-          bodyMedium: GoogleFonts.inter(color: const Color(0xFF2D3436)),
-        ),
-      ),
+      theme: FyneTheme.light,
+      darkTheme: FyneTheme.dark,
+      themeMode: ThemeMode.system,
       home: const AuthWrapper(),
     );
   }
