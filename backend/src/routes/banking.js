@@ -4,13 +4,21 @@ const { verifyToken } = require('../middleware/auth');
 const GoCardlessAdapter = require('../services/banking/GoCardlessAdapter');
 const MockBankingAdapter = require('../services/banking/MockBankingAdapter');
 const TinkAdapter = require('../services/banking/TinkAdapter');
-const { encrypt, encryptWithPublicKey } = require('../utils/crypto');
+const { encryptWithPublicKey } = require('../utils/crypto');
 const db = require('../utils/db');
 const { notifyUser } = require('../utils/firebase');
 
 const gcProvider = new GoCardlessAdapter();
 const mockProvider = new MockBankingAdapter();
 const tinkProvider = new TinkAdapter();
+
+function getProviderForAccountId(accountId) {
+    if (!accountId) return gcProvider;
+    const normalized = String(accountId).toLowerCase();
+    if (normalized.startsWith('mock_') || normalized.startsWith('sandbox')) return mockProvider;
+    if (normalized.startsWith('tink_')) return tinkProvider;
+    return gcProvider;
+}
 
 router.get('/institutions', verifyToken, async (req, res) => {
     const { country } = req.query;
@@ -91,7 +99,8 @@ router.post('/connect', verifyToken, async (req, res) => {
 router.get('/fetch-raw/:accountId', verifyToken, async (req, res) => {
     const { accountId } = req.params;
     try {
-        const transactions = await bankingProvider.getTransactions(accountId);
+        const provider = getProviderForAccountId(accountId);
+        const transactions = await provider.getTransactions(accountId);
         res.json(transactions);
     } catch (error) {
         res.status(500).json({ error: error.message });

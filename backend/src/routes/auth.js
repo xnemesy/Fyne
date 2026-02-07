@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
 const db = require('../utils/db');
-const { auth } = require('../utils/firebase');
 
 /**
  * Apple Sign-In Config (Used by Firebase Console, but kept here for reference)

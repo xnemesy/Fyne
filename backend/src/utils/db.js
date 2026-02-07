@@ -1,6 +1,4 @@
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
 
 const pool = new Pool({
     host: process.env.DB_HOST || '10.80.0.3', // Private IP of Cloud SQL

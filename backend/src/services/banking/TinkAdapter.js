@@ -1,6 +1,5 @@
 const axios = require('axios');
 const BankingProvider = require('./BankingProvider');
-const { encryptWithPublicKey } = require('../../utils/crypto');
 
 class TinkAdapter extends BankingProvider {
     constructor(config = {}) {

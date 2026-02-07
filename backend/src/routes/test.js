@@ -110,7 +110,8 @@ router.post('/seed-demo', async (req, res) => {
         const count = await processMockTransactions(userUid, accountId, mockTransactions);
         res.json({
             message: `Successfully seeded demo data for user ${userUid}.`,
-            status: 'success'
+            status: 'success',
+            count
         });
     } catch (error) {
         console.error('Seed Demo Error:', error.message);

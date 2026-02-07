@@ -1,0 +1,16 @@
+{
+    "name": "Fyne",
+    "type": "flutter",
+    "structure": {
+        "models": "lib/models/",
+        "repositories": "lib/data/repositories/",
+        "providers": "lib/providers/",
+        "screens": "lib/presentation/screens/",
+        "widgets": "lib/presentation/widgets/"
+    },
+    "constraints": {
+        "no_ai_ml": true,
+        "encryption_required": true,
+        "max_page_size": 50
+    }
+}

@@ -12,11 +12,11 @@ class BankingProvider {
      * @param {Object} params
      * @returns {Promise<string>}
      */
-    async getAuthLink(params) {
+    async getAuthLink(_params) {
         throw new Error('Method getAuthLink() must be implemented');
     }
 
-    async getRequisition(requisitionId) {
+    async getRequisition(_requisitionId) {
         throw new Error('Method getRequisition() must be implemented');
     }
 
@@ -25,7 +25,7 @@ class BankingProvider {
      * @param {string} token
      * @returns {Promise<Array>}
      */
-    async getAccounts(token) {
+    async getAccounts(_token) {
         throw new Error('Method getAccounts() must be implemented');
     }
 
@@ -35,7 +35,7 @@ class BankingProvider {
      * @param {Object} options
      * @returns {Promise<Array>}
      */
-    async getTransactions(accountId, options) {
+    async getTransactions(_accountId, _options) {
         throw new Error('Method getTransactions() must be implemented');
     }
 
@@ -44,7 +44,7 @@ class BankingProvider {
      * @param {Object} rawTransaction
      * @returns {Object} StandardTransaction
      */
-    normalizeTransaction(rawTransaction) {
+    normalizeTransaction(_rawTransaction) {
         throw new Error('Method normalizeTransaction() must be implemented');
     }
 }
