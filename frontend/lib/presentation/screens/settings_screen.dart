@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/transaction_provider.dart';
 import 'categorization_rules_screen.dart';
 import 'backup_screen.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import 'package:flutter/services.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -17,6 +14,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+    final userEmail = authState.user?.email ?? (authState.user?.isAnonymous == true ? "Utente Verificato" : "utente@fyne.it");
 
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBF9),
@@ -43,7 +41,7 @@ class SettingsScreen extends ConsumerWidget {
                       "Gestisci il tuo account e le preferenze",
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                        color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -58,7 +56,7 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   _buildSection("ACCOUNT", [
-                    _buildTile(LucideIcons.user, "Profilo", authState.user?.email ?? (authState.user?.isAnonymous == true ? "Utente Verificato" : "utente@fyne.it"), onTap: () => _showMsg(context, "Profilo utente")),
+                    _buildProfileTile(context, userEmail, onTap: () => _showMsg(context, "Profilo utente")),
                     _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Gestisci", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
                     _buildTile(LucideIcons.tag, "Regole Categorizzazione", "Gestisci", onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const CategorizationRulesScreen()));
@@ -85,7 +83,7 @@ class SettingsScreen extends ConsumerWidget {
                       child: TextButton(
                         onPressed: () => ref.read(authProvider.notifier).signOut(),
                         style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF3B30).withOpacity(0.1),
+                          backgroundColor: const Color(0xFFFF3B30).withValues(alpha: 0.1),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
@@ -104,49 +102,6 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _exportData(BuildContext context, WidgetRef ref) async {
-    // 1. Security Check
-    // We instantiate LocalAuthentication directly or use ExportService if it was a provider.
-    // For simplicity/cleanliness, let's use the local_auth package here or a service wrapper.
-    // Since we don't have ExportService as a provider yet, I'll add the logic here briefly 
-    // or better, create a proper provider if we want to reuse it.
-    // But wait, we have ExportService class in services/export_service.dart.
-    
-    // Let's assume we want to enforce biometric auth before export
-    /*
-    final auth = LocalAuthentication();
-    final canCheck = await auth.canCheckBiometrics || await auth.isDeviceSupported();
-    if (canCheck) {
-      final didAuth = await auth.authenticate(localizedReason: 'Autenticati per esportare');
-      if (!didAuth) return;
-    }
-    */
-    // Since adding package:local_auth to settings might require pubspec check, 
-    // I'll stick to the current logic but wrap it in a try-catch and maybe user confirmation alert first.
-
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Esporta Dati"),
-        content: const Text("Stai per esportare tutte le tue transazioni in un file CSV non criptato. Sei sicuro?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ESPORTA")),
-        ],
-      ),
-    );
-
-    if (confirm != true) return;
-
-    try {
-      await ref.read(transactionsProvider.notifier).exportToCsv();
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore durante l'esportazione: $e")));
-      }
-    }
   }
 
   Future<void> _showPrivateKey(BuildContext context, WidgetRef ref) async {
@@ -209,7 +164,7 @@ class SettingsScreen extends ConsumerWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
             ],
           ),
           child: Column(
@@ -236,6 +191,49 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildProfileTile(BuildContext context, String userEmail, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.user, color: Color(0xFF1A1A1A), size: 20),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Profilo',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1A1A1A),
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    userEmail,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: FyneColors.inkLight,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Icon(LucideIcons.chevronRight, size: 16, color: Color(0xFFC7C7CC)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSecurityTile(String label) {
     return ListTile(
       dense: true,
@@ -245,7 +243,7 @@ class SettingsScreen extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: const Color(0xFF1A1A1A).withOpacity(0.7),
+          color: const Color(0xFF1A1A1A).withValues(alpha: 0.7),
         ),
       ),
     );
@@ -261,4 +259,3 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
-

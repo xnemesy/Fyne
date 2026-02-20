@@ -248,9 +248,16 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
       final crypto = ref.read(cryptoServiceProvider);
       final masterKey = ref.read(masterKeyProvider);
 
-      if (masterKey == null) throw Exception("Master key not found");
+      if (masterKey == null) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(const SnackBar(
+            content: Text('Il vault non è ancora pronto. Riprova tra un momento.'),
+          ));
+        return;
+      }
 
-      final encryptedName = await crypto.encrypt(_nameController.text, masterKey);
+      final encryptedName = await crypto.encrypt(_nameController.text, scope: EncryptionScope.database, type: 'account_name');
 
       await ref.read(accountsProvider.notifier).updateAccount(
         widget.account.id,
@@ -261,7 +268,11 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore: $e")));
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(const SnackBar(
+            content: Text('Errore nel salvataggio. Riprova.'),
+          ));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

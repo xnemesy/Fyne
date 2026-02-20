@@ -82,8 +82,23 @@ const TransactionModelSchema = CollectionSchema(
       name: r'encryptedDescription',
       type: IsarType.string,
     ),
-    r'uuid': PropertySchema(
+    r'encryptionVersion': PropertySchema(
       id: 13,
+      name: r'encryptionVersion',
+      type: IsarType.long,
+    ),
+    r'isDeleted': PropertySchema(
+      id: 14,
+      name: r'isDeleted',
+      type: IsarType.bool,
+    ),
+    r'updatedAt': PropertySchema(
+      id: 15,
+      name: r'updatedAt',
+      type: IsarType.dateTime,
+    ),
+    r'uuid': PropertySchema(
+      id: 16,
       name: r'uuid',
       type: IsarType.string,
     )
@@ -158,6 +173,45 @@ const TransactionModelSchema = CollectionSchema(
           caseSensitive: false,
         )
       ],
+    ),
+    r'updatedAt': IndexSchema(
+      id: -6238191080293565125,
+      name: r'updatedAt',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'updatedAt',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'encryptionVersion': IndexSchema(
+      id: 7273617020205662875,
+      name: r'encryptionVersion',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'encryptionVersion',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'isDeleted': IndexSchema(
+      id: -786475870904832312,
+      name: r'isDeleted',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'isDeleted',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
     )
   },
   links: {},
@@ -165,7 +219,7 @@ const TransactionModelSchema = CollectionSchema(
   getId: _transactionModelGetId,
   getLinks: _transactionModelGetLinks,
   attach: _transactionModelAttach,
-  version: '3.1.0+1',
+  version: '3.3.0',
 );
 
 int _transactionModelEstimateSize(
@@ -242,7 +296,10 @@ void _transactionModelSerialize(
   writer.writeString(offsets[10], object.encryptedCategoryName);
   writer.writeString(offsets[11], object.encryptedCounterParty);
   writer.writeString(offsets[12], object.encryptedDescription);
-  writer.writeString(offsets[13], object.uuid);
+  writer.writeLong(offsets[13], object.encryptionVersion);
+  writer.writeBool(offsets[14], object.isDeleted);
+  writer.writeDateTime(offsets[15], object.updatedAt);
+  writer.writeString(offsets[16], object.uuid);
 }
 
 TransactionModel _transactionModelDeserialize(
@@ -261,8 +318,11 @@ TransactionModel _transactionModelDeserialize(
     encryptedCategoryName: reader.readStringOrNull(offsets[10]),
     encryptedCounterParty: reader.readStringOrNull(offsets[11]),
     encryptedDescription: reader.readStringOrNull(offsets[12]),
+    encryptionVersion: reader.readLongOrNull(offsets[13]) ?? 1,
     id: id,
-    uuid: reader.readString(offsets[13]),
+    isDeleted: reader.readBoolOrNull(offsets[14]) ?? false,
+    updatedAt: reader.readDateTime(offsets[15]),
+    uuid: reader.readString(offsets[16]),
   );
   return object;
 }
@@ -301,6 +361,12 @@ P _transactionModelDeserializeProp<P>(
     case 12:
       return (reader.readStringOrNull(offset)) as P;
     case 13:
+      return (reader.readLongOrNull(offset) ?? 1) as P;
+    case 14:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
+    case 15:
+      return (reader.readDateTime(offset)) as P;
+    case 16:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -396,6 +462,31 @@ extension TransactionModelQueryWhereSort
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'createdAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhere> anyUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'updatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhere>
+      anyEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'encryptionVersion'),
+      );
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhere> anyIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'isDeleted'),
       );
     });
   }
@@ -810,6 +901,237 @@ extension TransactionModelQueryWhere
         upper: [upperCreatedAt],
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      updatedAtEqualTo(DateTime updatedAt) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'updatedAt',
+        value: [updatedAt],
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      updatedAtNotEqualTo(DateTime updatedAt) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [],
+              upper: [updatedAt],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [updatedAt],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [updatedAt],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [],
+              upper: [updatedAt],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      updatedAtGreaterThan(
+    DateTime updatedAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [updatedAt],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      updatedAtLessThan(
+    DateTime updatedAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [],
+        upper: [updatedAt],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      updatedAtBetween(
+    DateTime lowerUpdatedAt,
+    DateTime upperUpdatedAt, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [lowerUpdatedAt],
+        includeLower: includeLower,
+        upper: [upperUpdatedAt],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      encryptionVersionEqualTo(int encryptionVersion) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'encryptionVersion',
+        value: [encryptionVersion],
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      encryptionVersionNotEqualTo(int encryptionVersion) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [],
+              upper: [encryptionVersion],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [encryptionVersion],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [encryptionVersion],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [],
+              upper: [encryptionVersion],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      encryptionVersionGreaterThan(
+    int encryptionVersion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [encryptionVersion],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      encryptionVersionLessThan(
+    int encryptionVersion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [],
+        upper: [encryptionVersion],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      encryptionVersionBetween(
+    int lowerEncryptionVersion,
+    int upperEncryptionVersion, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [lowerEncryptionVersion],
+        includeLower: includeLower,
+        upper: [upperEncryptionVersion],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      isDeletedEqualTo(bool isDeleted) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'isDeleted',
+        value: [isDeleted],
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterWhereClause>
+      isDeletedNotEqualTo(bool isDeleted) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [],
+              upper: [isDeleted],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [isDeleted],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [isDeleted],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [],
+              upper: [isDeleted],
+              includeUpper: false,
+            ));
+      }
     });
   }
 }
@@ -2501,6 +2823,62 @@ extension TransactionModelQueryFilter
   }
 
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      encryptionVersionEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      encryptionVersionGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      encryptionVersionLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      encryptionVersionBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'encryptionVersion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
       idIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -2566,6 +2944,72 @@ extension TransactionModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      isDeletedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isDeleted',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      updatedAtEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      updatedAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      updatedAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
+      updatedAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'updatedAt',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -2901,6 +3345,48 @@ extension TransactionModelQuerySortBy
     });
   }
 
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      sortByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      sortByEncryptionVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      sortByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      sortByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      sortByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      sortByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy> sortByUuid() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uuid', Sort.asc);
@@ -3099,6 +3585,20 @@ extension TransactionModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      thenByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      thenByEncryptionVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.desc);
+    });
+  }
+
   QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -3109,6 +3609,34 @@ extension TransactionModelQuerySortThenBy
       thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      thenByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      thenByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      thenByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
+      thenByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 
@@ -3223,6 +3751,27 @@ extension TransactionModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<TransactionModel, TransactionModel, QDistinct>
+      distinctByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'encryptionVersion');
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QDistinct>
+      distinctByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isDeleted');
+    });
+  }
+
+  QueryBuilder<TransactionModel, TransactionModel, QDistinct>
+      distinctByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'updatedAt');
+    });
+  }
+
   QueryBuilder<TransactionModel, TransactionModel, QDistinct> distinctByUuid(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -3324,6 +3873,26 @@ extension TransactionModelQueryProperty
       encryptedDescriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'encryptedDescription');
+    });
+  }
+
+  QueryBuilder<TransactionModel, int, QQueryOperations>
+      encryptionVersionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'encryptionVersion');
+    });
+  }
+
+  QueryBuilder<TransactionModel, bool, QQueryOperations> isDeletedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isDeleted');
+    });
+  }
+
+  QueryBuilder<TransactionModel, DateTime, QQueryOperations>
+      updatedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'updatedAt');
     });
   }
 

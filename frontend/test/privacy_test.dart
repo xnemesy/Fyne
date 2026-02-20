@@ -5,19 +5,20 @@ import 'package:fyne_frontend/providers/privacy_provider.dart';
 
 void main() {
   testWidgets('PrivacyNotifier state changes with lifecycle', (WidgetTester tester) async {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
+    await tester.runAsync(() async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-    final privacyState = container.read(privacyProvider);
-    expect(privacyState.isAppInBackground, false);
+      final privacyState = container.read(privacyProvider);
+      expect(privacyState.isAppInBackground, false);
 
-    // Access the notifier through the container
-    final notifier = container.read(privacyProvider.notifier);
+      final notifier = container.read(privacyProvider.notifier);
 
-    // Simulate lifecycle change
-    notifier.didChangeAppLifecycleState(AppLifecycleState.inactive);
-    
-    expect(container.read(privacyProvider).isAppInBackground, true);
-    expect(container.read(privacyProvider).isBlurred, true);
+      notifier.didChangeAppLifecycleState(AppLifecycleState.inactive);
+      await tester.pump();
+      
+      expect(container.read(privacyProvider).isAppInBackground, true);
+      expect(container.read(privacyProvider).isBlurred, true);
+    });
   });
 }

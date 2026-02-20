@@ -50,13 +50,12 @@ class SecurityNotifier extends Notifier<SecurityState> {
 
   Future<bool> authenticate({String reason = 'Autenticati per accedere al tuo Vault'}) async {
     // Only authenticate if preferences say so or if we are explicitly asking (during setup)
+    final prefs = ref.read(preferencesProvider);
+    if (!prefs.useBiometrics) return true;
+
     try {
       return await _auth.authenticate(
         localizedReason: reason,
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false, // Fallback to PIN/Passcode enabled
-        ),
       );
     } catch (e) {
       debugPrint("Auth Error: $e");

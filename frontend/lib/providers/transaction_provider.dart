@@ -1,44 +1,53 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar/isar.dart';
+import 'package:flutter_riverpod/legacy.dart'
+    show StateNotifier, StateNotifierProvider;
+import 'package:isar_community/isar.dart';
 import '../models/transaction.dart';
 import '../data/repositories/transaction_repository.dart';
 import 'isar_provider.dart';
 import '../services/crypto_service.dart';
-import 'master_key_provider.dart';
+import '../services/key_rotation_service.dart';
 
 /// Provider for the Transaction Repository
 final transactionRepositoryProvider = Provider<TransactionRepository?>((ref) {
   final isar = ref.watch(isarProvider).value;
   final crypto = ref.watch(cryptoServiceProvider);
-  final masterKey = ref.watch(masterKeyProvider);
-  
-  if (isar == null || masterKey == null) return null;
-  
-  return TransactionRepository(isar, crypto, masterKey);
+  final rotation = ref.watch(keyRotationProvider);
+
+  if (isar == null) return null;
+
+  return TransactionRepository(isar, crypto, rotation);
 });
 
 /// Fetches a specific page of transaction summaries (Decrypted in isolate)
-final transactionsPageProvider = FutureProvider.family<List<TransactionSummary>, int>((ref, page) async {
-  final repo = ref.read(transactionRepositoryProvider);
-  if (repo == null) return [];
-  
+final transactionsPageProvider =
+    FutureProvider.family<List<TransactionSummary>, int>((ref, page) async {
+  final repo = ref.watch(transactionRepositoryProvider);
+  if (repo == null) {
+    // Repository not ready yet — return empty, will reload when Isar is ready
+    return <TransactionSummary>[];
+  }
+
   // 1. Fetch encrypted items (Instant)
   final encrypted = await repo.getEncryptedPage(page: page);
-  
+
   // 2. Decrypt in isolate (Non-blocking)
   return await repo.decryptPageForList(encrypted);
 });
 
 /// Detailed Transaction decryption (On-demand)
-final transactionDetailProvider = FutureProvider.family<TransactionModel?, String>((ref, uuid) async {
-  final repo = ref.read(transactionRepositoryProvider);
+final transactionDetailProvider =
+    FutureProvider.family<TransactionModel?, String>((ref, uuid) async {
+  final repo = ref.watch(transactionRepositoryProvider);
   if (repo == null) return null;
-  
+
   return await repo.getByUuid(uuid);
 });
 
 /// Main Notifier to manage infinite scroll state
-class TransactionsNotifier extends StateNotifier<AsyncValue<List<TransactionSummary>>> {
+class TransactionsNotifier
+    extends StateNotifier<AsyncValue<List<TransactionSummary>>> {
   final Ref ref;
   int _currentPage = 0;
   bool _hasMore = true;
@@ -50,6 +59,7 @@ class TransactionsNotifier extends StateNotifier<AsyncValue<List<TransactionSumm
   bool get hasMore => _hasMore;
 
   Future<void> loadInitial() async {
+    ref.invalidate(transactionsPageProvider);
     _currentPage = 0;
     _hasMore = true;
     state = const AsyncValue.loading();
@@ -60,18 +70,28 @@ class TransactionsNotifier extends StateNotifier<AsyncValue<List<TransactionSumm
     if (!_hasMore || state.isLoading && _currentPage > 0) return;
 
     try {
-      final newItems = await ref.read(transactionsPageProvider(_currentPage).future);
-      
+      final newItems = await ref
+          .read(transactionsPageProvider(_currentPage).future)
+          .timeout(const Duration(seconds: 20));
+
       if (newItems.isEmpty) {
         _hasMore = false;
         if (_currentPage == 0) state = const AsyncValue.data([]);
       } else {
         _currentPage++;
-        final currentList = state.valueOrNull ?? [];
+        final currentList = state is AsyncData<List<TransactionSummary>>
+            ? (state as AsyncData<List<TransactionSummary>>).value
+            : <TransactionSummary>[];
         state = AsyncValue.data([...currentList, ...newItems]);
       }
     } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+      debugPrint("Transactions loadMore error: $e");
+      if (_currentPage == 0) {
+        // First page failed — show empty state, not error
+        state = const AsyncValue.data([]);
+      } else {
+        state = AsyncValue.error(e, stack);
+      }
     }
   }
 
@@ -82,40 +102,85 @@ class TransactionsNotifier extends StateNotifier<AsyncValue<List<TransactionSumm
   Future<void> exportToCsv() async {
     final repo = ref.read(transactionRepositoryProvider);
     if (repo == null) return;
-    
+
     final isar = ref.read(isarProvider).value;
     if (isar == null) return;
-    
+
     // 1. Fetch ALL transactions (encrypted)
     final allEncrypted = await isar.transactionModels.where().findAll();
-    
+
     // 2. Decrypt ALL (Isolate)
     final decrypted = await repo.decryptPageForList(allEncrypted);
-    
+
     // 3. User ExportService to handle auth and CSV creation
     // To avoid dependency loops, we can use a provider for ExportService
-    // final exportService = ExportService(); 
+    // final exportService = ExportService();
     // exportService.exportToCsv(decrypted.map((e) => {
     //   'bookingDate': e.bookingDate,
     //   'decryptedDescription': e.description,
     //   'amount': e.amount,
     //   'decryptedCategory': e.categoryName,
     // }).toList());
-    
+
     print("Export requested for ${decrypted.length} items");
   }
 
-  Future<void> addTransaction(TransactionModel tx) async {
+  Future<void> addTransaction(
+    TransactionModel tx, {
+    String? rawAmount,
+    String? rawDesc,
+    String? rawCounterParty,
+    String? rawCategoryName,
+  }) async {
     final repo = ref.read(transactionRepositoryProvider);
-    if (repo == null) return;
-    
-    await repo.save(tx, rawAmount: tx.amount?.toString(), rawDesc: tx.description);
+    if (repo == null) {
+      throw StateError('Transaction repository non inizializzato');
+    }
+
+    await repo.save(
+      tx,
+      rawAmount: rawAmount ?? tx.amount?.toString(),
+      rawDesc: rawDesc ?? tx.description,
+      rawCounterParty: rawCounterParty ?? tx.counterParty,
+      rawCategoryName: rawCategoryName ?? tx.categoryName,
+    );
+    ref.invalidate(transactionsPageProvider);
+    ref.invalidate(transactionDetailProvider);
+    ref.invalidate(monthlySpentProvider);
     await refresh();
+  }
+
+  Future<TransactionModel?> deleteTransaction(String uuid) async {
+    final repo = ref.read(transactionRepositoryProvider);
+    if (repo == null) {
+      throw StateError('Transaction repository non inizializzato');
+    }
+
+    final existing = await repo.getByUuid(uuid);
+    await repo.deleteByUuid(uuid);
+    ref.invalidate(transactionsPageProvider);
+    ref.invalidate(transactionDetailProvider);
+    ref.invalidate(monthlySpentProvider);
+    await refresh();
+    return existing;
   }
 }
 
-final transactionsNotifierProvider = StateNotifierProvider<TransactionsNotifier, AsyncValue<List<TransactionSummary>>>((ref) {
+final transactionsNotifierProvider = StateNotifierProvider<TransactionsNotifier,
+    AsyncValue<List<TransactionSummary>>>((ref) {
   return TransactionsNotifier(ref);
 });
 
 final transactionsProvider = transactionsNotifierProvider;
+
+/// Provider for total spent in the current month (Accurate, not paginated)
+final monthlySpentProvider = FutureProvider<double>((ref) async {
+  final repo = ref.watch(transactionRepositoryProvider);
+  if (repo == null) return 0.0;
+
+  final now = DateTime.now();
+  final firstOfMonth = DateTime(now.year, now.month, 1);
+  final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+
+  return await repo.getTotalSpentInRange(firstOfMonth, endOfMonth);
+});

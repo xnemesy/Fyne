@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'budget_provider.dart';
 import 'insights_provider.dart';
 import 'scheduled_provider.dart';
+import 'transaction_provider.dart';
 
 enum FyneState {
   stableBalance,    // Equilibrio stabile
@@ -29,6 +30,7 @@ final homeStateProvider = Provider<HomeState>((ref) {
   final dailyAllowance = ref.watch(dailyAllowanceProvider);
   final insights = ref.watch(insightsProvider);
   final scheduled = ref.watch(scheduledProvider).value ?? [];
+  final transactions = ref.watch(transactionsProvider).value ?? [];
   final now = DateTime.now();
 
   FyneState fyneState;
@@ -49,19 +51,42 @@ final homeStateProvider = Provider<HomeState>((ref) {
   // If no history, assume a base daily burn of 30.0 for calculations
   final baseBurnRate = insights.burnRate > 0 ? insights.burnRate : 30.0;
   
-  // 2. Check for attention (allowance < 50% of typical daily spend)
-  if (dailyAllowance < (baseBurnRate * 0.5)) {
+  // 2. Daily budget status: warning at 80%-100%, exceeded above 100%.
+  final startOfDay = DateTime(now.year, now.month, now.day);
+  final endOfDay = startOfDay.add(const Duration(days: 1));
+  final spentToday = transactions
+      .where((tx) => tx.bookingDate.isAfter(startOfDay) && tx.bookingDate.isBefore(endOfDay) && tx.amount < 0)
+      .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+  final dailyTarget = spentToday + dailyAllowance;
+  final usage = dailyTarget > 0 ? (spentToday / dailyTarget) : 0.0;
+
+  // Guard: if no spending data at all, don't show false "limit reached"
+  if (spentToday == 0 && dailyAllowance <= 0 && transactions.isEmpty) {
+    fyneState = FyneState.settlingPhase;
+    title = "Nessuna spesa registrata";
+    subtitle = "Aggiungi transazioni per iniziare a monitorare";
+  } else if (usage >= 1.0) {
+    fyneState = FyneState.lightAttention;
+    title = "Limite raggiunto oggi";
+    subtitle = "Hai superato il budget giornaliero";
+  } else if (usage >= 0.8) {
+    fyneState = FyneState.lightAttention;
+    title = "Attenzione leggera";
+    subtitle = "Sei vicino al limite giornaliero";
+  }
+  // 3. Legacy fallback on burn rate.
+  else if (dailyAllowance < (baseBurnRate * 0.5)) {
     fyneState = FyneState.lightAttention;
     title = "Attenzione leggera";
     subtitle = "Qualche attenzione nei prossimi giorni";
   }
-  // 3. Stable balance (allowance >= 90% of typical daily spend)
+  // 4. Stable balance (allowance >= 90% of typical daily spend)
   else if (dailyAllowance >= (baseBurnRate * 0.9)) {
     fyneState = FyneState.stableBalance;
     title = "Equilibrio stabile";
     subtitle = "Nessuna azione necessaria";
   }
-  // 4. Default to under control
+  // 5. Default to under control
   else {
     fyneState = FyneState.underControl;
     title = "Sotto controllo";

@@ -15,6 +15,7 @@ import '../widgets/wallet/wallet_summary_card.dart';
 import '../widgets/daily_allowance_card.dart';
 import '../widgets/home_compass_widget.dart';
 import '../../providers/home_state_provider.dart';
+import '../../providers/transaction_provider.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -22,23 +23,62 @@ class WalletScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accountsAsync = ref.watch(accountsProvider);
+    final transactionsAsync = ref.watch(transactionsProvider);
     final authState = ref.watch(authProvider);
     final now = DateTime.now();
     final formattedDate = DateFormat('dd MMM yyyy, HH:mm', 'it_IT').format(now);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBF9),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const AddTransactionSheet(),
-          );
-        },
-        backgroundColor: const Color(0xFF4A6741),
-        child: const Icon(LucideIcons.plus, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (accountsAsync.hasValue &&
+              accountsAsync.value!.isNotEmpty &&
+              transactionsAsync.hasValue &&
+              transactionsAsync.value!.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Aggiungi la tua prima spesa",
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(LucideIcons.arrowDown,
+                        color: Colors.white, size: 16),
+                  ],
+                ),
+              ),
+            ),
+          FloatingActionButton(
+            heroTag: 'add_tx_fab',
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => const AddTransactionSheet(),
+              );
+            },
+            backgroundColor: const Color(0xFF4A6741),
+            child: const Icon(LucideIcons.plus, color: Colors.white),
+          ),
+        ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -104,7 +144,7 @@ class WalletScreen extends ConsumerWidget {
               // BLOCK 1, 2, 3: THE COMPASS
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 20, bottom: 40),
+                  padding: EdgeInsets.only(top: 10, bottom: 20),
                   child: HomeCompassWidget(),
                 ),
               ),
@@ -156,7 +196,7 @@ class WalletScreen extends ConsumerWidget {
               // Dettagli Conti (Sotto i 3 blocchi principali)
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                   child: Divider(color: Colors.black12),
                 ),
               ),
@@ -197,51 +237,6 @@ class WalletScreen extends ConsumerWidget {
                 ),
                 error: (err, stack) => SliverToBoxAdapter(
                   child: Center(child: Text("Errore: $err", style: const TextStyle(color: Colors.red))),
-                ),
-              ),
-              
-              // Educational Note
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0F4F2).withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(LucideIcons.lightbulb, size: 16, color: Color(0xFF4A6741)),
-                            const SizedBox(width: 8),
-                            Text(
-                              "FILOSOFIA FYNE",
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.5,
-                                color: const Color(0xFF4A6741),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          "Lo \"spazio disponibile\" è un riferimento, non un limite rigido. Ti aiuta a orientarti, non a limitarti.",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            height: 1.6,
-                            color: const Color(0xFF1A1A1A).withOpacity(0.5),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
               
@@ -376,14 +371,16 @@ class WalletScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "Aggiungi un conto per vedere il tuo patrimonio prendere forma.\nNessuna sincronizzazione automatica. Inserisci solo ciò che vuoi.",
+              "Aggiungi un conto per vedere il tuo patrimonio prendere forma.\nNon c'è fretta, inizia con quello che usi di più.",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: const Color(0xFF1A1A1A).withOpacity(0.5),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            const Icon(LucideIcons.arrowUp, color: Color(0xFF4A6741), size: 24),
+            const SizedBox(height: 16),
             TextButton(
               onPressed: () {
                 Navigator.push(

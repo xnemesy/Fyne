@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'storage_provider.dart';
 
 class PreferencesState {
   final bool milestoneAccountReached;
@@ -30,10 +31,11 @@ class PreferencesState {
 }
 
 class PreferencesNotifier extends Notifier<PreferencesState> {
-  final _storage = const FlutterSecureStorage();
+  late final FlutterSecureStorage _storage;
 
   @override
   PreferencesState build() {
+    _storage = ref.read(secureStorageProvider);
     _load();
     return PreferencesState();
   }

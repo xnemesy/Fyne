@@ -23,6 +23,7 @@ class FyneColors {
   static const Color amber = Color(0xFFD4A574);
   static const Color rust = Color(0xFFB85450);
   static const Color gold = Color(0xFFC9A227);
+  static const Color softRed = Color(0xFFE57373);
 
   // Overlay
   static const Color blind = Color(0x801A1A1A);
@@ -223,8 +224,8 @@ class FyneTheme {
     );
   }
 
-  static CardTheme get _cardTheme {
-    return CardTheme(
+  static CardThemeData get _cardTheme {
+    return CardThemeData(
       elevation: 0,
       color: FyneColors.paperDark,
       shape: RoundedRectangleBorder(
@@ -234,8 +235,8 @@ class FyneTheme {
     );
   }
 
-  static CardTheme get _cardThemeDark {
-    return CardTheme(
+  static CardThemeData get _cardThemeDark {
+    return CardThemeData(
       elevation: 0,
       color: const Color(0xFF2A2A2A),
       shape: RoundedRectangleBorder(

@@ -72,6 +72,8 @@
 	<string>Fyne necessita della fotocamera per scansionare gli scontrini e inserire le transazioni velocemente.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fyne necessita dell'accesso alle foto per caricare scontrini dalla galleria.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Fyne utilizza FaceID per sbloccare il tuo vault in sicurezza.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>

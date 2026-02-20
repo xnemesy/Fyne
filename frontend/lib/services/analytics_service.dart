@@ -9,7 +9,17 @@ class AnalyticsService {
   factory AnalyticsService() => _instance;
   AnalyticsService._internal();
 
-  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  FirebaseAnalytics? _analyticsInstance;
+  FirebaseAnalytics? get _analytics {
+    if (kIsWeb) return null; // O gestisci web separatamente
+    try {
+      _analyticsInstance ??= FirebaseAnalytics.instance;
+      return _analyticsInstance;
+    } catch (e) {
+      debugPrint('[Analytics] Firebase non disponibile: $e');
+      return null;
+    }
+  }
 
   /// Inizializza Crashlytics.
   Future<void> init() async {
@@ -34,7 +44,7 @@ class AnalyticsService {
       return MapEntry(key, value);
     });
 
-    await _analytics.logEvent(name: name, parameters: safeParams);
+    await _analytics?.logEvent(name: name, parameters: safeParams);
     debugPrint('[Analytics] Evento tracciato: $name');
   }
 

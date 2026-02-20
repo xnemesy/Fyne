@@ -53,8 +53,7 @@ class NetWorthChart extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: const Color(0xFF1A1A1A).withOpacity(0.8),
-                    tooltipRoundedRadius: 8,
+                    getTooltipColor: (touchedSpot) => const Color(0xFF1A1A1A).withOpacity(0.8),
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(

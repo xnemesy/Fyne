@@ -1,121 +1,244 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/foundation.dart';
+import 'package:isar_community/isar.dart';
 import '../models/account.dart';
-import '../services/api_service.dart';
 import '../services/crypto_service.dart';
-import 'master_key_provider.dart';
-import '../providers/budget_provider.dart';
+import 'isar_provider.dart';
+import '../services/key_rotation_service.dart';
+import '../data/repositories/account_sync_repository.dart';
+import 'account_sync_provider.dart';
+import 'dart:convert';
 
 class AccountNotifier extends AsyncNotifier<List<Account>> {
   @override
   Future<List<Account>> build() async {
-    final masterKey = ref.watch(masterKeyProvider);
-    return _fetchAndDecryptAccounts(masterKey);
+    final isar = await ref.watch(isarProvider.future);
+
+    // Watch for changes in Isar to keep UI reactive
+    final stream = isar.accounts
+        .where()
+        .isDeletedEqualTo(false)
+        .watch(fireImmediately: true);
+
+    // We handle the stream by updating the state when Isar changes
+    stream.listen((accounts) async {
+      await _processAccounts(accounts);
+      state = AsyncData(accounts);
+    });
+
+    return _fetchAndProcessAccounts(isar);
   }
 
-  Future<List<Account>> _fetchAndDecryptAccounts(dynamic masterKey) async {
-    final api = ref.read(apiServiceProvider);
+  Future<List<Account>> _fetchAndProcessAccounts(Isar isar) async {
+    final accounts =
+        await isar.accounts.where().isDeletedEqualTo(false).findAll();
+    await _processAccounts(accounts);
+    return accounts;
+  }
+
+  Future<void> _processAccounts(List<Account> accounts) async {
     final crypto = ref.read(cryptoServiceProvider);
+    final rotation = ref.read(keyRotationProvider);
+    final isar = await ref.read(isarProvider.future);
 
-    if (masterKey == null) {
-      debugPrint("[AccountProvider] MasterKey is NULL, returning early.");
-      return [];
-    }
+    for (var i = 0; i < accounts.length; i++) {
+      final account = accounts[i];
 
-    try {
-      debugPrint("[AccountProvider] Fetching accounts from API...");
-      final response = await api.get('/api/accounts');
-      final List<dynamic> data = response.data;
-      debugPrint("[AccountProvider] API returned ${data.length} accounts.");
-      
-      final List<Account> accounts = data.map((json) => Account.fromJson(json)).toList();
+      // 1. Lazy Migration
+      final migrated = await rotation.migrateIfLegacy<Account>(
+        recordUuid: account.id,
+        currentVersion: account.encryptionVersion,
+        decryptFn: (v) async {
+          final name = await crypto.decrypt(account.encryptedName,
+              scope: EncryptionScope.database,
+              type: 'account_name',
+              version: v);
+          final balance = await crypto.decrypt(account.encryptedBalance,
+              scope: EncryptionScope.database,
+              type: 'account_balance',
+              version: v);
+          return jsonEncode({'name': name, 'balance': balance});
+        },
+        reEncryptAndUpdateFn: (plain, v) async {
+          final data = jsonDecode(plain);
+          final newName = await crypto.encrypt(data['name'],
+              scope: EncryptionScope.database,
+              type: 'account_name',
+              version: v);
+          final newBalance = await crypto.encrypt(data['balance'],
+              scope: EncryptionScope.database,
+              type: 'account_balance',
+              version: v);
 
-      for (var account in accounts) {
-        try {
-          // 1. Try AES (Manual accounts)
-          account.decryptedName = await crypto.decrypt(account.encryptedName, masterKey);
-          account.decryptedBalance = await crypto.decrypt(account.encryptedBalance, masterKey);
-        } catch (e) {
-          debugPrint("[AccountProvider] Decryption failed for account ${account.id}, trying RSA...");
-          try {
-            // 2. Try RSA (Synced accounts)
-            account.decryptedName = await crypto.decryptWithPrivateKey(account.encryptedName);
-            account.decryptedBalance = await crypto.decryptWithPrivateKey(account.encryptedBalance);
-          } catch (e2) {
-            debugPrint("[AccountProvider] RSA Decryption failed too.");
-            account.decryptedName = "Account Criptato";
-            account.decryptedBalance = "0.00";
-          }
-        }
+          return await isar.writeTxn(() async {
+            final existing =
+                await isar.accounts.where().idEqualTo(account.id).findFirst();
+            if (existing == null) throw Exception('Record lost');
+
+            final updated = Account(
+              id: existing.id,
+              encryptedName: newName,
+              encryptedBalance: newBalance,
+              currency: existing.currency,
+              type: existing.type,
+              providerId: existing.providerId,
+              group: existing.group,
+              updatedAt: DateTime.now(),
+              isDeleted: existing.isDeleted,
+              encryptionVersion: v,
+            );
+            await isar.accounts.put(updated);
+            return updated;
+          });
+        },
+      );
+
+      final active = migrated ?? account;
+      if (migrated != null) accounts[i] = migrated;
+
+      // 2. Standard Decryption
+      try {
+        active.decryptedName = await crypto.decrypt(active.encryptedName,
+            scope: EncryptionScope.database,
+            type: 'account_name',
+            version: active.encryptionVersion);
+        active.decryptedBalance = await crypto.decrypt(active.encryptedBalance,
+            scope: EncryptionScope.database,
+            type: 'account_balance',
+            version: active.encryptionVersion);
+      } catch (e) {
+        active.decryptedName =
+            "Account Criptato [v${active.encryptionVersion}]";
+        active.decryptedBalance = "0.00";
       }
-      return accounts;
-    } catch (e) {
-      debugPrint("[AccountProvider] ERROR in _fetchAndDecryptAccounts: $e");
-      return [];
     }
   }
 
-  Future<void> refresh() async {
-    final masterKey = ref.read(masterKeyProvider);
-    state = await AsyncValue.guard(() => _fetchAndDecryptAccounts(masterKey));
+  Future<void> saveAccount(Account account) async {
+    final isar = await ref.read(isarProvider.future);
+    final updatedAccount = Account(
+      id: account.id,
+      encryptedName: account.encryptedName,
+      encryptedBalance: account.encryptedBalance,
+      currency: account.currency,
+      type: account.type,
+      providerId: account.providerId,
+      group: account.group,
+      updatedAt: DateTime.now(),
+      isDeleted: false,
+    );
+
+    await isar.writeTxn(() => isar.accounts.put(updatedAccount));
+    ref.invalidateSelf();
   }
 
-  Future<void> updateAccount(String accountId, {String? encryptedName, String? groupName}) async {
-    final api = ref.read(apiServiceProvider);
-    
-    try {
-      await api.put('/api/accounts/$accountId', data: {
-        if (encryptedName != null) 'encrypted_name': encryptedName,
-        if (groupName != null) 'group_name': groupName,
-      });
-      refresh();
-    } catch (e) {
-      print("Update account error: $e");
-    }
+  Future<CreateAccountResult> createAccountFromForm(
+      CreateAccountCommand command) async {
+    final syncRepository = ref.read(accountSyncRepositoryProvider);
+    final result = await syncRepository.createLocalFirst(command);
+    ref.invalidateSelf();
+    return result;
+  }
+
+  Future<void> syncPendingCreates() async {
+    final syncRepository = ref.read(accountSyncRepositoryProvider);
+    await syncRepository.syncPendingCreates();
+    ref.invalidateSelf();
   }
 
   Future<void> deleteAccount(String accountId) async {
-    final api = ref.read(apiServiceProvider);
-    
-    // 1. Snapshot previous state
-    final previousState = state.value;
-    if (previousState == null) return;
-
-    // 2. Optimistic Update
-    final newState = previousState.where((a) => a.id != accountId).toList();
-    state = AsyncData(newState);
-
-    try {
-      // 3. API Call
-      await api.post('/api/accounts/delete', data: {'id': accountId});
-      
-      // 4. Invalidate related providers lazily
-      // ref.invalidate(budgetsProvider);
-    } catch (e) {
-      print("Delete account error: $e");
-      // 5. Rollback
-      state = AsyncData(previousState);
-    }
+    final isar = await ref.read(isarProvider.future);
+    await isar.writeTxn(() async {
+      final existing =
+          await isar.accounts.where().idEqualTo(accountId).findFirst();
+      if (existing != null) {
+        final deletedAccount = Account(
+          id: existing.id,
+          encryptedName: existing.encryptedName,
+          encryptedBalance: existing.encryptedBalance,
+          currency: existing.currency,
+          type: existing.type,
+          providerId: existing.providerId,
+          group: existing.group,
+          updatedAt: DateTime.now(),
+          isDeleted: true,
+        );
+        await isar.accounts.put(deletedAccount);
+      }
+    });
+    ref.invalidateSelf();
   }
 
-  void updateLocalBalance(String accountId, String newDecryptedBalance) {
-    final currentState = state;
-    if (currentState is AsyncData<List<Account>>) {
-      final List<Account> currentList = currentState.value;
-      // Create a shallow copy of the list
-      final newList = List<Account>.from(currentList);
-      
-      for (var account in newList) {
-        if (account.id == accountId) {
-          account.decryptedBalance = newDecryptedBalance;
-          break;
-        }
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+  }
+
+  Future<void> applyTransactionDelta(String accountId, double delta) async {
+    final isar = await ref.read(isarProvider.future);
+    final crypto = ref.read(cryptoServiceProvider);
+
+    await isar.writeTxn(() async {
+      final account =
+          await isar.accounts.where().idEqualTo(accountId).findFirst();
+      if (account == null) return;
+
+      final currentBalanceStr = await crypto.decrypt(
+        account.encryptedBalance,
+        scope: EncryptionScope.database,
+        version: account.encryptionVersion,
+        type: 'account_balance',
+      );
+
+      final currentBalance = double.tryParse(currentBalanceStr) ?? 0.0;
+      final newBalance = currentBalance + delta;
+
+      final encryptedBalance = await crypto.encrypt(
+        newBalance.toString(),
+        scope: EncryptionScope.database,
+        type: 'account_balance',
+      );
+
+      final updatedAccount = Account(
+        id: account.id,
+        encryptedName: account.encryptedName,
+        encryptedBalance: encryptedBalance,
+        currency: account.currency,
+        type: account.type,
+        providerId: account.providerId,
+        group: account.group,
+        updatedAt: DateTime.now(),
+        encryptionVersion: CryptoService.currentCryptoVersion,
+      );
+
+      await isar.accounts.put(updatedAccount);
+    });
+    ref.invalidateSelf();
+  }
+
+  Future<void> updateAccount(String id,
+      {String? encryptedName, String? groupName}) async {
+    final isar = await ref.read(isarProvider.future);
+    await isar.writeTxn(() async {
+      final existing = await isar.accounts.where().idEqualTo(id).findFirst();
+      if (existing != null) {
+        final updated = Account(
+          id: existing.id,
+          encryptedName: encryptedName ?? existing.encryptedName,
+          encryptedBalance: existing.encryptedBalance,
+          currency: existing.currency,
+          type: existing.type,
+          providerId: existing.providerId,
+          group: groupName ?? existing.group,
+          updatedAt: DateTime.now(),
+          isDeleted: existing.isDeleted,
+        );
+        await isar.accounts.put(updated);
       }
-      state = AsyncData(newList);
-    }
+    });
+    ref.invalidateSelf();
   }
 }
 
-final accountsProvider = AsyncNotifierProvider<AccountNotifier, List<Account>>(() {
+final accountsProvider =
+    AsyncNotifierProvider<AccountNotifier, List<Account>>(() {
   return AccountNotifier();
 });

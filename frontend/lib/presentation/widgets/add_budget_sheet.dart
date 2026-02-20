@@ -133,13 +133,19 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
       final api = ref.read(apiServiceProvider);
       final masterKey = ref.read(masterKeyProvider);
 
-      if (masterKey == null) throw Exception("Master key not found");
+      if (masterKey == null) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(const SnackBar(
+            content: Text('Il vault non è ancora pronto. Riprova tra un momento.'),
+          ));
+        return;
+      }
 
       final amount = double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0.0;
-      final encryptedName = await crypto.encrypt(_selectedCategory!, masterKey);
+      final encryptedName = await crypto.encrypt(_selectedCategory!, scope: EncryptionScope.database, type: 'budget_category_name');
       
       final categorizationService = ref.read(categorizationServiceProvider);
-      // Ensure we use the exact same logic as transaction categorization
       final categoryUuid = categorizationService.getCategoryId(_selectedCategory!); 
 
       await api.post('/api/budgets/create', data: {
@@ -152,7 +158,11 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
       ref.read(budgetsProvider.notifier).refresh();
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore: $e")));
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(
+          content: Text('Errore nel salvataggio. Riprova.'),
+        ));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

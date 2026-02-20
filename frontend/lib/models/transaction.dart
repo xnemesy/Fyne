@@ -1,5 +1,4 @@
-import 'package:isar/isar.dart';
-import 'package:flutter/foundation.dart';
+import 'package:isar_community/isar.dart';
 
 part 'transaction.g.dart';
 
@@ -29,6 +28,15 @@ class TransactionModel {
   @Index()
   final DateTime createdAt;
 
+  @Index()
+  final DateTime updatedAt;
+
+  @Index()
+  final int encryptionVersion;
+
+  @Index()
+  final bool isDeleted;
+
   TransactionModel({
     this.id,
     required this.uuid,
@@ -41,6 +49,9 @@ class TransactionModel {
     this.encryptedCategoryName,
     this.categoryUuid,
     required this.createdAt,
+    required this.updatedAt,
+    this.isDeleted = false,
+    this.encryptionVersion = 1,
   });
 
   /// Helper to create a copy with decrypted data (ONLY for UI use, not for storage)
@@ -62,6 +73,9 @@ class TransactionModel {
       encryptedCategoryName: encryptedCategoryName,
       categoryUuid: categoryUuid,
       createdAt: createdAt,
+      updatedAt: updatedAt,
+      isDeleted: isDeleted,
+      encryptionVersion: encryptionVersion,
     );
     model._decryptedAmount = amount;
     model._decryptedDescription = description;
@@ -103,6 +117,11 @@ class TransactionModel {
       createdAt: json['created_at'] != null 
           ? DateTime.parse(json['created_at']) 
           : DateTime.now(),
+      updatedAt: json['updated_at'] != null 
+          ? DateTime.parse(json['updated_at']) 
+          : DateTime.now(),
+      isDeleted: json['is_deleted'] ?? false,
+      encryptionVersion: json['encryption_version'] ?? 1,
     );
   }
 
@@ -118,6 +137,9 @@ class TransactionModel {
       'encrypted_category_name': encryptedCategoryName,
       'category_uuid': categoryUuid,
       'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'is_deleted': isDeleted,
+      'encryption_version': encryptionVersion,
     };
   }
 }
@@ -131,6 +153,7 @@ class TransactionSummary {
   final String? categoryName;
   final String? categoryUuid;
   final String? description;
+  final String? counterParty;
   final String accountId;
 
   TransactionSummary({
@@ -141,5 +164,6 @@ class TransactionSummary {
     this.categoryName,
     this.categoryUuid,
     this.description,
+    this.counterParty,
   });
 }

@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/account.dart';
 import 'account_provider.dart';
+import 'scheduled_provider.dart';
 import '../services/currency_service.dart';
 
 class WalletSummary {
@@ -42,19 +43,18 @@ class WalletSummary {
 
 final walletSummaryProvider = Provider<WalletSummary>((ref) {
   final accountsAsync = ref.watch(accountsProvider);
+  final scheduledAsync = ref.watch(scheduledProvider);
   final currencyService = ref.watch(currencyServiceProvider);
 
   return accountsAsync.when(
     data: (accounts) {
-      double netWorth = 0;
-      double liabilities = 0;
       double assets = 0;
+      double liabilities = 0;
 
+      // 1. Calculate from balances
       for (var acc in accounts) {
         final balStr = acc.decryptedBalance?.replaceAll(',', '.') ?? '0';
         double bal = double.tryParse(balStr) ?? 0;
-        
-        // Convert to EUR
         double balInEur = currencyService.convertToEur(bal, acc.currency);
         
         if (balInEur >= 0) {
@@ -63,7 +63,21 @@ final walletSummaryProvider = Provider<WalletSummary>((ref) {
           liabilities += balInEur.abs();
         }
       }
-      netWorth = assets - liabilities; // liabilities are positive magnitude here
+
+      // 2. Add future expenses from Vault (Scheduled Transactions)
+      final scheduled = scheduledAsync.value ?? [];
+      for (var tx in scheduled) {
+        // We only add expenses (negative amounts or assumed debt) to liabilities
+        // Assuming scheduled transactions with amount > 0 are income (not liabilities)
+        if (tx.amount < 0) {
+          // Scheduled amounts are usually in EUR or primary currency, 
+          // but we apply conversion to be safe if model supports it.
+          // For now, ScheduledTransaction model uses double amount directly.
+          liabilities += tx.amount.abs();
+        }
+      }
+
+      double netWorth = assets - liabilities;
 
       return WalletSummary(
         netWorth: netWorth,

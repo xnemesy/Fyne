@@ -3,7 +3,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'crypto_service.dart';
 import 'notification_service.dart';
 import 'api_service.dart';
+import '../providers/storage_provider.dart';
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -15,7 +17,11 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     
     // In a real ZK app, we would need the private key stored in Secure Storage
     // For this implementation, we assume the CryptoService can access it or we have a mechanism.
-    final crypto = CryptoService();
+    const storage = FlutterSecureStorage(
+      iOptions: fyneSecureStorageOptions,
+      aOptions: fyneAndroidStorageOptions,
+    );
+    final crypto = CryptoService(storage: storage);
     
     // We would need the masterKey here. Usually, for background tasks, 
     // we store a 'Notification Key' in Secure Storage that can decrypt just the title/body.

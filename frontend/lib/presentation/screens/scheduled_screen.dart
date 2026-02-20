@@ -76,7 +76,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               final tx = transactions[index];
-                              return _buildScheduledItem(tx);
+                              return _buildScheduledItem(tx, ref, context);
                             },
                             childCount: transactions.length,
                           ),
@@ -101,50 +101,87 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScheduledItem(ScheduledTransaction tx) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.03)),
+  Widget _buildScheduledItem(ScheduledTransaction tx, WidgetRef ref, BuildContext context) {
+    return Dismissible(
+      key: Key('scheduled-${tx.id}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFF3B30),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Icon(LucideIcons.trash2, color: Colors.white),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE9E9EB),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              _getCategoryIcon(tx.categoryName),
-              size: 20, 
-              color: const Color(0xFF1A1A1A)
-            ),
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text("Elimina Spesa", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+            content: Text("Vuoi eliminare questa spesa programmata dal Vault?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("ANNULLA", style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("ELIMINA", style: GoogleFonts.inter(color: const Color(0xFFFF3B30), fontWeight: FontWeight.bold)),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  tx.decryptedDescription ?? "Operazione",
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
-                ),
-                Text(
-                  "Prossima: ${DateFormat('d MMM').format(tx.nextOccurrence)} • ${tx.frequency}",
-                  style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
-                ),
-              ],
+        );
+      },
+      onDismissed: (direction) {
+        ref.read(scheduledProvider.notifier).deleteScheduledTransaction(tx.id);
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.black.withOpacity(0.03)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE9E9EB),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                _getCategoryIcon(tx.categoryName),
+                size: 20, 
+                color: const Color(0xFF1A1A1A)
+              ),
             ),
-          ),
-          Text(
-            "${tx.amount.toStringAsFixed(2)} €",
-            style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: const Color(0xFF1A1A1A)),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tx.decryptedDescription ?? "Operazione",
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  Text(
+                    "Prossima: ${DateFormat('d MMM').format(tx.nextOccurrence)} • ${tx.frequency}",
+                    style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              "${tx.amount.toStringAsFixed(2)} €",
+              style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: const Color(0xFF1A1A1A)),
+            ),
+          ],
+        ),
       ),
     );
   }

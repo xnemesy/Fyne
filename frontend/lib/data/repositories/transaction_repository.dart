@@ -1,16 +1,17 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:isar/isar.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:isar_community/isar.dart';
 import '../../models/transaction.dart';
 import '../../services/crypto_service.dart';
+import '../../services/key_rotation_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:cryptography/cryptography.dart';
 
 class TransactionRepository {
   final Isar _isar;
   final CryptoService _crypto;
-  final SecretKey _masterKey;
+  final KeyRotationService _rotation;
 
-  TransactionRepository(this._isar, this._crypto, this._masterKey);
+  TransactionRepository(this._isar, this._crypto, this._rotation);
 
   /// PAGINATION: Loads encrypted items (FAST, no CPU block)
   Future<List<TransactionModel>> getEncryptedPage({
@@ -19,40 +20,81 @@ class TransactionRepository {
   }) async {
     return _isar.transactionModels
         .where()
+        .isDeletedEqualTo(false) // Filter out deleted items
         .sortByBookingDateDesc()
         .offset(page * pageSize)
         .limit(pageSize)
         .findAll();
   }
 
-  /// Single item decryption using Isolate
+  /// Single item decryption (Production-ready)
   Future<TransactionModel> decryptSingle(TransactionModel encrypted) async {
-    final keyData = await _masterKey.extractBytes();
-    
-    return await compute(
-      _decryptWorker,
-      _DecryptionParams(
-        model: encrypted,
-        masterKeyBytes: keyData,
-      ),
+    // 1. Check for legacy version and migrate
+    final migrated = await _rotation.migrateIfLegacy<TransactionModel>(
+      recordUuid: encrypted.uuid,
+      currentVersion: encrypted.encryptionVersion,
+      decryptFn: (v) async {
+        final amount = await _crypto.decrypt(encrypted.encryptedAmount, scope: EncryptionScope.database, type: 'transaction_amount', version: v);
+        final desc = encrypted.encryptedDescription != null ? await _crypto.decrypt(encrypted.encryptedDescription!, scope: EncryptionScope.database, type: 'transaction_description', version: v) : null;
+        return jsonEncode({'amount': amount, 'desc': desc});
+      },
+      reEncryptAndUpdateFn: (plain, v) async {
+        final data = jsonDecode(plain);
+        final newAmount = await _crypto.encrypt(data['amount'], scope: EncryptionScope.database, type: 'transaction_amount', version: v);
+        final newDesc = data['desc'] != null ? await _crypto.encrypt(data['desc'], scope: EncryptionScope.database, type: 'transaction_description', version: v) : null;
+        
+        return await _isar.writeTxn(() async {
+          final existing = await _isar.transactionModels.where().uuidEqualTo(encrypted.uuid).findFirst();
+          if (existing == null) throw Exception('Record lost');
+          
+          final updated = TransactionModel(
+            id: existing.id,
+            uuid: existing.uuid,
+            accountId: existing.accountId,
+            bookingDate: existing.bookingDate,
+            currency: existing.currency,
+            encryptedAmount: newAmount,
+            encryptedDescription: newDesc,
+            categoryUuid: existing.categoryUuid,
+            createdAt: existing.createdAt,
+            updatedAt: DateTime.now(),
+            isDeleted: existing.isDeleted,
+            encryptionVersion: v,
+          );
+          await _isar.transactionModels.put(updated);
+          return updated;
+        });
+      },
+    );
+
+    final active = migrated ?? encrypted;
+
+    // 2. Standard Decryption using internal version
+    final amountText = await _crypto.decrypt(active.encryptedAmount, scope: EncryptionScope.database, type: 'transaction_amount', version: active.encryptionVersion);
+    final descText = active.encryptedDescription != null ? await _crypto.decrypt(active.encryptedDescription!, scope: EncryptionScope.database, type: 'transaction_description', version: active.encryptionVersion) : null;
+
+    return active.copyWithDecrypted(
+      amount: double.tryParse(amountText),
+      description: descText,
     );
   }
 
-  /// Batch decryption for list pages (Isolate)
+  /// Batch decryption for list pages (Lazy migration support)
   Future<List<TransactionSummary>> decryptPageForList(
     List<TransactionModel> encryptedList,
   ) async {
-    if (encryptedList.isEmpty) return [];
-    
-    final keyData = await _masterKey.extractBytes();
-
-    return await compute(
-      _decryptBatchWorker,
-      _BatchDecryptionParams(
-        models: encryptedList,
-        masterKeyBytes: keyData,
-      ),
-    );
+    final List<TransactionSummary> summaries = [];
+    for (final encrypted in encryptedList) {
+      final decrypted = await decryptSingle(encrypted);
+      summaries.add(TransactionSummary(
+        uuid: decrypted.uuid,
+        amount: decrypted.amount ?? 0.0,
+        bookingDate: decrypted.bookingDate,
+        description: decrypted.description,
+        accountId: decrypted.accountId,
+      ));
+    }
+    return summaries;
   }
 
   /// Fetch and decrypt by UUID
@@ -62,28 +104,95 @@ class TransactionRepository {
         .uuidEqualTo(uuid)
         .findFirst();
         
-    if (encrypted == null) return null;
+    if (encrypted == null || encrypted.isDeleted) return null;
     
     return decryptSingle(encrypted);
   }
 
-  /// Save with Isolate encryption
-  Future<void> save(TransactionModel tx, {String? rawAmount, String? rawDesc}) async {
-    final keyData = await _masterKey.extractBytes();
+  /// Save with Signal-grade encryption (HMAC + AAD)
+  Future<void> save(
+    TransactionModel tx, {
+    String? rawAmount,
+    String? rawDesc,
+    String? rawCounterParty,
+    String? rawCategoryName,
+  }) async {
+    final amount = rawAmount ?? tx.amount?.toString() ?? '0.0';
+    final desc = rawDesc ?? tx.description;
 
-    final encryptedModel = await compute(
-      _encryptWorker,
-      _EncryptionParams(
-        model: tx,
-        rawAmount: rawAmount ?? tx.amount?.toString() ?? "0.0",
-        rawDescription: rawDesc ?? tx.description,
-        masterKeyBytes: keyData,
-      ),
+    final encryptedAmount = await _crypto.encrypt(
+      amount,
+      scope: EncryptionScope.database,
+      type: 'transaction_amount',
+    );
+
+    final encryptedDesc = desc != null ? await _crypto.encrypt(
+      desc,
+      scope: EncryptionScope.database,
+      type: 'transaction_description',
+    ) : null;
+
+    final modelToPut = TransactionModel(
+      id: tx.id,
+      uuid: tx.uuid,
+      accountId: tx.accountId,
+      bookingDate: tx.bookingDate,
+      currency: tx.currency,
+      encryptedAmount: encryptedAmount,
+      encryptedDescription: encryptedDesc,
+      categoryUuid: tx.categoryUuid,
+      createdAt: tx.createdAt,
+      updatedAt: DateTime.now(),
+      isDeleted: tx.isDeleted,
+      encryptionVersion: CryptoService.currentCryptoVersion,
     );
 
     await _isar.writeTxn(() async {
-      await _isar.transactionModels.put(encryptedModel);
+      await _isar.transactionModels.put(modelToPut);
     });
+  }
+
+  Future<void> deleteByUuid(String uuid) async {
+    await _isar.writeTxn(() async {
+      final existing = await _isar.transactionModels.where().uuidEqualTo(uuid).findFirst();
+      if (existing != null) {
+        // SOFT DELETE for Sync propagation
+        final deletedModel = TransactionModel(
+          id: existing.id,
+          uuid: existing.uuid,
+          accountId: existing.accountId,
+          bookingDate: existing.bookingDate,
+          currency: existing.currency,
+          encryptedAmount: existing.encryptedAmount,
+          encryptedDescription: existing.encryptedDescription,
+          encryptedCounterParty: existing.encryptedCounterParty,
+          encryptedCategoryName: existing.encryptedCategoryName,
+          categoryUuid: existing.categoryUuid,
+          createdAt: existing.createdAt,
+          updatedAt: DateTime.now(),
+          isDeleted: true,
+        );
+        await _isar.transactionModels.put(deletedModel);
+      }
+    });
+  }
+
+  /// Calculates total spent in a range by decrypting all relevant items (Isolate)
+  Future<double> getTotalSpentInRange(DateTime start, DateTime end) async {
+    final encrypted = await _isar.transactionModels
+        .where()
+        .isDeletedEqualTo(false)
+        .filter()
+        .bookingDateBetween(start, end)
+        .findAll();
+    
+    if (encrypted.isEmpty) return 0.0;
+    
+    // Decrypt in batch (Optimize for CPU)
+    final summaries = await decryptPageForList(encrypted);
+    return summaries
+        .where((s) => s.amount < 0)
+        .fold<double>(0.0, (double sum, s) => sum + s.amount.abs());
   }
 }
 
@@ -105,12 +214,20 @@ class _EncryptionParams {
   final TransactionModel model;
   final String rawAmount;
   final String? rawDescription;
+  final String? rawCounterParty;
+  final String? rawCategoryName;
   final List<int> masterKeyBytes;
+  final DateTime updatedAt;
+  final bool isDeleted;
   _EncryptionParams({
     required this.model, 
     required this.rawAmount, 
     this.rawDescription, 
-    required this.masterKeyBytes
+    this.rawCounterParty,
+    this.rawCategoryName,
+    required this.masterKeyBytes,
+    required this.updatedAt,
+    this.isDeleted = false,
   });
 }
 
@@ -131,6 +248,7 @@ Future<List<TransactionSummary>> _decryptBatchWorker(_BatchDecryptionParams para
       categoryName: decrypted.categoryName,
       categoryUuid: decrypted.categoryUuid,
       description: decrypted.description,
+      counterParty: decrypted.counterParty,
       accountId: decrypted.accountId,
     ));
   }
@@ -154,9 +272,12 @@ Future<TransactionModel> _encryptWorker(_EncryptionParams params) async {
     currency: params.model.currency,
     encryptedAmount: await encrypt(params.rawAmount),
     encryptedDescription: params.rawDescription != null ? await encrypt(params.rawDescription!) : null,
-    encryptedCounterParty: params.model.counterParty != null ? await encrypt(params.model.counterParty!) : null,
-    encryptedCategoryName: params.model.categoryName != null ? await encrypt(params.model.categoryName!) : null,
+    encryptedCounterParty: params.rawCounterParty != null ? await encrypt(params.rawCounterParty!) : null,
+    encryptedCategoryName: params.rawCategoryName != null ? await encrypt(params.rawCategoryName!) : null,
+    categoryUuid: params.model.categoryUuid,
     createdAt: params.model.createdAt,
+    updatedAt: params.updatedAt,
+    isDeleted: params.isDeleted,
   );
 }
 
@@ -177,12 +298,13 @@ Future<TransactionModel> _decryptAsync(TransactionModel model, List<int> keyByte
       final clearText = await algorithm.decrypt(secretBox, secretKey: secretKey);
       return utf8.decode(clearText);
     } catch (e) {
+      debugPrint('⚠️ Decryption failed for field: $e');
       return null;
     }
   }
 
   final amountStr = await decrypt(model.encryptedAmount);
-  final amount = double.tryParse(amountStr ?? "0.0") ?? 0.0;
+  final amount = amountStr != null ? double.tryParse(amountStr) : null;
   
   final desc = await decrypt(model.encryptedDescription);
   final cp = await decrypt(model.encryptedCounterParty);

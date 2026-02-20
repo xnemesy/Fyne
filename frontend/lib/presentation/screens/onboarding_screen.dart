@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import '../../../providers/auth_provider.dart';
-import '../../../providers/security_provider.dart';
-import '../../../providers/preferences_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/theme/fyne_theme.dart';
+
+/// Provider per tracciare se l'onboarding è stato completato
+final onboardingCompletedProvider = FutureProvider<bool>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('onboarding_completed') ?? false;
+});
 
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({Key? key}) : super(key: key);
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -17,447 +20,407 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingData> _pages = [
-    OnboardingData(
-      title: "Benvenuto in Fyne",
-      description: "La gestione finanziaria per chi pretende controllo, non compromessi.",
-      icon: LucideIcons.sparkles,
+  final List<OnboardingPage> _pages = [
+    OnboardingPage(
+      title: 'Benvenuto in Fyne',
+      description: 'Il tuo vault finanziario personale, completamente cifrato e privato. I tuoi dati restano solo tuoi.',
+      icon: Icons.shield_outlined,
+      color: FyneColors.forest,
+      illustration: 'shield',
     ),
-    OnboardingData(
-      title: "Privacy radicale",
-      description: "I tuoi dati non lasciano mai il tuo dispositivo. Nemmeno noi possiamo accedervi.",
-      microCopy: "Architettura Zero-Knowledge nativa.",
-      icon: LucideIcons.shieldCheck,
+    OnboardingPage(
+      title: 'Zero-Knowledge Banking',
+      description: 'Tutto è cifrato end-to-end. Nemmeno noi possiamo vedere i tuoi dati finanziari. Solo tu hai le chiavi.',
+      icon: Icons.lock_outlined,
+      color: FyneColors.amber,
+      illustration: 'lock',
     ),
-    OnboardingData(
-      title: "Intelligence locale",
-      description: "L'analisi avviene sul tuo dispositivo. Nessun cloud. Nessuna condivisione.",
-      microCopy: "AI privata, sempre offline.",
-      icon: LucideIcons.brainCircuit,
+    OnboardingPage(
+      title: 'Traccia le tue Finanze',
+      description: 'Registra transazioni, gestisci conti multipli e monitora il tuo cash flow in tempo reale.',
+      icon: Icons.account_balance_wallet_outlined,
+      color: FyneColors.moss,
+      illustration: 'wallet',
     ),
-    OnboardingData(
-      title: "I tuoi dati, le tue regole",
-      description: "Inserisci solo ciò che scegli. Nessuna sincronizzazione automatica. Nessuna dipendenza da terze parti.",
-      icon: LucideIcons.key,
+    OnboardingPage(
+      title: 'Backup Sicuro',
+      description: 'Esporta i tuoi dati in un file .fyne cifrato. Ripristinali quando vuoi, su qualsiasi dispositivo.',
+      icon: Icons.backup_outlined,
+      color: FyneColors.gold,
+      illustration: 'backup',
     ),
-    OnboardingData(
-      title: "Vault Blindato",
-      description: "Proteggi il tuo archivio con la biometria del tuo dispositivo. I tuoi dati restano tuoi.",
-      microCopy: "Supporto FaceID, TouchID e Impronta.",
-      icon: LucideIcons.fingerprint,
-      isSecurityPage: true,
-    ),
-    OnboardingData(
-      title: "Tutto è pronto",
-      description: "Fyne è progettata per funzionare in silenzio, lasciando parlare solo i numeri.",
-      icon: LucideIcons.checkCircle,
+    OnboardingPage(
+      title: 'Pronto a Iniziare?',
+      description: 'Crea il tuo account e inizia a prendere il controllo delle tue finanze in modo sicuro.',
+      icon: Icons.rocket_launch_outlined,
+      color: FyneColors.forest,
+      illustration: 'rocket',
     ),
   ];
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_completed', true);
+    
+    if (mounted) {
+      // Invalidate the provider so AuthWrapper re-evaluates routing
+      ref.invalidate(onboardingCompletedProvider);
+      // AuthWrapper will now show the appropriate screen based on auth state
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
-      body: Stack(
-        children: [
-          PageView.builder(
-            controller: _pageController,
-            itemCount: _pages.length,
-            onPageChanged: (index) => setState(() => _currentPage = index),
-            itemBuilder: (context, index) {
-              return _buildPage(_pages[index]);
-            },
-          ),
-          
-          Positioned(
-            bottom: 60,
-            left: 40,
-            right: 40,
-            child: Column(
-              children: [
-                _buildPageIndicator(),
-                const SizedBox(height: 48),
-                if (_currentPage == _pages.length - 1)
-                  _buildAuthButtons(authState)
-                else
-                  _buildNextButton(),
-              ],
-            ),
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Skip button
+            if (_currentPage < _pages.length - 1)
+              Align(
+                alignment: Alignment.topRight,
+                child: TextButton(
+                  onPressed: () {
+                    _pageController.animateToPage(
+                      _pages.length - 1,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: const Text('Salta'),
+                ),
+              ),
 
-          if (authState.status == AuthStatus.signingIn || authState.status == AuthStatus.initializingKeys)
-            _buildLoadingOverlay(authState.status == AuthStatus.initializingKeys),
-            
-          if (authState.error != null)
-            _buildErrorHint(authState.error!),
-        ],
+            // PageView con le pagine dell'onboarding
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
+                },
+                itemCount: _pages.length,
+                itemBuilder: (context, index) {
+                  return _buildPage(_pages[index]);
+                },
+              ),
+            ),
+
+            // Indicatori e pulsanti
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  // Page indicators
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _pages.length,
+                      (index) => _buildPageIndicator(index == _currentPage),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Pulsanti navigazione
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Back button
+                      if (_currentPage > 0)
+                        TextButton.icon(
+                          onPressed: () {
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          icon: const Icon(Icons.arrow_back),
+                          label: const Text('Indietro'),
+                        )
+                      else
+                        const SizedBox(width: 100),
+
+                      // Next/Complete button
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_currentPage < _pages.length - 1) {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          } else {
+                            _completeOnboarding();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _currentPage < _pages.length - 1
+                                  ? 'Avanti'
+                                  : 'Inizia',
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              _currentPage < _pages.length - 1
+                                  ? Icons.arrow_forward
+                                  : Icons.check,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPage(OnboardingData page) {
+  Widget _buildPage(OnboardingPage page) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.all(32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: 1),
-            duration: const Duration(seconds: 1),
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: Opacity(opacity: value, child: child),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A).withOpacity(0.03),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(page.icon, size: 48, color: const Color(0xFF1A1A1A).withOpacity(0.7)),
+          // Illustration
+          Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: page.color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              page.icon,
+              size: 100,
+              color: page.color,
             ),
           ),
-          const SizedBox(height: 60),
+          const SizedBox(height: 48),
+
+          // Title
           Text(
             page.title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.lora(
-              fontSize: 32,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: page.color,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A),
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+
+          // Description
           Text(
             page.description,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: FyneColors.inkLight,
+              height: 1.5,
+            ),
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              color: const Color(0xFF1A1A1A).withOpacity(0.8),
-              height: 1.6,
-            ),
           ),
-          if (page.microCopy != null) ...[
-            const SizedBox(height: 16),
-            Text(
-              page.microCopy!,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1A1A).withOpacity(0.3),
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-          if (page.isSecurityPage) ...[
+
+          // Features (solo per alcune pagine)
+          if (page.features != null) ...[
             const SizedBox(height: 32),
-            _buildBiometricsToggle(),
+            ...page.features!.map((feature) => _buildFeatureItem(feature)),
           ],
-          const SizedBox(height: 120), // Spacer for bottom buttons
         ],
       ),
     );
   }
 
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(_pages.length, (index) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: _currentPage == index ? 24 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: _currentPage == index ? const Color(0xFF4A6741) : const Color(0xFF4A6741).withOpacity(0.2),
-            borderRadius: BorderRadius.circular(4),
+  Widget _buildFeatureItem(String feature) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          const Icon(Icons.check_circle, color: FyneColors.forest, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              feature,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildNextButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          _pageController.nextPage(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4A6741),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 0,
-        ),
-        child: Text("CONTINUA", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1)),
+        ],
       ),
     );
   }
 
-  Widget _buildAuthButtons(AuthState authState) {
-    return Column(
+  Widget _buildPageIndicator(bool isActive) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: isActive ? 24 : 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: isActive ? FyneColors.forest : FyneColors.paperDark,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+}
+
+/// Modello per una pagina dell'onboarding
+class OnboardingPage {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final String illustration;
+  final List<String>? features;
+
+  OnboardingPage({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.color,
+    required this.illustration,
+    this.features,
+  });
+}
+
+/// Widget per mostrare tutorial contestuale nelle schermate principali
+class InAppTutorialOverlay extends StatefulWidget {
+  final Widget child;
+  final List<TutorialStep> steps;
+  final VoidCallback onComplete;
+
+  const InAppTutorialOverlay({
+    Key? key,
+    required this.child,
+    required this.steps,
+    required this.onComplete,
+  }) : super(key: key);
+
+  @override
+  State<InAppTutorialOverlay> createState() => _InAppTutorialOverlayState();
+}
+
+class _InAppTutorialOverlayState extends State<InAppTutorialOverlay> {
+  int _currentStep = 0;
+  bool _showTutorial = true;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_showTutorial || _currentStep >= widget.steps.length) {
+      return widget.child;
+    }
+
+    final step = widget.steps[_currentStep];
+
+    return Stack(
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => ref.read(authProvider.notifier).signInAnonymously(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A6741),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              elevation: 0,
-            ),
-            child: Text("INIZIA COME OSPITE", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
-          ),
+        widget.child,
+        
+        // Overlay scuro
+        Container(
+          color: FyneColors.blind,
         ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(height: 1, width: 40, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text("OPPURE", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3))),
-            ),
-            Container(height: 1, width: 40, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton(
-            onPressed: () => _showEmailAuthSheet(),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF1A1A1A),
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              side: BorderSide(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
-            child: Text("ACCEDI CON EMAIL", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildSocialBtn(LucideIcons.chrome, "Google", () => ref.read(authProvider.notifier).signInWithGoogle()),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildSocialBtn(LucideIcons.apple, "Apple", () => ref.read(authProvider.notifier).signInWithApple()),
-            ),
-          ],
+
+        // Tutorial bubble
+        Positioned(
+          top: step.position.dy,
+          left: step.position.dx,
+          child: _buildTutorialBubble(step),
         ),
       ],
     );
   }
 
-  Widget _buildSocialBtn(IconData icon, String label, VoidCallback onTap) {
-    return OutlinedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 18),
-      label: Text(label.toUpperCase(), style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF1A1A1A),
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        side: BorderSide(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-  }
-
-  void _showEmailAuthSheet() {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    bool isSignUp = false;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 40,
-            left: 32, right: 32, top: 32,
-          ),
-          decoration: const BoxDecoration(
-            color: Color(0xFFFBFBF9),
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(isSignUp ? "Crea Account" : "Bentornato", style: GoogleFonts.lora(fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 24),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: "Email", 
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Password", 
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ref.read(authProvider.notifier).signInWithEmail(emailController.text, passwordController.text, isSignUp: isSignUp);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4A6741),
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 0,
-                  ),
-                  child: Text(isSignUp ? "REGISTRATI" : "ACCEDI", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => setModalState(() => isSignUp = !isSignUp),
-                child: Text(
-                  isSignUp ? "Hai già un account? Accedi" : "Nuovo qui? Crea un account",
-                  style: GoogleFonts.inter(color: const Color(0xFF1A1A1A).withOpacity(0.5), fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingOverlay(bool isInitializingKeys) {
+  Widget _buildTutorialBubble(TutorialStep step) {
     return Container(
-      color: const Color(0xFFFBFBF9).withOpacity(0.95),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(color: Color(0xFF4A6741)),
-            const SizedBox(height: 32),
-            Text(
-              isInitializingKeys ? "GENERAZIONE CHIAVI SICURE..." : "ACCESSO IN CORSO...",
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-                fontSize: 11,
-                color: const Color(0xFF1A1A1A).withOpacity(0.6),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 60),
-              child: Text(
-                isInitializingKeys 
-                  ? "Stiamo creando le tue chiavi crittografiche locali per una privacy totale."
-                  : "Stiamo preparando la tua custodia digitale.",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.4), height: 1.5),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorHint(String error) {
-    return Positioned(
-      top: 60,
-      left: 20,
-      right: 20,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFF3B30).withOpacity(0.9),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            const Icon(LucideIcons.alertCircle, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(error, style: GoogleFonts.inter(color: Colors.white, fontSize: 13)),
-            ),
-            IconButton(
-              onPressed: () => ref.read(authProvider.notifier).clearError(),
-              icon: const Icon(LucideIcons.x, color: Colors.white, size: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBiometricsToggle() {
-    final prefs = ref.watch(preferencesProvider);
-    final security = ref.watch(securityProvider);
-
-    if (!security.isSupported) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      width: 280,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.shield, size: 20, color: Color(0xFF4A6741)),
+              Icon(step.icon, color: FyneColors.forest),
               const SizedBox(width: 12),
-              Text(
-                "Attiva Biometria",
-                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+              Expanded(
+                child: Text(
+                  step.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
-          Switch.adaptive(
-            value: prefs.useBiometrics,
-            activeColor: const Color(0xFF4A6741),
-            onChanged: (val) async {
-              if (val) {
-                final success = await ref.read(securityProvider.notifier).authenticate(
-                  reason: 'Conferma per attivare la protezione biometrica',
-                );
-                if (success) {
-                  ref.read(preferencesProvider.notifier).toggleBiometrics(true);
-                }
-              } else {
-                ref.read(preferencesProvider.notifier).toggleBiometrics(false);
-              }
-            },
+          const SizedBox(height: 12),
+          Text(
+            step.description,
+            style: const TextStyle(fontSize: 14, height: 1.5),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${_currentStep + 1}/${widget.steps.length}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: FyneColors.inkLight,
+                ),
+              ),
+              Row(
+                children: [
+                  if (_currentStep > 0)
+                    TextButton(
+                      onPressed: () {
+                        setState(() => _currentStep--);
+                      },
+                      child: const Text('Indietro'),
+                    ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_currentStep < widget.steps.length - 1) {
+                        setState(() => _currentStep++);
+                      } else {
+                        setState(() => _showTutorial = false);
+                        widget.onComplete();
+                      }
+                    },
+                    child: Text(
+                      _currentStep < widget.steps.length - 1
+                          ? 'Avanti'
+                          : 'Fine',
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
@@ -465,17 +428,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-class OnboardingData {
+/// Singolo step del tutorial contestuale
+class TutorialStep {
   final String title;
   final String description;
-  final String? microCopy;
   final IconData icon;
-  final bool isSecurityPage;
-  OnboardingData({
-    required this.title, 
-    required this.description, 
-    this.microCopy, 
+  final Offset position;
+
+  TutorialStep({
+    required this.title,
+    required this.description,
     required this.icon,
-    this.isSecurityPage = false,
+    required this.position,
   });
 }

@@ -1,89 +1,132 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter/foundation.dart';
+import 'package:isar_community/isar.dart';
 import '../models/budget.dart';
-import '../services/api_service.dart';
 import '../services/crypto_service.dart';
+import '../services/key_rotation_service.dart';
+import 'isar_provider.dart';
+import 'dart:convert';
 import 'transaction_provider.dart';
-import 'master_key_provider.dart';
 
-// The master key provider is now in lib/providers/master_key_provider.dart
-
-/**
- * Async Notifier for Budgets.
- * Fetches data from Cloud Run and decrypts it locally.
- */
 class BudgetNotifier extends AsyncNotifier<List<Budget>> {
   @override
   Future<List<Budget>> build() async {
-    final masterKey = ref.watch(masterKeyProvider);
-    return _fetchAndDecryptBudgets(masterKey);
+    final isar = await ref.watch(isarProvider.future);
+
+    // Watch Isar for changes
+    final stream = isar.budgets.where().isDeletedEqualTo(false).watch(fireImmediately: true);
+    stream.listen((budgets) async {
+      await _processBudgets(budgets);
+      state = AsyncData(budgets);
+    });
+
+    return _fetchAndProcessBudgets(isar);
   }
 
-  Future<List<Budget>> _fetchAndDecryptBudgets(dynamic masterKey) async {
-    final api = ref.read(apiServiceProvider);
-    final crypto = ref.read(cryptoServiceProvider);
-
-    if (masterKey == null) return [];
-
-    List<Budget> budgets = [];
-    try {
-      final response = await api.get('/api/budgets');
-      final List<dynamic> jsonList = response.data;
-      budgets = jsonList.map((json) => Budget.fromJson(json)).toList();
-
-      // Decrypt names for UI display
-      for (var budget in budgets) {
-        try {
-          if (budget.encryptedCategoryName.startsWith('mock_')) {
-            budget.decryptedCategoryName = budget.encryptedCategoryName.replaceFirst('mock_', '');
-          } else {
-            budget.decryptedCategoryName = await crypto.decrypt(
-              budget.encryptedCategoryName, 
-              masterKey
-            );
-          }
-        } catch (e) {
-          budget.decryptedCategoryName = "Spesa";
-        }
-      }
-    } catch (e) {
-      debugPrint("Budget fetch error: $e");
-      return [];
-    }
+  Future<List<Budget>> _fetchAndProcessBudgets(Isar isar) async {
+    final budgets = await isar.budgets.where().isDeletedEqualTo(false).findAll();
+    await _processBudgets(budgets);
     return budgets;
   }
 
-  Future<void> refresh() async {
-    final masterKey = ref.read(masterKeyProvider);
-    state = await AsyncValue.guard(() => _fetchAndDecryptBudgets(masterKey));
+  Future<void> _processBudgets(List<Budget> budgets) async {
+    final crypto = ref.read(cryptoServiceProvider);
+    final rotation = ref.read(keyRotationProvider);
+    final isar = await ref.read(isarProvider.future);
+
+    for (var i = 0; i < budgets.length; i++) {
+      final budget = budgets[i];
+      
+      // 1. Lazy Migration
+      final migrated = await rotation.migrateIfLegacy<Budget>(
+        recordUuid: budget.id,
+        currentVersion: budget.encryptionVersion,
+        decryptFn: (v) async {
+          final catName = await crypto.decrypt(budget.encryptedCategoryName, scope: EncryptionScope.database, type: 'budget_category', version: v);
+          return jsonEncode({'categoryName': catName});
+        },
+        reEncryptAndUpdateFn: (plain, v) async {
+          final data = jsonDecode(plain);
+          final newCatName = await crypto.encrypt(data['categoryName'], scope: EncryptionScope.database, type: 'budget_category', version: v);
+          
+          return await isar.writeTxn(() async {
+            final existing = await isar.budgets.where().idEqualTo(budget.id).findFirst();
+            if (existing == null) throw Exception('Record lost');
+            
+            final updated = Budget(
+              id: existing.id,
+              categoryUuid: existing.categoryUuid,
+              encryptedCategoryName: newCatName,
+              limitAmount: existing.limitAmount,
+              currentSpent: existing.currentSpent,
+              updatedAt: DateTime.now(),
+              isDeleted: existing.isDeleted,
+              encryptionVersion: v,
+            );
+            await isar.budgets.put(updated);
+            return updated;
+          });
+        },
+      );
+
+      final active = migrated ?? budget;
+      if (migrated != null) budgets[i] = migrated;
+
+      // 2. Standard Decryption
+      try {
+        active.decryptedCategoryName = await crypto.decrypt(active.encryptedCategoryName, scope: EncryptionScope.database, type: 'budget_category', version: active.encryptionVersion);
+      } catch (e) {
+        active.decryptedCategoryName = "Budget Criptato [v${active.encryptionVersion}]";
+      }
+    }
+  }
+
+  Future<void> saveBudget(Budget budget) async {
+    final isar = await ref.read(isarProvider.future);
+    final updatedBudget = Budget(
+      id: budget.id,
+      categoryUuid: budget.categoryUuid,
+      encryptedCategoryName: budget.encryptedCategoryName,
+      limitAmount: budget.limitAmount,
+      currentSpent: budget.currentSpent,
+      updatedAt: DateTime.now(),
+      isDeleted: false,
+    );
+
+    await isar.writeTxn(() => isar.budgets.put(updatedBudget));
+    ref.invalidateSelf();
   }
 
   Future<void> deleteBudget(String budgetId) async {
-    final api = ref.read(apiServiceProvider);
-    
-    // 1. Snapshot previous state
-    final previousState = state.value;
-    if (previousState == null) return;
+    final isar = await ref.read(isarProvider.future);
+    await isar.writeTxn(() async {
+      final existing = await isar.budgets.where().idEqualTo(budgetId).findFirst();
+      if (existing != null) {
+        final deletedBudget = Budget(
+          id: existing.id,
+          categoryUuid: existing.categoryUuid,
+          encryptedCategoryName: existing.encryptedCategoryName,
+          limitAmount: existing.limitAmount,
+          currentSpent: existing.currentSpent,
+          updatedAt: DateTime.now(),
+          isDeleted: true,
+        );
+        await isar.budgets.put(deletedBudget);
+      }
+    });
+    ref.invalidateSelf();
+  }
 
-    // 2. Optimistic Update
-    final newState = previousState.where((b) => b.id != budgetId).toList();
-    state = AsyncData(newState);
-
-    try {
-      // 3. API Call
-      await api.post('/api/budgets/delete', data: {'id': budgetId});
-    } catch (e) {
-      debugPrint("Delete budget error: $e");
-      // 4. Rollback
-      state = AsyncData(previousState);
-    }
+  Future<void> refresh() async {
+    ref.invalidateSelf();
   }
 }
 
 final totalMonthlyBudgetProvider = StateProvider<double>((ref) => 0.0);
 
 final dailyAllowanceProvider = Provider<double>((ref) {
-  final transactions = ref.watch(transactionsProvider).value ?? [];
+  final monthlySpentAsync = ref.watch(monthlySpentProvider);
   final budgets = ref.watch(budgetsProvider).value ?? [];
   final stateBudget = ref.watch(totalMonthlyBudgetProvider);
   
@@ -94,32 +137,21 @@ final dailyAllowanceProvider = Provider<double>((ref) {
   
   if (totalBudget <= 0) return 0.0;
   
-  // Calculate total spent this month
-  final now = DateTime.now();
-  final firstOfMonth = DateTime(now.year, now.month, 1);
-  final spentThisMonth = transactions
-      .where((tx) {
-        final date = tx.bookingDate;
-        return (date.isAfter(firstOfMonth) || date.isAtSameMomentAs(firstOfMonth)) && tx.amount < 0;
-      })
-      .fold(0.0, (sum, tx) => sum + tx.amount.abs());
+  // Calculate total spent this month using the accurate provider
+  final spentThisMonth = monthlySpentAsync.value ?? 0.0;
   
   final remainingBudget = totalBudget - spentThisMonth;
   
   // Days remaining in month
+  final now = DateTime.now();
   final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
   final daysRemaining = lastDayOfMonth - now.day + 1;
   
-  // Safe Division & Edge Cases
   if (daysRemaining <= 0) {
-    // If it's the last day (or calculation anomaly), all remaining budget is available today.
-    // Clamp to 0 to avoid negative allowance if overbudget.
     return remainingBudget < 0 ? 0.0 : remainingBudget;
   }
   
   final daily = remainingBudget / daysRemaining;
-  
-  // Return 0 if negative (overbudget), otherwise the calculated daily amount
   return daily < 0 ? 0.0 : daily;
 });
 

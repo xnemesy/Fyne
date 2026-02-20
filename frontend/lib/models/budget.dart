@@ -1,4 +1,4 @@
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'budget.g.dart';
 
@@ -18,6 +18,15 @@ class Budget {
   final double limitAmount;
   final double currentSpent;
   
+  @Index()
+  final DateTime updatedAt;
+
+  @Index()
+  final bool isDeleted;
+
+  @Index()
+  final int encryptionVersion;
+
   @ignore
   String? decryptedCategoryName;
 
@@ -27,6 +36,9 @@ class Budget {
     required this.encryptedCategoryName,
     required this.limitAmount,
     required this.currentSpent,
+    required this.updatedAt,
+    this.isDeleted = false,
+    this.encryptionVersion = 1,
     this.decryptedCategoryName,
   });
 
@@ -37,6 +49,11 @@ class Budget {
       encryptedCategoryName: json['encrypted_category_name'] ?? json['encryptedCategoryName'] ?? '',
       limitAmount: (json['limit_amount'] ?? json['limitAmount'] ?? json['amount'] ?? 0.0 as num).toDouble(),
       currentSpent: (json['current_spent'] ?? json['currentSpent'] ?? 0.0 as num).toDouble(),
+      updatedAt: json['updated_at'] != null 
+          ? DateTime.parse(json['updated_at']) 
+          : DateTime.now(),
+      isDeleted: json['is_deleted'] ?? false,
+      encryptionVersion: json['encryption_version'] ?? 1,
     );
   }
 
@@ -47,6 +64,9 @@ class Budget {
       'encrypted_category_name': encryptedCategoryName,
       'limit_amount': limitAmount,
       'current_spent': currentSpent,
+      'updated_at': updatedAt.toIso8601String(),
+      'is_deleted': isDeleted,
+      'encryption_version': encryptionVersion,
     };
   }
 

@@ -228,14 +228,21 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
       final api = ref.read(apiServiceProvider);
       final masterKey = ref.read(masterKeyProvider);
 
-      if (masterKey == null) throw Exception("Master key not found");
+      if (masterKey == null) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(const SnackBar(
+            content: Text('Il vault non è ancora pronto. Riprova tra un momento.'),
+          ));
+        return;
+      }
 
       final amount = double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0.0;
-      final encryptedDesc = await crypto.encrypt(_descriptionController.text, masterKey);
+      final encryptedDesc = await crypto.encrypt(_descriptionController.text, scope: EncryptionScope.database, type: 'scheduled_description');
 
       await api.post('/api/scheduled-transactions', data: {
         'encrypted_description': encryptedDesc,
-        'amount': -amount.abs(), // Always store as negative for expenses
+        'amount': -amount.abs(),
         'currency': 'EUR',
         'frequency': _frequency,
         'next_occurrence': _selectedDate.toIso8601String(),
@@ -243,9 +250,13 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
 
       ref.read(scheduledProvider.notifier).refresh();
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Transazione programmata correttamente!")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Transazione programmata correttamente!')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore: $e")));
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(
+          content: Text('Errore nel salvataggio. Riprova.'),
+        ));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

@@ -32,30 +32,45 @@ const BudgetSchema = CollectionSchema(
       name: r'encryptedCategoryName',
       type: IsarType.string,
     ),
-    r'id': PropertySchema(
+    r'encryptionVersion': PropertySchema(
       id: 3,
+      name: r'encryptionVersion',
+      type: IsarType.long,
+    ),
+    r'id': PropertySchema(
+      id: 4,
       name: r'id',
       type: IsarType.string,
     ),
+    r'isDeleted': PropertySchema(
+      id: 5,
+      name: r'isDeleted',
+      type: IsarType.bool,
+    ),
     r'isOverBudget': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'isOverBudget',
       type: IsarType.bool,
     ),
     r'limitAmount': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'limitAmount',
       type: IsarType.double,
     ),
     r'progress': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'progress',
       type: IsarType.double,
     ),
     r'remaining': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'remaining',
       type: IsarType.double,
+    ),
+    r'updatedAt': PropertySchema(
+      id: 10,
+      name: r'updatedAt',
+      type: IsarType.dateTime,
     )
   },
   estimateSize: _budgetEstimateSize,
@@ -76,6 +91,45 @@ const BudgetSchema = CollectionSchema(
           caseSensitive: true,
         )
       ],
+    ),
+    r'updatedAt': IndexSchema(
+      id: -6238191080293565125,
+      name: r'updatedAt',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'updatedAt',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'isDeleted': IndexSchema(
+      id: -786475870904832312,
+      name: r'isDeleted',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'isDeleted',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'encryptionVersion': IndexSchema(
+      id: 7273617020205662875,
+      name: r'encryptionVersion',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'encryptionVersion',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
     )
   },
   links: {},
@@ -83,7 +137,7 @@ const BudgetSchema = CollectionSchema(
   getId: _budgetGetId,
   getLinks: _budgetGetLinks,
   attach: _budgetAttach,
-  version: '3.1.0+1',
+  version: '3.3.0',
 );
 
 int _budgetEstimateSize(
@@ -107,11 +161,14 @@ void _budgetSerialize(
   writer.writeString(offsets[0], object.categoryUuid);
   writer.writeDouble(offsets[1], object.currentSpent);
   writer.writeString(offsets[2], object.encryptedCategoryName);
-  writer.writeString(offsets[3], object.id);
-  writer.writeBool(offsets[4], object.isOverBudget);
-  writer.writeDouble(offsets[5], object.limitAmount);
-  writer.writeDouble(offsets[6], object.progress);
-  writer.writeDouble(offsets[7], object.remaining);
+  writer.writeLong(offsets[3], object.encryptionVersion);
+  writer.writeString(offsets[4], object.id);
+  writer.writeBool(offsets[5], object.isDeleted);
+  writer.writeBool(offsets[6], object.isOverBudget);
+  writer.writeDouble(offsets[7], object.limitAmount);
+  writer.writeDouble(offsets[8], object.progress);
+  writer.writeDouble(offsets[9], object.remaining);
+  writer.writeDateTime(offsets[10], object.updatedAt);
 }
 
 Budget _budgetDeserialize(
@@ -124,8 +181,11 @@ Budget _budgetDeserialize(
     categoryUuid: reader.readString(offsets[0]),
     currentSpent: reader.readDouble(offsets[1]),
     encryptedCategoryName: reader.readString(offsets[2]),
-    id: reader.readString(offsets[3]),
-    limitAmount: reader.readDouble(offsets[5]),
+    encryptionVersion: reader.readLongOrNull(offsets[3]) ?? 1,
+    id: reader.readString(offsets[4]),
+    isDeleted: reader.readBoolOrNull(offsets[5]) ?? false,
+    limitAmount: reader.readDouble(offsets[7]),
+    updatedAt: reader.readDateTime(offsets[10]),
   );
   object.isarId = id;
   return object;
@@ -145,15 +205,21 @@ P _budgetDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset) ?? 1) as P;
     case 4:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 6:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 7:
       return (reader.readDouble(offset)) as P;
+    case 8:
+      return (reader.readDouble(offset)) as P;
+    case 9:
+      return (reader.readDouble(offset)) as P;
+    case 10:
+      return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -229,6 +295,30 @@ extension BudgetQueryWhereSort on QueryBuilder<Budget, Budget, QWhere> {
   QueryBuilder<Budget, Budget, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhere> anyUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'updatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhere> anyIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'isDeleted'),
+      );
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhere> anyEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'encryptionVersion'),
+      );
     });
   }
 }
@@ -339,6 +429,231 @@ extension BudgetQueryWhere on QueryBuilder<Budget, Budget, QWhereClause> {
               includeUpper: false,
             ));
       }
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> updatedAtEqualTo(
+      DateTime updatedAt) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'updatedAt',
+        value: [updatedAt],
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> updatedAtNotEqualTo(
+      DateTime updatedAt) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [],
+              upper: [updatedAt],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [updatedAt],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [updatedAt],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [],
+              upper: [updatedAt],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> updatedAtGreaterThan(
+    DateTime updatedAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [updatedAt],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> updatedAtLessThan(
+    DateTime updatedAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [],
+        upper: [updatedAt],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> updatedAtBetween(
+    DateTime lowerUpdatedAt,
+    DateTime upperUpdatedAt, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [lowerUpdatedAt],
+        includeLower: includeLower,
+        upper: [upperUpdatedAt],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> isDeletedEqualTo(
+      bool isDeleted) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'isDeleted',
+        value: [isDeleted],
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> isDeletedNotEqualTo(
+      bool isDeleted) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [],
+              upper: [isDeleted],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [isDeleted],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [isDeleted],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [],
+              upper: [isDeleted],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> encryptionVersionEqualTo(
+      int encryptionVersion) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'encryptionVersion',
+        value: [encryptionVersion],
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> encryptionVersionNotEqualTo(
+      int encryptionVersion) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [],
+              upper: [encryptionVersion],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [encryptionVersion],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [encryptionVersion],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [],
+              upper: [encryptionVersion],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> encryptionVersionGreaterThan(
+    int encryptionVersion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [encryptionVersion],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> encryptionVersionLessThan(
+    int encryptionVersion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [],
+        upper: [encryptionVersion],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterWhereClause> encryptionVersionBetween(
+    int lowerEncryptionVersion,
+    int upperEncryptionVersion, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [lowerEncryptionVersion],
+        includeLower: includeLower,
+        upper: [upperEncryptionVersion],
+        includeUpper: includeUpper,
+      ));
     });
   }
 }
@@ -673,6 +988,60 @@ extension BudgetQueryFilter on QueryBuilder<Budget, Budget, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> encryptionVersionEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition>
+      encryptionVersionGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> encryptionVersionLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> encryptionVersionBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'encryptionVersion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Budget, Budget, QAfterFilterCondition> idEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -797,6 +1166,16 @@ extension BudgetQueryFilter on QueryBuilder<Budget, Budget, QFilterCondition> {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'id',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> isDeletedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isDeleted',
+        value: value,
       ));
     });
   }
@@ -1048,6 +1427,59 @@ extension BudgetQueryFilter on QueryBuilder<Budget, Budget, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> updatedAtEqualTo(
+      DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> updatedAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> updatedAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterFilterCondition> updatedAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'updatedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension BudgetQueryObject on QueryBuilder<Budget, Budget, QFilterCondition> {}
@@ -1091,6 +1523,18 @@ extension BudgetQuerySortBy on QueryBuilder<Budget, Budget, QSortBy> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByEncryptionVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.desc);
+    });
+  }
+
   QueryBuilder<Budget, Budget, QAfterSortBy> sortById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1100,6 +1544,18 @@ extension BudgetQuerySortBy on QueryBuilder<Budget, Budget, QSortBy> {
   QueryBuilder<Budget, Budget, QAfterSortBy> sortByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
     });
   }
 
@@ -1150,6 +1606,18 @@ extension BudgetQuerySortBy on QueryBuilder<Budget, Budget, QSortBy> {
       return query.addSortBy(r'remaining', Sort.desc);
     });
   }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> sortByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
 }
 
 extension BudgetQuerySortThenBy on QueryBuilder<Budget, Budget, QSortThenBy> {
@@ -1189,6 +1657,18 @@ extension BudgetQuerySortThenBy on QueryBuilder<Budget, Budget, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByEncryptionVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.desc);
+    });
+  }
+
   QueryBuilder<Budget, Budget, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1198,6 +1678,18 @@ extension BudgetQuerySortThenBy on QueryBuilder<Budget, Budget, QSortThenBy> {
   QueryBuilder<Budget, Budget, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
     });
   }
 
@@ -1260,6 +1752,18 @@ extension BudgetQuerySortThenBy on QueryBuilder<Budget, Budget, QSortThenBy> {
       return query.addSortBy(r'remaining', Sort.desc);
     });
   }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QAfterSortBy> thenByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
 }
 
 extension BudgetQueryWhereDistinct on QueryBuilder<Budget, Budget, QDistinct> {
@@ -1284,10 +1788,22 @@ extension BudgetQueryWhereDistinct on QueryBuilder<Budget, Budget, QDistinct> {
     });
   }
 
+  QueryBuilder<Budget, Budget, QDistinct> distinctByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'encryptionVersion');
+    });
+  }
+
   QueryBuilder<Budget, Budget, QDistinct> distinctById(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'id', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QDistinct> distinctByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isDeleted');
     });
   }
 
@@ -1312,6 +1828,12 @@ extension BudgetQueryWhereDistinct on QueryBuilder<Budget, Budget, QDistinct> {
   QueryBuilder<Budget, Budget, QDistinct> distinctByRemaining() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'remaining');
+    });
+  }
+
+  QueryBuilder<Budget, Budget, QDistinct> distinctByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'updatedAt');
     });
   }
 }
@@ -1342,9 +1864,21 @@ extension BudgetQueryProperty on QueryBuilder<Budget, Budget, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Budget, int, QQueryOperations> encryptionVersionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'encryptionVersion');
+    });
+  }
+
   QueryBuilder<Budget, String, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Budget, bool, QQueryOperations> isDeletedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isDeleted');
     });
   }
 
@@ -1369,6 +1903,12 @@ extension BudgetQueryProperty on QueryBuilder<Budget, Budget, QQueryProperty> {
   QueryBuilder<Budget, double, QQueryOperations> remainingProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'remaining');
+    });
+  }
+
+  QueryBuilder<Budget, DateTime, QQueryOperations> updatedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'updatedAt');
     });
   }
 }

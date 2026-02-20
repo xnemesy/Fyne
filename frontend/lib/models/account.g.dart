@@ -32,26 +32,52 @@ const AccountSchema = CollectionSchema(
       name: r'encryptedName',
       type: IsarType.string,
     ),
-    r'group': PropertySchema(
+    r'encryptionVersion': PropertySchema(
       id: 3,
+      name: r'encryptionVersion',
+      type: IsarType.long,
+    ),
+    r'group': PropertySchema(
+      id: 4,
       name: r'group',
       type: IsarType.string,
     ),
     r'id': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'id',
       type: IsarType.string,
     ),
+    r'isDeleted': PropertySchema(
+      id: 6,
+      name: r'isDeleted',
+      type: IsarType.bool,
+    ),
     r'providerId': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'providerId',
       type: IsarType.string,
     ),
+    r'remoteError': PropertySchema(
+      id: 8,
+      name: r'remoteError',
+      type: IsarType.string,
+    ),
+    r'syncStatus': PropertySchema(
+      id: 9,
+      name: r'syncStatus',
+      type: IsarType.byte,
+      enumMap: _AccountsyncStatusEnumValueMap,
+    ),
     r'type': PropertySchema(
-      id: 6,
+      id: 10,
       name: r'type',
       type: IsarType.byte,
       enumMap: _AccounttypeEnumValueMap,
+    ),
+    r'updatedAt': PropertySchema(
+      id: 11,
+      name: r'updatedAt',
+      type: IsarType.dateTime,
     )
   },
   estimateSize: _accountEstimateSize,
@@ -72,6 +98,45 @@ const AccountSchema = CollectionSchema(
           caseSensitive: true,
         )
       ],
+    ),
+    r'updatedAt': IndexSchema(
+      id: -6238191080293565125,
+      name: r'updatedAt',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'updatedAt',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'isDeleted': IndexSchema(
+      id: -786475870904832312,
+      name: r'isDeleted',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'isDeleted',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'encryptionVersion': IndexSchema(
+      id: 7273617020205662875,
+      name: r'encryptionVersion',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'encryptionVersion',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
     )
   },
   links: {},
@@ -79,7 +144,7 @@ const AccountSchema = CollectionSchema(
   getId: _accountGetId,
   getLinks: _accountGetLinks,
   attach: _accountAttach,
-  version: '3.1.0+1',
+  version: '3.3.0',
 );
 
 int _accountEstimateSize(
@@ -99,6 +164,12 @@ int _accountEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.remoteError;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -111,10 +182,15 @@ void _accountSerialize(
   writer.writeString(offsets[0], object.currency);
   writer.writeString(offsets[1], object.encryptedBalance);
   writer.writeString(offsets[2], object.encryptedName);
-  writer.writeString(offsets[3], object.group);
-  writer.writeString(offsets[4], object.id);
-  writer.writeString(offsets[5], object.providerId);
-  writer.writeByte(offsets[6], object.type.index);
+  writer.writeLong(offsets[3], object.encryptionVersion);
+  writer.writeString(offsets[4], object.group);
+  writer.writeString(offsets[5], object.id);
+  writer.writeBool(offsets[6], object.isDeleted);
+  writer.writeString(offsets[7], object.providerId);
+  writer.writeString(offsets[8], object.remoteError);
+  writer.writeByte(offsets[9], object.syncStatus.index);
+  writer.writeByte(offsets[10], object.type.index);
+  writer.writeDateTime(offsets[11], object.updatedAt);
 }
 
 Account _accountDeserialize(
@@ -127,11 +203,18 @@ Account _accountDeserialize(
     currency: reader.readString(offsets[0]),
     encryptedBalance: reader.readString(offsets[1]),
     encryptedName: reader.readString(offsets[2]),
-    group: reader.readStringOrNull(offsets[3]) ?? 'Personale',
-    id: reader.readString(offsets[4]),
-    providerId: reader.readStringOrNull(offsets[5]),
-    type: _AccounttypeValueEnumMap[reader.readByteOrNull(offsets[6])] ??
+    encryptionVersion: reader.readLongOrNull(offsets[3]) ?? 1,
+    group: reader.readStringOrNull(offsets[4]) ?? 'Personale',
+    id: reader.readString(offsets[5]),
+    isDeleted: reader.readBoolOrNull(offsets[6]) ?? false,
+    providerId: reader.readStringOrNull(offsets[7]),
+    remoteError: reader.readStringOrNull(offsets[8]),
+    syncStatus:
+        _AccountsyncStatusValueEnumMap[reader.readByteOrNull(offsets[9])] ??
+            AccountSyncStatus.synced,
+    type: _AccounttypeValueEnumMap[reader.readByteOrNull(offsets[10])] ??
         AccountType.checking,
+    updatedAt: reader.readDateTime(offsets[11]),
   );
   object.isarId = id;
   return object;
@@ -151,19 +234,40 @@ P _accountDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset) ?? 'Personale') as P;
+      return (reader.readLongOrNull(offset) ?? 1) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? 'Personale') as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
+    case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
+      return (reader.readStringOrNull(offset)) as P;
+    case 9:
+      return (_AccountsyncStatusValueEnumMap[reader.readByteOrNull(offset)] ??
+          AccountSyncStatus.synced) as P;
+    case 10:
       return (_AccounttypeValueEnumMap[reader.readByteOrNull(offset)] ??
           AccountType.checking) as P;
+    case 11:
+      return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
 
+const _AccountsyncStatusEnumValueMap = {
+  'synced': 0,
+  'pendingCreate': 1,
+  'failedCreate': 2,
+};
+const _AccountsyncStatusValueEnumMap = {
+  0: AccountSyncStatus.synced,
+  1: AccountSyncStatus.pendingCreate,
+  2: AccountSyncStatus.failedCreate,
+};
 const _AccounttypeEnumValueMap = {
   'checking': 0,
   'credit': 1,
@@ -253,6 +357,30 @@ extension AccountQueryWhereSort on QueryBuilder<Account, Account, QWhere> {
   QueryBuilder<Account, Account, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhere> anyUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'updatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhere> anyIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'isDeleted'),
+      );
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhere> anyEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'encryptionVersion'),
+      );
     });
   }
 }
@@ -364,6 +492,232 @@ extension AccountQueryWhere on QueryBuilder<Account, Account, QWhereClause> {
               includeUpper: false,
             ));
       }
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> updatedAtEqualTo(
+      DateTime updatedAt) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'updatedAt',
+        value: [updatedAt],
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> updatedAtNotEqualTo(
+      DateTime updatedAt) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [],
+              upper: [updatedAt],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [updatedAt],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [updatedAt],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'updatedAt',
+              lower: [],
+              upper: [updatedAt],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> updatedAtGreaterThan(
+    DateTime updatedAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [updatedAt],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> updatedAtLessThan(
+    DateTime updatedAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [],
+        upper: [updatedAt],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> updatedAtBetween(
+    DateTime lowerUpdatedAt,
+    DateTime upperUpdatedAt, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'updatedAt',
+        lower: [lowerUpdatedAt],
+        includeLower: includeLower,
+        upper: [upperUpdatedAt],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> isDeletedEqualTo(
+      bool isDeleted) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'isDeleted',
+        value: [isDeleted],
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> isDeletedNotEqualTo(
+      bool isDeleted) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [],
+              upper: [isDeleted],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [isDeleted],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [isDeleted],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isDeleted',
+              lower: [],
+              upper: [isDeleted],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> encryptionVersionEqualTo(
+      int encryptionVersion) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'encryptionVersion',
+        value: [encryptionVersion],
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> encryptionVersionNotEqualTo(
+      int encryptionVersion) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [],
+              upper: [encryptionVersion],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [encryptionVersion],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [encryptionVersion],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'encryptionVersion',
+              lower: [],
+              upper: [encryptionVersion],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause>
+      encryptionVersionGreaterThan(
+    int encryptionVersion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [encryptionVersion],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> encryptionVersionLessThan(
+    int encryptionVersion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [],
+        upper: [encryptionVersion],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterWhereClause> encryptionVersionBetween(
+    int lowerEncryptionVersion,
+    int upperEncryptionVersion, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'encryptionVersion',
+        lower: [lowerEncryptionVersion],
+        includeLower: includeLower,
+        upper: [upperEncryptionVersion],
+        includeUpper: includeUpper,
+      ));
     });
   }
 }
@@ -767,6 +1121,62 @@ extension AccountQueryFilter
     });
   }
 
+  QueryBuilder<Account, Account, QAfterFilterCondition>
+      encryptionVersionEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition>
+      encryptionVersionGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition>
+      encryptionVersionLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'encryptionVersion',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition>
+      encryptionVersionBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'encryptionVersion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterFilterCondition> groupEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1026,6 +1436,16 @@ extension AccountQueryFilter
     });
   }
 
+  QueryBuilder<Account, Account, QAfterFilterCondition> isDeletedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isDeleted',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterFilterCondition> isarIdEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -1225,6 +1645,206 @@ extension AccountQueryFilter
     });
   }
 
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'remoteError',
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'remoteError',
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'remoteError',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'remoteError',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'remoteError',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'remoteError',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'remoteError',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'remoteError',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'remoteError',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'remoteError',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> remoteErrorIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'remoteError',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition>
+      remoteErrorIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'remoteError',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> syncStatusEqualTo(
+      AccountSyncStatus value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'syncStatus',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> syncStatusGreaterThan(
+    AccountSyncStatus value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'syncStatus',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> syncStatusLessThan(
+    AccountSyncStatus value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'syncStatus',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> syncStatusBetween(
+    AccountSyncStatus lower,
+    AccountSyncStatus upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'syncStatus',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterFilterCondition> typeEqualTo(
       AccountType value) {
     return QueryBuilder.apply(this, (query) {
@@ -1277,6 +1897,59 @@ extension AccountQueryFilter
       ));
     });
   }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> updatedAtEqualTo(
+      DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> updatedAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> updatedAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'updatedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterFilterCondition> updatedAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'updatedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension AccountQueryObject
@@ -1322,6 +1995,18 @@ extension AccountQuerySortBy on QueryBuilder<Account, Account, QSortBy> {
     });
   }
 
+  QueryBuilder<Account, Account, QAfterSortBy> sortByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortByEncryptionVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.desc);
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterSortBy> sortByGroup() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'group', Sort.asc);
@@ -1346,6 +2031,18 @@ extension AccountQuerySortBy on QueryBuilder<Account, Account, QSortBy> {
     });
   }
 
+  QueryBuilder<Account, Account, QAfterSortBy> sortByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterSortBy> sortByProviderId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'providerId', Sort.asc);
@@ -1358,6 +2055,30 @@ extension AccountQuerySortBy on QueryBuilder<Account, Account, QSortBy> {
     });
   }
 
+  QueryBuilder<Account, Account, QAfterSortBy> sortByRemoteError() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteError', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortByRemoteErrorDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteError', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortBySyncStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'syncStatus', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortBySyncStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'syncStatus', Sort.desc);
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterSortBy> sortByType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.asc);
@@ -1367,6 +2088,18 @@ extension AccountQuerySortBy on QueryBuilder<Account, Account, QSortBy> {
   QueryBuilder<Account, Account, QAfterSortBy> sortByTypeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> sortByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 }
@@ -1409,6 +2142,18 @@ extension AccountQuerySortThenBy
     });
   }
 
+  QueryBuilder<Account, Account, QAfterSortBy> thenByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenByEncryptionVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'encryptionVersion', Sort.desc);
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterSortBy> thenByGroup() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'group', Sort.asc);
@@ -1430,6 +2175,18 @@ extension AccountQuerySortThenBy
   QueryBuilder<Account, Account, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
     });
   }
 
@@ -1457,6 +2214,30 @@ extension AccountQuerySortThenBy
     });
   }
 
+  QueryBuilder<Account, Account, QAfterSortBy> thenByRemoteError() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteError', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenByRemoteErrorDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'remoteError', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenBySyncStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'syncStatus', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenBySyncStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'syncStatus', Sort.desc);
+    });
+  }
+
   QueryBuilder<Account, Account, QAfterSortBy> thenByType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.asc);
@@ -1466,6 +2247,18 @@ extension AccountQuerySortThenBy
   QueryBuilder<Account, Account, QAfterSortBy> thenByTypeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Account, Account, QAfterSortBy> thenByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 }
@@ -1495,6 +2288,12 @@ extension AccountQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Account, Account, QDistinct> distinctByEncryptionVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'encryptionVersion');
+    });
+  }
+
   QueryBuilder<Account, Account, QDistinct> distinctByGroup(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1509,6 +2308,12 @@ extension AccountQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Account, Account, QDistinct> distinctByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isDeleted');
+    });
+  }
+
   QueryBuilder<Account, Account, QDistinct> distinctByProviderId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1516,9 +2321,28 @@ extension AccountQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Account, Account, QDistinct> distinctByRemoteError(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'remoteError', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Account, Account, QDistinct> distinctBySyncStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'syncStatus');
+    });
+  }
+
   QueryBuilder<Account, Account, QDistinct> distinctByType() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'type');
+    });
+  }
+
+  QueryBuilder<Account, Account, QDistinct> distinctByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'updatedAt');
     });
   }
 }
@@ -1549,6 +2373,12 @@ extension AccountQueryProperty
     });
   }
 
+  QueryBuilder<Account, int, QQueryOperations> encryptionVersionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'encryptionVersion');
+    });
+  }
+
   QueryBuilder<Account, String, QQueryOperations> groupProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'group');
@@ -1561,15 +2391,40 @@ extension AccountQueryProperty
     });
   }
 
+  QueryBuilder<Account, bool, QQueryOperations> isDeletedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isDeleted');
+    });
+  }
+
   QueryBuilder<Account, String?, QQueryOperations> providerIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'providerId');
     });
   }
 
+  QueryBuilder<Account, String?, QQueryOperations> remoteErrorProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'remoteError');
+    });
+  }
+
+  QueryBuilder<Account, AccountSyncStatus, QQueryOperations>
+      syncStatusProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'syncStatus');
+    });
+  }
+
   QueryBuilder<Account, AccountType, QQueryOperations> typeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'type');
+    });
+  }
+
+  QueryBuilder<Account, DateTime, QQueryOperations> updatedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'updatedAt');
     });
   }
 }

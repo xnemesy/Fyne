@@ -60,7 +60,7 @@ const PlannedTransactionSchema = CollectionSchema(
   getId: _plannedTransactionGetId,
   getLinks: _plannedTransactionGetLinks,
   attach: _plannedTransactionAttach,
-  version: '3.1.0+1',
+  version: '3.3.0',
 );
 
 int _plannedTransactionEstimateSize(

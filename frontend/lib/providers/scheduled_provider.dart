@@ -61,7 +61,7 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
              if (tx.encryptedDescription!.startsWith('mock_')) {
                 tx.decryptedDescription = tx.encryptedDescription!.replaceFirst('mock_', '');
              } else {
-                tx.decryptedDescription = await crypto.decrypt(tx.encryptedDescription!, masterKey);
+                tx.decryptedDescription = await crypto.decrypt(tx.encryptedDescription!, scope: EncryptionScope.database, type: 'transaction_description');
              }
              
              // Run categorization
@@ -86,6 +86,25 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
   Future<void> refresh() async {
     final masterKey = ref.read(masterKeyProvider);
     state = await AsyncValue.guard(() => _fetchScheduled(masterKey));
+  }
+
+  Future<void> deleteScheduledTransaction(String id) async {
+    final api = ref.read(apiServiceProvider);
+    
+    // Snapshot previous state
+    final previousState = state.value;
+    if (previousState == null) return;
+
+    // Optimistic Update
+    state = AsyncValue.data(previousState.where((tx) => tx.id != id).toList());
+
+    try {
+      await api.post('/api/scheduled-transactions/delete', data: {'id': id});
+    } catch (e) {
+      print("Delete scheduled error: $e");
+      // Rollback
+      state = AsyncValue.data(previousState);
+    }
   }
 }
 

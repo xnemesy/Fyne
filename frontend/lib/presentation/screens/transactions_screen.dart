@@ -52,10 +52,11 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
+        automaticallyImplyLeading: false,
+        leading: widget.accountId != null ? IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1A1A1A)),
           onPressed: () => Navigator.pop(context),
-        ),
+        ) : null,
         title: Text(
           "I Tuoi Movimenti",
           style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF1A1A1A)),
@@ -74,38 +75,103 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           Expanded(
             child: transactionsAsync.when(
               data: (summaries) {
-                if (summaries.isEmpty) return _buildEmptyState();
+                final visibleSummaries = widget.accountId == null
+                    ? summaries
+                    : summaries.where((tx) => tx.accountId == widget.accountId).toList();
+
+                if (visibleSummaries.isEmpty) return _buildEmptyState();
 
                 return ListView.builder(
+                  key: ValueKey(widget.accountId ?? 'all-transactions'),
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   physics: const BouncingScrollPhysics(),
-                  itemCount: summaries.length + (notifier.hasMore ? 1 : 0),
+                  itemCount: visibleSummaries.length + (notifier.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index == summaries.length) {
+                    if (index == visibleSummaries.length) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 32),
                         child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
                       );
                     }
 
-                    final summary = summaries[index];
-                    return TransactionItem(
-                      summary: summary,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TransactionDetailScreen(uuid: summary.uuid),
+                    final summary = visibleSummaries[index];
+                    return Dismissible(
+                      key: Key('tx-${summary.uuid}'),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B30),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(LucideIcons.trash2, color: Colors.white),
+                      ),
+                      confirmDismiss: (direction) async {
+                        return await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            title: Text("Elimina Movimento", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                            content: Text("Sei sicuro di voler eliminare questo movimento?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text("ANNULLA", style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.bold)),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text("ELIMINA", style: GoogleFonts.inter(color: const Color(0xFFFF3B30), fontWeight: FontWeight.bold)),
+                              ),
+                            ],
                           ),
                         );
                       },
+                      onDismissed: (direction) {
+                        HapticFeedback.mediumImpact();
+                        notifier.deleteTransaction(summary.uuid);
+                      },
+                      child: TransactionItem(
+                        key: ValueKey(summary.uuid),
+                        summary: summary,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransactionDetailScreen(uuid: summary.uuid),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   },
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
-              error: (err, _) => Center(child: Text("Errore nel caricamento: $err")),
+              error: (err, _) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, color: Color(0xFFA0665F), size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Errore caricamento: $err",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(fontSize: 14),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => ref.read(transactionsProvider.notifier).refresh(),
+                        child: const Text("Riprova"),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -118,9 +184,9 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF4A6741).withOpacity(0.05),
+        color: const Color(0xFF4A6741).withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF4A6741).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFF4A6741).withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -132,7 +198,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF4A6741).withOpacity(0.8),
+                color: const Color(0xFF4A6741).withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -146,14 +212,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.inbox, size: 48, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+          Icon(LucideIcons.inbox, size: 48, color: const Color(0xFF1A1A1A).withValues(alpha: 0.1)),
           const SizedBox(height: 16),
           Text(
             "Nessuna transazione trovata",
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF1A1A1A).withOpacity(0.4),
+              color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
             ),
           ),
         ],
@@ -161,4 +227,3 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     );
   }
 }
-
