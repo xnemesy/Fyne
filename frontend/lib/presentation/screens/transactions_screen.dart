@@ -58,7 +58,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         ) : null,
         title: Text(
           "I Tuoi Movimenti",
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF1A1A1A)),
+          style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           IconButton(
@@ -211,14 +211,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.inbox, size: 48, color: const Color(0xFF1A1A1A).withValues(alpha: 0.1)),
+          Icon(LucideIcons.inbox, size: 48, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
           const SizedBox(height: 16),
           Text(
             "Nessuna transazione trovata",
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
             ),
           ),
         ],

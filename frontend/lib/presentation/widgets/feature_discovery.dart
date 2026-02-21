@@ -140,7 +140,7 @@ class _FeatureHintDialog extends StatelessWidget {
             Text(
               description,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: FyneColors.inkLight,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,

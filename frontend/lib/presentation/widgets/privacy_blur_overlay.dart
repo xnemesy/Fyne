@@ -36,7 +36,7 @@ class PrivacyBlurOverlay extends ConsumerWidget {
                         Text(
                           "CONTENUTO PROTETTO",
                           style: TextStyle(
-                            color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
                             fontSize: 12,

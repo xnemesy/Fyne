@@ -102,7 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   : 'Accesso in corso...',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 16,
-                  color: FyneColors.inkLight,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -151,7 +151,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 'Il tuo vault finanziario',
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: FyneColors.inkLight,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 48),
@@ -214,7 +214,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Text(
                 'I dati restano solo sul tuo dispositivo',
                 style: GoogleFonts.inter(
-                  fontSize: 12, color: FyneColors.inkLight,
+                  fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 32),
@@ -228,7 +228,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       'oppure',
                       style: GoogleFonts.inter(
-                        fontSize: 12, color: FyneColors.inkLight,
+                        fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ),
@@ -247,7 +247,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: FyneColors.ink,
+                    foregroundColor: Theme.of(context).colorScheme.onSurface,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -323,7 +323,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     _isSignUp
                       ? 'Hai già un account? Accedi'
                       : 'Non hai un account? Registrati',
-                    style: GoogleFonts.inter(fontSize: 13, color: FyneColors.inkLight),
+                    style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                   ),
                 ),
               ],

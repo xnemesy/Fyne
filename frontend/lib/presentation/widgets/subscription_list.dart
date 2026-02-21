@@ -39,7 +39,7 @@ class SubscriptionList extends StatelessWidget {
               letterSpacing: 1.5,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
             ),
           ),
         ),
@@ -74,7 +74,7 @@ class SubscriptionList extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1A1A1A),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -89,7 +89,7 @@ class SubscriptionList extends StatelessWidget {
                           "Previsto il 27", // Mocking prediction
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -98,7 +98,7 @@ class SubscriptionList extends StatelessWidget {
                           style: GoogleFonts.lora(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1A1A1A),
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],

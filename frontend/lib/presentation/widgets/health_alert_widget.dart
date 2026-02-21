@@ -62,7 +62,7 @@ class HealthAlertWidget extends ConsumerWidget {
                       "Hai registrato una spesa in ${tx.categoryName}. Ricorda il tuo obiettivo salute (BMI: 29.1). Ti senti ancora in linea con il tuo piano?",
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: const Color(0xFF1A1A1A).withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         height: 1.4,
                       ),
                     ),

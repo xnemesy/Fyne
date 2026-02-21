@@ -56,7 +56,7 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
                     style: GoogleFonts.lora(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A1A),
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -74,12 +74,12 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
               style: GoogleFonts.lora(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A1A),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: "0.00 €",
-                hintStyle: TextStyle(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                 border: InputBorder.none,
               ),
             ),

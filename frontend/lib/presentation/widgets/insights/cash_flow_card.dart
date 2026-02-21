@@ -22,7 +22,7 @@ class CashFlowCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("FLUSSO DI CASSA (MESE CORRENTE)", 
-          style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3))),
+          style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(24),

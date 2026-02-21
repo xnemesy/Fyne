@@ -30,7 +30,7 @@ class FinancialInsightCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.onSurface,
         borderRadius: BorderRadius.circular(32),
       ),
       child: Column(

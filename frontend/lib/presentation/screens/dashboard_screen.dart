@@ -60,8 +60,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: FyneColors.forest,
-        unselectedItemColor: FyneColors.inkLight,
+        
+        
         selectedLabelStyle:
             const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
         unselectedLabelStyle:
@@ -124,7 +124,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.hourglass_empty_rounded,
-                  size: 64, color: FyneColors.inkLight),
+                  size: 64, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
               const SizedBox(height: 16),
               Text(
                 userMessage,

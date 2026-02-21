@@ -48,14 +48,14 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                         style: GoogleFonts.lora(
                           fontSize: 34,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A1A),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         "Pagamenti ricorrenti e spese future",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -156,7 +156,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
               child: Icon(
                 _getCategoryIcon(tx.categoryName),
                 size: 20, 
-                color: const Color(0xFF1A1A1A)
+                color: Theme.of(context).colorScheme.onSurface
               ),
             ),
             const SizedBox(width: 16),
@@ -170,14 +170,14 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                   ),
                   Text(
                     "Prossima: ${DateFormat('d MMM').format(tx.nextOccurrence)} • ${tx.frequency}",
-                    style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+                    style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                   ),
                 ],
               ),
             ),
             Text(
               "${tx.amount.toStringAsFixed(2)} €",
-              style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: const Color(0xFF1A1A1A)),
+              style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),
@@ -194,7 +194,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
           color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
+        child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
       ),
     );
   }
@@ -205,16 +205,16 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            Icon(LucideIcons.calendarClock, size: 64, color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+            Icon(LucideIcons.calendarClock, size: 64, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
             const SizedBox(height: 24),
             Text(
               "Nessun pagamento programmato",
-              style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+              style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
             ),
             const SizedBox(height: 16),
             Text(
               "Aggiungi affitti, abbonamenti o rate.",
-              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.4)),
+              style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
             ),
           ],
         ),

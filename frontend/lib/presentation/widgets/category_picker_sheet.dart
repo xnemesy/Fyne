@@ -39,7 +39,7 @@ class CategoryPickerSheet extends StatelessWidget {
               category.name,
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1A1A),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             trailing: isSelected

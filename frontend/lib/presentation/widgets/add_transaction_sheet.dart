@@ -358,7 +358,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF1A1A1A),
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],

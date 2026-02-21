@@ -44,7 +44,7 @@ class DecryptedValue extends StatelessWidget {
               width: isLarge ? 120 : 60,
               height: isLarge ? 32 : 16,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A).withOpacity(0.05),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

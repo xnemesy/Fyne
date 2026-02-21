@@ -56,14 +56,14 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                       style: GoogleFonts.lora(
                         fontSize: 34,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1A1A1A),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       "Analisi dettagliata delle tue finanze",
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -103,7 +103,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                         style: GoogleFonts.lora(
                                             fontSize: 40,
                                             fontWeight: FontWeight.w300,
-                                            color: const Color(0xFF1A1A1A)),
+                                            color: Theme.of(context).colorScheme.onSurface),
                                       ),
                                     ),
                                     Text(
@@ -111,7 +111,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                       style: GoogleFonts.inter(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
-                                          color: const Color(0xFF1A1A1A)
+                                          color: Theme.of(context).colorScheme.onSurface
                                               .withValues(alpha: 0.4)),
                                     ),
                                   ],
@@ -184,7 +184,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                             letterSpacing: 2,
                                             fontSize: 11,
                                             fontWeight: FontWeight.bold,
-                                            color: const Color(0xFF1A1A1A)
+                                            color: Theme.of(context).colorScheme.onSurface
                                                 .withValues(alpha: 0.4))),
                                     const SizedBox(height: 20),
                                     TopCategoriesList(
@@ -227,14 +227,14 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
             style: GoogleFonts.lora(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A1A)),
+                color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 12),
           Text(
             "Non appena aggiungerai conti e movimenti, Fyne inizierà ad analizzare i tuoi dati per fornirti insight dettagliati.",
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
-              color: const Color(0xFF1A1A1A).withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               height: 1.5,
             ),
           ),
@@ -258,7 +258,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
             style: GoogleFonts.lora(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A1A)),
+                color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
         _buildPeriodToggle(insightsState.selectedPeriod),
@@ -315,8 +315,8 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
           label,
           style: GoogleFonts.inter(
             color: active
-                ? const Color(0xFF1A1A1A)
-                : const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),

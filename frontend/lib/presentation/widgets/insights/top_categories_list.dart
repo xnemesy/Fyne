@@ -19,6 +19,7 @@ class TopCategoriesList extends StatelessWidget {
     return Column(
       children: categories.take(5).map((status) {
         return _categoryRow(
+          context,
           status.budget.decryptedCategoryName ?? "Sconosciuta",
           "${status.spent.toStringAsFixed(0)} €",
           status.progress,
@@ -28,7 +29,7 @@ class TopCategoriesList extends StatelessWidget {
     );
   }
 
-  Widget _categoryRow(String label, String amount, double progress, Color color) {
+  Widget _categoryRow(BuildContext context, String label, String amount, double progress, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24),
       child: Column(
@@ -36,8 +37,8 @@ class TopCategoriesList extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: GoogleFonts.lora(fontSize: 15, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))),
-              Text(amount, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF1A1A1A))),
+              Text(label, style: GoogleFonts.lora(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
+              Text(amount, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
           const SizedBox(height: 12),

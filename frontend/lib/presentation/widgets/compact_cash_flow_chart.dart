@@ -47,7 +47,7 @@ class CompactCashFlowChart extends StatelessWidget {
                 letterSpacing: 1.5,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: Colors.black54, // Darker text
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), // Darker text
               ),
             ),
           ),
@@ -65,7 +65,7 @@ class CompactCashFlowChart extends StatelessWidget {
                       showTitles: true,
                       reservedSize: 45, // Increased space
                       getTitlesWidget: (value, meta) {
-                         return Text(value.toInt().toString(), style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold));
+                         return Text(value.toInt().toString(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 10, fontWeight: FontWeight.bold));
                       },
                     ),
                   ),
@@ -76,7 +76,7 @@ class CompactCashFlowChart extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
-                          child: Text(value.toInt().toString(), style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                          child: Text(value.toInt().toString(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 10, fontWeight: FontWeight.bold)),
                         );
                       },
                     ),
@@ -113,7 +113,7 @@ class CompactCashFlowChart extends StatelessWidget {
               "Questo andamento include anche spese future",
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: Colors.black38,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                 fontStyle: FontStyle.italic,
               ),
             ),

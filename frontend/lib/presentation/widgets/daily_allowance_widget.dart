@@ -37,7 +37,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
               fontSize: 11,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
-              color: const Color(0xFF1A1A1A).withOpacity(0.4),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
             ),
           ),
           const SizedBox(height: 24),
@@ -52,7 +52,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                   style: GoogleFonts.lora(
                     fontSize: 56,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A1A1A),
+                    color: Theme.of(context).colorScheme.onSurface,
                     letterSpacing: -1,
                   ),
                 ),
@@ -61,7 +61,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                   style: GoogleFonts.lora(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   ),
                 ),
               ],
@@ -93,7 +93,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 height: 4,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A).withOpacity(0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -117,7 +117,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 "Calcolato su ${DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day - DateTime.now().day + 1} giorni rimanenti",
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -126,7 +126,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 ),
               ),
             ],

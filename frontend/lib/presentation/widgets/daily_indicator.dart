@@ -36,7 +36,7 @@ class DailyIndicator extends ConsumerWidget {
                   letterSpacing: 2,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                 ),
               ),
               if (info.isExhausted)
@@ -67,14 +67,14 @@ class DailyIndicator extends ConsumerWidget {
                 style: GoogleFonts.lora(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: info.isExhausted ? const Color(0xFFD63031) : const Color(0xFF1A1A1A),
+                  color: info.isExhausted ? const Color(0xFFD63031) : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(width: 8),
               Text(
                 "/ oggi",
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -97,7 +97,7 @@ class DailyIndicator extends ConsumerWidget {
               ? "Hai sforato il budget mensile. Risparmia per i prossimi ${info.daysRemaining} giorni."
               : "Puoi spendere questo importo oggi per restare in target.",
             style: GoogleFonts.inter(
-              color: const Color(0xFF1A1A1A).withOpacity(0.4),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               fontSize: 12,
               height: 1.5,
             ),

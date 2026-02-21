@@ -52,14 +52,14 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           children: [
             Icon(icon,
                 size: 16,
-                color: isSelected ? Colors.white : const Color(0xFF1A1A1A)),
+                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface),
             const SizedBox(width: 8),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : const Color(0xFF1A1A1A),
+                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],
@@ -95,7 +95,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         title: Text(
           _selectedType == null ? "Tipo Conto" : "Dettagli Conto",
           style: GoogleFonts.lora(
-              fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+              fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -308,7 +308,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
             letterSpacing: 2,
             fontSize: 10,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
       ),
     );
   }

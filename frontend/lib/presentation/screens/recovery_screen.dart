@@ -78,11 +78,11 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: FyneColors.ink),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Theme.of(context).colorScheme.onSurface),
         ),
         title: Text(
           'Ripristino Vault',
-          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: FyneColors.ink),
+          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
         ),
         centerTitle: true,
       ),
@@ -97,14 +97,14 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: FyneColors.ink,
+                  color: Theme.of(context).colorScheme.onSurface,
                   height: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Inserisci le 12 parole che hai salvato durante la configurazione iniziale.',
-                style: GoogleFonts.inter(fontSize: 14, color: FyneColors.inkLight, height: 1.5),
+                style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5),
               ),
               const SizedBox(height: 24),
 
@@ -139,7 +139,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                       prefixText: '${i + 1}. ',
                       prefixStyle: GoogleFonts.inter(
                         fontSize: 11,
-                        color: FyneColors.inkLighter,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er,
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -214,7 +214,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               Center(
                 child: Text(
                   'La chiave non viene inviata a nessun server.',
-                  style: GoogleFonts.inter(fontSize: 12, color: FyneColors.inkLighter),
+                  style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er),
                 ),
               ),
             ],

@@ -17,22 +17,22 @@ class HomeCompassWidget extends ConsumerWidget {
     return Column(
       children: [
         // BLOCK 1: STATE
-        _buildStateBlock(homeState),
+        _buildStateBlock(context, homeState),
         
         const SizedBox(height: 32), // Reduced from 48
 
         // BLOCK 2: COMPASS
-        _buildCompassBlock(dailyAllowance),
+        _buildCompassBlock(context, dailyAllowance),
 
         const SizedBox(height: 32), // Reduced from 48
 
         // BLOCK 3: CONTEXT
-        _buildContextBlock(homeState),
+        _buildContextBlock(context, homeState),
       ],
     );
   }
 
-  Widget _buildStateBlock(HomeState homeState) {
+  Widget _buildStateBlock(BuildContext context, HomeState homeState) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -45,7 +45,7 @@ class HomeCompassWidget extends ConsumerWidget {
               letterSpacing: 2,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
             ),
           ),
           const SizedBox(height: 12), // Reduced from 16
@@ -54,7 +54,7 @@ class HomeCompassWidget extends ConsumerWidget {
             style: GoogleFonts.lora(
               fontSize: 28, // Reduced from 32
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 4), // Reduced from 8
@@ -62,7 +62,7 @@ class HomeCompassWidget extends ConsumerWidget {
             homeState.subtitle,
             style: GoogleFonts.inter(
               fontSize: 14, // Reduced from 15
-              color: const Color(0xFF1A1A1A).withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -71,7 +71,7 @@ class HomeCompassWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildCompassBlock(double allowance) {
+  Widget _buildCompassBlock(BuildContext context, double allowance) {
     // Color logic based on allowance status
     Color allowanceColor = const Color(0xFF4A6741); // Default Green
     if (allowance <= 0) {
@@ -118,7 +118,7 @@ class HomeCompassWidget extends ConsumerWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 ),
               ),
               const SizedBox(height: 4),
@@ -127,7 +127,7 @@ class HomeCompassWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -137,13 +137,13 @@ class HomeCompassWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildContextBlock(HomeState homeState) {
+  Widget _buildContextBlock(BuildContext context, HomeState homeState) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.info, size: 12, color: const Color(0xFF1A1A1A).withOpacity(0.2)),
+          Icon(LucideIcons.info, size: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -151,7 +151,7 @@ class HomeCompassWidget extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 11, // Reduced from 12
-                color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                 fontStyle: FontStyle.italic,
               ),
             ),

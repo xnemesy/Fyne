@@ -48,7 +48,7 @@ class FyneEmptyState extends StatelessWidget {
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: FyneColors.inkLight,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),
               textAlign: TextAlign.center,
             ),

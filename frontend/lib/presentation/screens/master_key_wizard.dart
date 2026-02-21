@@ -164,7 +164,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
       backgroundColor: FyneColors.paper,
       // Fix Recovery Link
       appBar: AppBar(
-        title: Text('Configurazione Vault', style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: FyneColors.ink)),
+        title: Text('Configurazione Vault', style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -216,7 +216,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                 IconButton(
                   onPressed: _previousPage,
                   icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                  color: FyneColors.inkLight,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               const Spacer(),
               Text(
@@ -224,7 +224,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: FyneColors.inkLight,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               const Spacer(),
@@ -281,7 +281,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                     children: [
                       Text(
                         'Hai già un account?',
-                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: FyneColors.ink),
+                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
                       ),
                       const SizedBox(height: 2),
                       GestureDetector(
@@ -310,7 +310,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
             style: GoogleFonts.playfairDisplay(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: FyneColors.ink,
+              color: Theme.of(context).colorScheme.onSurface,
               height: 1.2,
             ),
           ),
@@ -319,7 +319,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
             'Queste 12 parole sono l\'unico modo per recuperare i tuoi dati. Salvale in un posto sicuro.',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: FyneColors.inkLight,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               height: 1.5,
             ),
           ),
@@ -395,7 +395,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                                   text: '${i + 1}. ',
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: FyneColors.inkLighter,
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -602,14 +602,14 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
             style: GoogleFonts.playfairDisplay(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: FyneColors.ink,
+              color: Theme.of(context).colorScheme.onSurface,
               height: 1.2,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             'Prima di procedere, assicurati di aver salvato le 12 parole in un posto sicuro.',
-            style: GoogleFonts.inter(fontSize: 14, color: FyneColors.inkLight, height: 1.5),
+            style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5),
           ),
           const SizedBox(height: 32),
 
@@ -757,7 +757,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: FyneColors.ink),
+                    style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const SizedBox(height: 3),
                   Text(
@@ -803,7 +803,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
               children: [
                 Text(title, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
-                Text(subtitle, style: GoogleFonts.inter(fontSize: 12, color: FyneColors.inkLight)),
+                Text(subtitle, style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
               ],
             ),
           ),
@@ -832,14 +832,14 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
             style: GoogleFonts.playfairDisplay(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: FyneColors.ink,
+              color: Theme.of(context).colorScheme.onSurface,
               height: 1.2,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             'Per assicurarci che tu abbia salvato correttamente il seed, inserisci le parole richieste.',
-            style: GoogleFonts.inter(fontSize: 14, color: FyneColors.inkLight, height: 1.5),
+            style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5),
           ),
           
           // Show which words are requested
@@ -882,7 +882,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: FyneColors.inkLight,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       letterSpacing: 1,
                     ),
                   ),
@@ -992,14 +992,14 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
             style: GoogleFonts.playfairDisplay(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: FyneColors.ink,
+              color: Theme.of(context).colorScheme.onSurface,
               height: 1.2,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             'Abilita lo sblocco biometrico per accedere rapidamente al tuo vault.',
-            style: GoogleFonts.inter(fontSize: 14, color: FyneColors.inkLight, height: 1.5),
+            style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5),
           ),
           const SizedBox(height: 40),
 
@@ -1055,7 +1055,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                           ),
                           Text(
                             'Sblocca il vault con la biometria',
-                            style: GoogleFonts.inter(fontSize: 12, color: FyneColors.inkLight),
+                            style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                           ),
                         ],
                       ),
@@ -1078,12 +1078,12 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: FyneColors.inkLight),
+                  const Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Il tuo dispositivo non supporta la biometria. Potrai configurarla in seguito.',
-                      style: GoogleFonts.inter(fontSize: 13, color: FyneColors.inkLight),
+                      style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                     ),
                   ),
                 ],
@@ -1093,7 +1093,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
           const SizedBox(height: 12),
           Text(
             'Puoi sempre modificare questa impostazione nelle Impostazioni.',
-            style: GoogleFonts.inter(fontSize: 12, color: FyneColors.inkLighter),
+            style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er),
           ),
           const SizedBox(height: 40),
 
@@ -1127,7 +1127,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                 onPressed: _isProcessing ? null : _completeSetup,
                 child: Text(
                   'Salta per ora',
-                  style: GoogleFonts.inter(fontSize: 14, color: FyneColors.inkLight),
+                  style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ),
             ),

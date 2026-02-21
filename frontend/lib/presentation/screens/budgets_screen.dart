@@ -47,14 +47,14 @@ class BudgetsScreen extends ConsumerWidget {
                         style: GoogleFonts.lora(
                           fontSize: 34,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A1A),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         "Gestisci i tuoi limiti di spesa per categoria",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -149,7 +149,7 @@ class BudgetsScreen extends ConsumerWidget {
           color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
+        child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
       ),
     );
   }
@@ -171,14 +171,14 @@ class BudgetsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Text(
               "Nessun budget attivo",
-              style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+              style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
             const SizedBox(height: 12),
             Text(
               "Definisci i tuoi limiti di spesa quando sei pronto",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 height: 1.5,
               ),
             ),

@@ -212,7 +212,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                 const SizedBox(height: 16),
                 Text(
                   'Esportato il: ${_formatDate(info['exported_at'])}',
-                  style: TextStyle(fontSize: 12, color: FyneColors.inkLight),
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -425,7 +425,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                         const Icon(
                           Icons.info_outline,
                           size: 20,
-                          color: FyneColors.inkLight,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -651,7 +651,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
               else
                 const Icon(
                   Icons.chevron_right,
-                  color: FyneColors.inkLight,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
             ],
           ),

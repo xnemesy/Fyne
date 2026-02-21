@@ -45,7 +45,7 @@ class ErrorScreen extends StatelessWidget {
               Text(
                 message,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: FyneColors.inkLight,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
               ),
               const SizedBox(height: 32),

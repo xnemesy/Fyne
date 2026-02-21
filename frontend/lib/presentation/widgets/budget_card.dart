@@ -127,7 +127,7 @@ class BudgetCard extends StatelessWidget {
                     DecryptedValue(
                       value: remaining.abs().toStringAsFixed(2),
                       style: TextStyle(
-                        color: isOver ? const Color(0xFFD63031) : const Color(0xFF1A1A1A),
+                        color: isOver ? const Color(0xFFD63031) : Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),

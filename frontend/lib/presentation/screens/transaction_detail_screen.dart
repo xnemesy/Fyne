@@ -44,7 +44,7 @@ class TransactionDetailScreen extends ConsumerWidget {
               style: GoogleFonts.lora(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF1A1A1A).withValues(alpha: 0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 8),
@@ -52,7 +52,7 @@ class TransactionDetailScreen extends ConsumerWidget {
               "Stiamo decriptando i tuoi dati con AES-256",
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],
@@ -104,7 +104,7 @@ class _TransactionDetailContent extends ConsumerWidget {
           style: GoogleFonts.lora(
               fontWeight: FontWeight.bold,
               fontSize: 18,
-              color: const Color(0xFF1A1A1A)),
+              color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           IconButton(
@@ -147,7 +147,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                     style: GoogleFonts.lora(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A1A),
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Text(
@@ -156,7 +156,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                       fontSize: 12,
                       letterSpacing: 1.2,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A1A).withValues(alpha: 0.3),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                   ),
                 ],
@@ -194,7 +194,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                       style: GoogleFonts.inter(
                           fontSize: 12,
                           color:
-                              const Color(0xFF1A1A1A).withValues(alpha: 0.6)),
+                              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                     ),
                   ),
                 ],
@@ -216,7 +216,7 @@ class _TransactionDetailContent extends ConsumerWidget {
             fontSize: 11,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.5,
-            color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
           ),
         ),
         const SizedBox(height: 8),

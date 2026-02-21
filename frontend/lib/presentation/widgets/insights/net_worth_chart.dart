@@ -23,13 +23,13 @@ class NetWorthChart extends StatelessWidget {
           DecryptedValue(
             value: netWorth.toStringAsFixed(2),
             isLarge: true,
-            style: GoogleFonts.lora(fontSize: 40, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+            style: GoogleFonts.lora(fontSize: 40, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             suffix: " €",
           ),
           const SizedBox(height: 8),
           Text(
             "PATRIMONIO NETTO",
-            style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+            style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
           ),
           const SizedBox(height: 30),
           Expanded(
@@ -53,7 +53,7 @@ class NetWorthChart extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (touchedSpot) => const Color(0xFF1A1A1A).withOpacity(0.8),
+                    getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(
@@ -94,7 +94,7 @@ class NetWorthChart extends StatelessWidget {
             "Variazione dovuta a una spesa programmata",
             style: GoogleFonts.inter(
               fontSize: 11,
-              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
               fontStyle: FontStyle.italic,
             ),
           ),

@@ -220,7 +220,7 @@ class SettingsScreen extends ConsumerWidget {
                   Text(
                     userEmail,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: FyneColors.inkLight,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -296,8 +296,8 @@ class SettingsScreen extends ConsumerWidget {
               value: ThemeMode.light,
               groupValue: currentTheme,
               onChanged: (val) {
-                if (val != null) ref.read(themeProvider.notifier).setThemeMode(val);
                 Navigator.pop(context);
+                if (val != null) Future.microtask(() => ref.read(themeProvider.notifier).setThemeMode(val));
               },
             ),
             RadioListTile<ThemeMode>(
@@ -306,8 +306,8 @@ class SettingsScreen extends ConsumerWidget {
               value: ThemeMode.dark,
               groupValue: currentTheme,
               onChanged: (val) {
-                if (val != null) ref.read(themeProvider.notifier).setThemeMode(val);
                 Navigator.pop(context);
+                if (val != null) Future.microtask(() => ref.read(themeProvider.notifier).setThemeMode(val));
               },
             ),
             RadioListTile<ThemeMode>(
@@ -316,8 +316,8 @@ class SettingsScreen extends ConsumerWidget {
               value: ThemeMode.system,
               groupValue: currentTheme,
               onChanged: (val) {
-                if (val != null) ref.read(themeProvider.notifier).setThemeMode(val);
                 Navigator.pop(context);
+                if (val != null) Future.microtask(() => ref.read(themeProvider.notifier).setThemeMode(val));
               },
             ),
           ],

@@ -31,6 +31,7 @@ class WalletSummaryCard extends ConsumerWidget {
         children: [
           Expanded(
             child: _summaryCard(
+              context: context,
               label: "SALDO NETTO",
               value: "${summary.netWorth.toStringAsFixed(2)} €",
               color: const Color(0xFF4A6741),
@@ -39,6 +40,7 @@ class WalletSummaryCard extends ConsumerWidget {
           const SizedBox(width: 12),
           Expanded(
             child: _summaryCard(
+              context: context,
               label: "PASSIVO",
               value: "${summary.liabilities.toStringAsFixed(2)} €",
               color: const Color(0xFFA0665F),
@@ -49,7 +51,7 @@ class WalletSummaryCard extends ConsumerWidget {
     );
   }
 
-  Widget _summaryCard({required String label, required String value, required Color color}) {
+  Widget _summaryCard({required BuildContext context, required String label, required String value, required Color color}) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       decoration: BoxDecoration(
@@ -75,7 +77,7 @@ class WalletSummaryCard extends ConsumerWidget {
             style: GoogleFonts.lora( // Use Lora for harmony
               fontSize: 18, 
               fontWeight: FontWeight.w500, // Regular-ish weight
-              color: const Color(0xFF1A1A1A)
+              color: Theme.of(context).colorScheme.onSurface
             ),
           ),
         ],

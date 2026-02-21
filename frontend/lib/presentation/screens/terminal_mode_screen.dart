@@ -42,7 +42,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                             letterSpacing: 4,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -52,7 +52,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                           style: GoogleFonts.lora(
                             fontSize: 42,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1A1A1A),
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -68,7 +68,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                         show: true,
                         drawVerticalLine: false,
                         getDrawingHorizontalLine: (value) => FlLine(
-                          color: const Color(0xFF1A1A1A).withOpacity(0.03),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
                           strokeWidth: 1,
                         ),
                       ),
@@ -89,7 +89,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF1A1A1A).withOpacity(0.2),
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                                   ),
                                 ),
                               );
@@ -159,7 +159,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: active ? const Color(0xFF1A1A1A) : const Color(0xFF1A1A1A).withOpacity(0.4),
+            color: active ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
           ),
         ),
       ),

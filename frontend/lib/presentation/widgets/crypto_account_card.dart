@@ -50,7 +50,7 @@ class CryptoAccountCard extends ConsumerWidget {
                 style: GoogleFonts.lora(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1A1A1A),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const Icon(LucideIcons.coins, color: Color(0xFF4A6741), size: 20),
@@ -63,7 +63,7 @@ class CryptoAccountCard extends ConsumerWidget {
               letterSpacing: 2,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A1A).withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
             ),
           ),
           const SizedBox(height: 4),
@@ -78,7 +78,7 @@ class CryptoAccountCard extends ConsumerWidget {
                     style: GoogleFonts.lora(
                       fontSize: 34,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A1A),
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),

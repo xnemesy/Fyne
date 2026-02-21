@@ -43,7 +43,7 @@ class WalletScreen extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: Theme.of(context).colorScheme.onSurface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -131,7 +131,7 @@ class WalletScreen extends ConsumerWidget {
                         "${authState.user?.email ?? (authState.user?.isAnonymous == true ? 'Utente Verificato' : 'utente@fyne.it')} / $formattedDate",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: const Color(0xFF1A1A1A).withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -182,7 +182,7 @@ class WalletScreen extends ConsumerWidget {
                         const SizedBox(width: 12),
                         Text(
                           "Tutte le transazioni", 
-                          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))
+                          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)
                         ),
                         const Spacer(),
                         const Icon(LucideIcons.chevronRight, size: 16, color: Colors.black26),
@@ -209,7 +209,7 @@ class WalletScreen extends ConsumerWidget {
                       letterSpacing: 2,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                     ),
                   ),
                 ),
@@ -256,7 +256,7 @@ class WalletScreen extends ConsumerWidget {
           color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isPrimary ? Colors.white : const Color(0xFF1A1A1A), size: 18),
+        child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
       ),
     );
   }
@@ -334,7 +334,7 @@ class WalletScreen extends ConsumerWidget {
           ),
           title: Text(
             account.decryptedName ?? "Conto",
-            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
           ),
           subtitle: Text(
             "${bal.toStringAsFixed(2)} ${account.currency}",
@@ -366,14 +366,14 @@ class WalletScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Text(
               "Inizia dal tuo primo conto",
-              style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A)),
+              style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
             const SizedBox(height: 12),
             Text(
               "Aggiungi un conto per vedere il tuo patrimonio prendere forma.\nNon c'è fretta, inizia con quello che usi di più.",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: const Color(0xFF1A1A1A).withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 height: 1.5,
               ),
             ),

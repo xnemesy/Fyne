@@ -228,7 +228,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           Text(
             page.description,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: FyneColors.inkLight,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -390,7 +390,7 @@ class _InAppTutorialOverlayState extends State<InAppTutorialOverlay> {
                 '${_currentStep + 1}/${widget.steps.length}',
                 style: const TextStyle(
                   fontSize: 12,
-                  color: FyneColors.inkLight,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               Row(

@@ -100,7 +100,7 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
           letterSpacing: 2,
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF1A1A1A).withOpacity(0.3),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
         ),
       ),
     );

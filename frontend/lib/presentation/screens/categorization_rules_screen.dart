@@ -23,7 +23,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
         ),
         title: Text(
           "Regole Categorizzazione",
-          style: GoogleFonts.lora(color: const Color(0xFF1A1A1A), fontWeight: FontWeight.bold),
+          style: GoogleFonts.lora(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
         ),
       ),
       body: rulesAsync.when(
@@ -67,7 +67,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1A1A1A).withOpacity(0.05)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
       ),
       child: ListTile(
         title: Text(rule.pattern, style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
@@ -89,7 +89,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(LucideIcons.search, size: 48, color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+          Icon(LucideIcons.search, size: 48, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
           const SizedBox(height: 16),
           Text(
             "Nessuna keyword personalizzata",
@@ -110,12 +110,12 @@ class CategorizationRulesScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A).withOpacity(0.02),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         "Fyne include già regole per le principali catene (Esselunga, Amazon, Netflix, ecc.). Le tue regole personalizzate hanno sempre la precedenza.",
-        style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF1A1A1A).withOpacity(0.5), height: 1.5),
+        style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), height: 1.5),
       ),
     );
   }
