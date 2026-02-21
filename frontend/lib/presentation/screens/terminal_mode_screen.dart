@@ -23,7 +23,6 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
     final totalNetWorth = summary.netWorth;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       body: Stack(
         children: [
           Padding(

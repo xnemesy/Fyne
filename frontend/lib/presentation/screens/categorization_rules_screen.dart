@@ -14,7 +14,6 @@ class CategorizationRulesScreen extends ConsumerWidget {
     final service = ref.read(categorizationServiceProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -134,8 +133,8 @@ class CategorizationRulesScreen extends ConsumerWidget {
           bottom: MediaQuery.of(context).viewInsets.bottom + 32,
           left: 24, right: 24, top: 24,
         ),
-        decoration: const BoxDecoration(
-          color: Color(0xFFFBFBF9),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
         ),
         child: Column(

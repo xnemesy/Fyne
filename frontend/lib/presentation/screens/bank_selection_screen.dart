@@ -85,7 +85,6 @@ class _BankSelectionScreenState extends ConsumerState<BankSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(
         title: Text("Seleziona la tua Banca", style: GoogleFonts.lora(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,

@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
-  return ThemeNotifier();
-});
-
-class ThemeNotifier extends StateNotifier<ThemeMode> {
+class ThemeNotifier extends Notifier<ThemeMode> {
   static const _themePrefKey = 'fyne_theme_mode';
 
-  ThemeNotifier() : super(ThemeMode.dark) {
+  @override
+  ThemeMode build() {
     _loadTheme();
+    return ThemeMode.dark;
   }
 
   Future<void> _loadTheme() async {
@@ -51,3 +49,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
     await prefs.setString(_themePrefKey, val);
   }
 }
+
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(() {
+  return ThemeNotifier();
+});

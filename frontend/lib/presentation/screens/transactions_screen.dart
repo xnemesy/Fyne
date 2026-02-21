@@ -46,7 +46,6 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     final notifier = ref.read(transactionsNotifierProvider.notifier);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(
         toolbarHeight: 80,
         backgroundColor: Colors.transparent,

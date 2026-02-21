@@ -72,10 +72,14 @@ class TransactionRepository {
     // 2. Standard Decryption using internal version
     final amountText = await _crypto.decrypt(active.encryptedAmount, scope: EncryptionScope.database, type: 'transaction_amount', version: active.encryptionVersion);
     final descText = active.encryptedDescription != null ? await _crypto.decrypt(active.encryptedDescription!, scope: EncryptionScope.database, type: 'transaction_description', version: active.encryptionVersion) : null;
+    final cpText = active.encryptedCounterParty != null ? await _crypto.decrypt(active.encryptedCounterParty!, scope: EncryptionScope.database, type: 'transaction_counterparty', version: active.encryptionVersion) : null;
+    final catText = active.encryptedCategoryName != null ? await _crypto.decrypt(active.encryptedCategoryName!, scope: EncryptionScope.database, type: 'transaction_category_name', version: active.encryptionVersion) : null;
 
     return active.copyWithDecrypted(
       amount: double.tryParse(amountText),
       description: descText,
+      counterParty: cpText,
+      categoryName: catText,
     );
   }
 
@@ -85,14 +89,29 @@ class TransactionRepository {
   ) async {
     final List<TransactionSummary> summaries = [];
     for (final encrypted in encryptedList) {
-      final decrypted = await decryptSingle(encrypted);
-      summaries.add(TransactionSummary(
-        uuid: decrypted.uuid,
-        amount: decrypted.amount ?? 0.0,
-        bookingDate: decrypted.bookingDate,
-        description: decrypted.description,
-        accountId: decrypted.accountId,
-      ));
+      try {
+        final decrypted = await decryptSingle(encrypted);
+        summaries.add(TransactionSummary(
+          uuid: decrypted.uuid,
+          amount: decrypted.amount ?? 0.0,
+          bookingDate: decrypted.bookingDate,
+          description: decrypted.description,
+          accountId: decrypted.accountId,
+          categoryName: decrypted.categoryName,
+          categoryUuid: decrypted.categoryUuid,
+          counterParty: decrypted.counterParty,
+        ));
+      } catch (e) {
+        debugPrint('⚠️ Errore decifratura transazione ${encrypted.uuid}: $e');
+        // Aggiungiamo un fallback per non perdere la riga e lasciarla eliminare all'utente se corrotta
+        summaries.add(TransactionSummary(
+          uuid: encrypted.uuid,
+          amount: 0.0,
+          bookingDate: encrypted.bookingDate,
+          description: "Errore decifratura (Corrotta)",
+          accountId: encrypted.accountId,
+        ));
+      }
     }
     return summaries;
   }
@@ -131,6 +150,18 @@ class TransactionRepository {
       scope: EncryptionScope.database,
       type: 'transaction_description',
     ) : null;
+    
+    final encryptedCp = rawCounterParty != null ? await _crypto.encrypt(
+      rawCounterParty,
+      scope: EncryptionScope.database,
+      type: 'transaction_counterparty',
+    ) : null;
+
+    final encryptedCat = rawCategoryName != null ? await _crypto.encrypt(
+      rawCategoryName,
+      scope: EncryptionScope.database,
+      type: 'transaction_category_name',
+    ) : null;
 
     final modelToPut = TransactionModel(
       id: tx.id,
@@ -140,6 +171,8 @@ class TransactionRepository {
       currency: tx.currency,
       encryptedAmount: encryptedAmount,
       encryptedDescription: encryptedDesc,
+      encryptedCounterParty: encryptedCp,
+      encryptedCategoryName: encryptedCat,
       categoryUuid: tx.categoryUuid,
       createdAt: tx.createdAt,
       updatedAt: DateTime.now(),

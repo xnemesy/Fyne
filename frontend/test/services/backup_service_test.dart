@@ -35,6 +35,8 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
     
     // Setup Isar
+    HttpOverrides.global = null;
+    await Isar.initializeIsarCore(download: true);
     isar = await Isar.open(
       [
         TransactionModelSchema,

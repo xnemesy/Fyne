@@ -15,7 +15,6 @@ class BudgetsScreen extends ConsumerWidget {
     final budgetsAsync = ref.watch(budgetsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(budgetsProvider.notifier).refresh(),

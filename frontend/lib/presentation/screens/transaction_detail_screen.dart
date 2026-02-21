@@ -32,7 +32,6 @@ class TransactionDetailScreen extends ConsumerWidget {
 
   Widget _buildLoadingState(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Center(
         child: Column(
@@ -64,7 +63,6 @@ class TransactionDetailScreen extends ConsumerWidget {
 
   Widget _buildErrorState(BuildContext context, String message) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Center(
         child: Column(
@@ -94,7 +92,6 @@ class _TransactionDetailContent extends ConsumerWidget {
         FyneDateFormatter.formatWeekdayFull(transaction.bookingDate);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

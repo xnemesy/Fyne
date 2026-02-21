@@ -30,6 +30,7 @@ void main() {
 
   setUp(() async {
     FlutterSecureStorage.setMockInitialValues({});
+    await Isar.initializeIsarCore(download: true);
     isar = await Isar.open(
       [TransactionModelSchema],
       directory: '',
@@ -120,9 +121,10 @@ void main() {
       await wrongCrypto.unlock('wrongpass', 'wrongsalt');
       final wrongRepo = TransactionRepository(isar, wrongCrypto, rotation);
 
-      final result = await wrongRepo.getByUuid('test-fail');
-      expect(result, isNotNull);
-      expect(result!.amount, isNull); // Decryption fallita
+      expect(
+        () async => await wrongRepo.getByUuid('test-fail'),
+        throwsA(isA<Exception>()),
+      );
     });
 
     test('deve eliminare correttamente una transazione', () async {

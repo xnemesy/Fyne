@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar_community/isar.dart';
 import 'package:mockito/mockito.dart';
@@ -25,6 +26,8 @@ void main() {
   late ProviderContainer container;
   
   setUpAll(() async {
+    FlutterSecureStorage.setMockInitialValues({});
+    HttpOverrides.global = null;
     await Isar.initializeIsarCore(download: true);
     isar = await Isar.open(
       [TransactionModelSchema],
@@ -124,7 +127,7 @@ void main() {
          return await rotation.migrateIfLegacy<TransactionModel>(
            recordUuid: tx.uuid,
            currentVersion: tx.encryptionVersion,
-           decryptFn: (v) async => crypto.decrypt(tx.encryptedAmount, scope: EncryptionScope.database, version: v),
+           decryptFn: (v) async => crypto.decrypt(tx.encryptedAmount, scope: EncryptionScope.database, type: 'transaction_amount', version: v),
            reEncryptAndUpdateFn: (plain, v) async {
              migrationCount++;
              // Artificial delay to simulate processing and trigger race

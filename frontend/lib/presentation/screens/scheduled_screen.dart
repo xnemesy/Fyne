@@ -16,7 +16,6 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
     final scheduledAsync = ref.watch(scheduledProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(scheduledProvider.notifier).refresh(),

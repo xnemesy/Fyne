@@ -29,7 +29,6 @@ class WalletScreen extends ConsumerWidget {
     final formattedDate = DateFormat('dd MMM yyyy, HH:mm', 'it_IT').format(now);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,

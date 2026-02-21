@@ -253,7 +253,7 @@ class SettingsScreen extends ConsumerWidget {
 
   Widget _buildThemeTile(BuildContext context, WidgetRef ref) {
     final currentTheme = ref.watch(themeProvider);
-    String themeText;
+    String themeText = "Scuro";
     switch (currentTheme) {
       case ThemeMode.light:
         themeText = "Chiaro";

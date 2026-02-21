@@ -29,7 +29,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     final insightsState = ref.watch(insightsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      // backgroundColor rimosso per supportare il dark mode
       body: RefreshIndicator(
         color: const Color(0xFF4A6741),
         onRefresh: () async {

@@ -91,7 +91,6 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
       appBar: AppBar(
         title: Text(
           _selectedType == null ? "Tipo Conto" : "Dettagli Conto",
