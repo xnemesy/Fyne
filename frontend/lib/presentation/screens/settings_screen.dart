@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/fyne_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
 import 'categorization_rules_screen.dart';
 import 'backup_screen.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +18,7 @@ class SettingsScreen extends ConsumerWidget {
     final userEmail = authState.user?.email ?? (authState.user?.isAnonymous == true ? "Utente Verificato" : "utente@fyne.it");
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBF9),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -27,21 +28,21 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(LucideIcons.settings, size: 28, color: Color(0xFF4A6741)),
+                    Icon(LucideIcons.settings, size: 28, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 20),
                     Text(
                       "Impostazioni",
                       style: GoogleFonts.lora(
                         fontSize: 34,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1A1A1A),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       "Gestisci il tuo account e le preferenze",
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -55,25 +56,26 @@ class SettingsScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: Column(
                 children: [
-                  _buildSection("ACCOUNT", [
+                  _buildSection(context, "ACCOUNT", [
                     _buildProfileTile(context, userEmail, onTap: () => _showMsg(context, "Profilo utente")),
-                    _buildTile(LucideIcons.shield, "Sicurezza & Privacy", "Gestisci", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
-                    _buildTile(LucideIcons.tag, "Regole Categorizzazione", "Gestisci", onTap: () {
+                    _buildTile(context, LucideIcons.shield, "Sicurezza & Privacy", "Gestisci", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
+                    _buildTile(context, LucideIcons.tag, "Regole Categorizzazione", "Gestisci", onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const CategorizationRulesScreen()));
                     }),
-                    _buildTile(LucideIcons.key, "Backup Chiave", "Richiesto", onTap: () => _showPrivateKey(context, ref)),
+                    _buildTile(context, LucideIcons.key, "Backup Chiave", "Richiesto", onTap: () => _showPrivateKey(context, ref)),
                   ]),
-                  _buildSection("STATO DELLA SICUREZZA", [
-                    _buildSecurityTile("Crittografia locale attiva (AES-256)"),
-                    _buildSecurityTile("Zero-Knowledge Vault attivo"),
-                    _buildSecurityTile("Keyword Intelligence (No Cloud)"),
-                    _buildSecurityTile("Nessuna telemetria esterna"),
+                  _buildSection(context, "STATO DELLA SICUREZZA", [
+                    _buildSecurityTile(context, "Crittografia locale attiva (AES-256)"),
+                    _buildSecurityTile(context, "Zero-Knowledge Vault attivo"),
+                    _buildSecurityTile(context, "Keyword Intelligence (No Cloud)"),
+                    _buildSecurityTile(context, "Nessuna telemetria esterna"),
                   ]),
-                  _buildSection("SISTEMA", [
-                    _buildTile(LucideIcons.database, "Backup & Recovery", "Gestisci", onTap: () {
+                  _buildSection(context, "SISTEMA", [
+                    _buildThemeTile(context, ref),
+                    _buildTile(context, LucideIcons.database, "Backup & Recovery", "Gestisci", onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const BackupScreen()));
                     }),
-                    _buildTile(LucideIcons.info, "Info", "v1.0.0", onTap: () => _showMsg(context, "Fyne v1.0.0 Stable")),
+                    _buildTile(context, LucideIcons.info, "Info", "v1.0.0", onTap: () => _showMsg(context, "Fyne v1.0.0 Stable")),
                   ]),
                   const SizedBox(height: 20),
                   Padding(
@@ -147,7 +149,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSection(String title, List<Widget> tiles) {
+  Widget _buildSection(BuildContext context, String title, List<Widget> tiles) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -155,13 +157,13 @@ class SettingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(24, 25, 24, 10),
           child: Text(
             title,
-            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF8E8E93), letterSpacing: 1.5),
+            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), letterSpacing: 1.5),
           ),
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
@@ -175,17 +177,17 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTile(IconData icon, String title, String value, {VoidCallback? onTap}) {
+  Widget _buildTile(BuildContext context, IconData icon, String title, String value, {VoidCallback? onTap}) {
     return ListTile(
       onTap: onTap ?? () {},
-      leading: Icon(icon, color: const Color(0xFF1A1A1A), size: 20),
-      title: Text(title, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500)),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+      title: Text(title, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF8E8E93))),
+          Text(value, style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
           const SizedBox(width: 8),
-          const Icon(LucideIcons.chevronRight, size: 16, color: Color(0xFFC7C7CC)),
+          Icon(LucideIcons.chevronRight, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
         ],
       ),
     );
@@ -199,7 +201,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const Icon(LucideIcons.user, color: Color(0xFF1A1A1A), size: 20),
+            Icon(LucideIcons.user, color: Theme.of(context).colorScheme.onSurface, size: 20),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -209,7 +211,7 @@ class SettingsScreen extends ConsumerWidget {
                     'Profilo',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1A1A1A),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -227,23 +229,98 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Icon(LucideIcons.chevronRight, size: 16, color: Color(0xFFC7C7CC)),
+            Icon(LucideIcons.chevronRight, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSecurityTile(String label) {
+  Widget _buildSecurityTile(BuildContext context, String label) {
     return ListTile(
       dense: true,
-      leading: const Icon(LucideIcons.check, color: Color(0xFF4A6741), size: 16),
+      leading: Icon(LucideIcons.check, color: Theme.of(context).colorScheme.primary, size: 16),
       title: Text(
         label,
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: const Color(0xFF1A1A1A).withValues(alpha: 0.7),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeTile(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.watch(themeProvider);
+    String themeText;
+    switch (currentTheme) {
+      case ThemeMode.light:
+        themeText = "Chiaro";
+        break;
+      case ThemeMode.dark:
+        themeText = "Scuro";
+        break;
+      case ThemeMode.system:
+        themeText = "Sistema";
+        break;
+    }
+
+    return ListTile(
+      onTap: () => _showThemeDialog(context, ref, currentTheme),
+      leading: Icon(LucideIcons.moon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+      title: Text("Tema App", style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(themeText, style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
+          const SizedBox(width: 8),
+          Icon(LucideIcons.chevronRight, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+        ],
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context, WidgetRef ref, ThemeMode currentTheme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text("Seleziona Tema", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<ThemeMode>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              title: Text("Chiaro", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              value: ThemeMode.light,
+              groupValue: currentTheme,
+              onChanged: (val) {
+                if (val != null) ref.read(themeProvider.notifier).setThemeMode(val);
+                Navigator.pop(context);
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              title: Text("Scuro", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              value: ThemeMode.dark,
+              groupValue: currentTheme,
+              onChanged: (val) {
+                if (val != null) ref.read(themeProvider.notifier).setThemeMode(val);
+                Navigator.pop(context);
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              activeColor: Theme.of(context).colorScheme.primary,
+              title: Text("Predefinito di Sistema", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              value: ThemeMode.system,
+              groupValue: currentTheme,
+              onChanged: (val) {
+                if (val != null) ref.read(themeProvider.notifier).setThemeMode(val);
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
       ),
     );

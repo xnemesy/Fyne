@@ -140,10 +140,10 @@ class AccountSyncRepository {
         encryptionVersion: existing.encryptionVersion,
         syncStatus: AccountSyncStatus.synced,
         remoteError: null,
-      );
+      )..isarId = existing.isarId;
 
       await isar.accounts.put(promoted);
-      await isar.accounts.delete(existing.isarId);
+      // Rimosso: await isar.accounts.delete(existing.isarId); dato che promoted ha lo stesso isarId e si sovrascrive.
 
       final linkedTransactions = await isar.transactionModels
           .where()
@@ -211,7 +211,7 @@ class AccountSyncRepository {
             encryptionVersion: existing.encryptionVersion,
             syncStatus: AccountSyncStatus.synced,
             remoteError: null,
-          );
+          )..isarId = existing.isarId;
           await isar.accounts.put(synced);
         });
       }
@@ -238,7 +238,7 @@ class AccountSyncRepository {
           encryptionVersion: existing.encryptionVersion,
           syncStatus: AccountSyncStatus.failedCreate,
           remoteError: e.toString(),
-        );
+        )..isarId = existing.isarId;
         await isar.accounts.put(failed);
       });
     }

@@ -136,12 +136,18 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             rawCounterParty: counterParty.isEmpty ? null : counterParty,
             rawCategoryName: _selectedCategory?.name,
           );
-      ref
+      await ref
           .read(accountsProvider.notifier)
           .applyTransactionDelta(accountId, signedAmount);
+      
       ref.invalidate(transactionsProvider);
       ref.invalidate(walletSummaryProvider);
-      ref.read(accountOverviewProvider.notifier).refresh();
+      ref.invalidate(accountsProvider); // Invalidates the future provider explicitly
+      
+      // We must wait for the UI to settle before refreshing the overview 
+      // which depends on Isar being fully flushed
+      await Future.delayed(const Duration(milliseconds: 100));
+      await ref.read(accountOverviewProvider.notifier).refresh();
 
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
@@ -188,9 +194,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFFFBFBF9),
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32), topRight: Radius.circular(32)),
         ),
         child: SafeArea(
@@ -207,7 +213,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     Text(
                       "Nuova Transazione",
                       style: GoogleFonts.lora(
-                          fontSize: 22, fontWeight: FontWeight.bold),
+                          fontSize: 22, 
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface),
                     ),
                     IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -225,13 +233,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   style: GoogleFonts.inter(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF4A6741)),
+                      color: Theme.of(context).colorScheme.primary),
                   decoration: InputDecoration(
                     hintText: "0,00",
                     prefixText: "€ ",
                     border: InputBorder.none,
                     hintStyle: TextStyle(
-                        color: const Color(0xFF4A6741).withValues(alpha: 0.3)),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -272,7 +280,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   decoration: InputDecoration(
                     hintText: "Descrizione (es. Esselunga, Netflix...)",
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none),
@@ -293,7 +301,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   decoration: InputDecoration(
                     hintText: "Beneficiario (opzionale)",
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none),
@@ -310,11 +318,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       builder: (context, child) {
                         return Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: Color(0xFF4A6741),
-                              onPrimary: Colors.white,
-                              onSurface: Color(0xFF1A1A1A),
-                            ),
+                            colorScheme: Theme.of(context).brightness == Brightness.light 
+                              ? const ColorScheme.light(primary: Color(0xFF4A6741), onPrimary: Colors.white)
+                              : const ColorScheme.dark(primary: Color(0xFF8FA68B), onPrimary: Color(0xFF1A1A1A)),
                           ),
                           child: child!,
                         );
@@ -327,15 +333,15 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
                       border:
-                          Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+                          Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(LucideIcons.calendar,
-                            color: Color(0xFF4A6741)),
+                        Icon(LucideIcons.calendar,
+                            color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -370,15 +376,15 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
                       border:
-                          Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+                          Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.category_outlined,
-                            color: Color(0xFF4A6741)),
+                        Icon(Icons.category_outlined,
+                            color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -396,8 +402,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: _selectedCategory != null
-                                      ? const Color(0xFF1A1A1A)
-                                      : const Color(0xFF9A9A9A),
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                                 ),
                               ),
                             ],
@@ -422,15 +428,15 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(LucideIcons.tag,
-                            size: 14, color: Color(0xFF4A6741)),
+                        Icon(LucideIcons.tag,
+                            size: 14, color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 6),
                         Text(
                           "Categoria: ${_selectedCategory!.name}",
                           style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF4A6741)),
+                              color: Theme.of(context).colorScheme.primary),
                         ),
                       ],
                     ),
@@ -461,20 +467,22 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                 horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? const Color(0xFF1A1A1A)
-                                  : Colors.white,
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                   color: isSelected
                                       ? Colors.transparent
-                                      : Colors.grey.withValues(alpha: 0.2)),
+                                      : Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                             ),
                             child: Text(
                               acc.decryptedName ?? "Senza nome",
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
-                                color: isSelected ? Colors.white : Colors.black,
+                                color: isSelected 
+                                   ? Theme.of(context).colorScheme.surface 
+                                   : Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -500,19 +508,19 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       elevation: 0,
                     ),
                     child: _isSaving
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                                  AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.onPrimary),
                             ),
                           )
                         : Text(
                             "SALVA NEL VAULT",
                             style: GoogleFonts.inter(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1),
                           ),
@@ -539,22 +547,22 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.12) : Colors.white,
+          color: selected ? color.withValues(alpha: 0.12) : Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-              color: selected ? color : Colors.grey.withValues(alpha: 0.2)),
+              color: selected ? color : Theme.of(context).dividerColor.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon,
-                size: 16, color: selected ? color : const Color(0xFF888888)),
+                size: 16, color: selected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
             const SizedBox(width: 8),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
-                color: selected ? color : const Color(0xFF888888),
+                color: selected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],

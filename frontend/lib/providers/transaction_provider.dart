@@ -72,25 +72,30 @@ class TransactionsNotifier
     try {
       final newItems = await ref
           .read(transactionsPageProvider(_currentPage).future)
-          .timeout(const Duration(seconds: 20));
+          .timeout(const Duration(seconds: 10)); // Reduced timeout for better UX
 
       if (newItems.isEmpty) {
         _hasMore = false;
-        if (_currentPage == 0) state = const AsyncValue.data([]);
+        if (_currentPage == 0) {
+          state = const AsyncValue.data([]);
+        } else {
+          // Force UI to stop showing the bottom spinner by updating state identically
+          final currentList = state.value ?? <TransactionSummary>[];
+          state = AsyncValue.data(currentList);
+        }
       } else {
         _currentPage++;
-        final currentList = state is AsyncData<List<TransactionSummary>>
-            ? (state as AsyncData<List<TransactionSummary>>).value
-            : <TransactionSummary>[];
+        final currentList = state.value ?? <TransactionSummary>[];
         state = AsyncValue.data([...currentList, ...newItems]);
       }
     } catch (e, stack) {
-      debugPrint("Transactions loadMore error: $e");
+      debugPrint("Transactions loadMore error: $e\n$stack");
       if (_currentPage == 0) {
-        // First page failed — show empty state, not error
+        // First page failed — show empty state or fallback, not infinite spinner
         state = const AsyncValue.data([]);
       } else {
-        state = AsyncValue.error(e, stack);
+        // Show error but keep existing data 
+        state = AsyncValue<List<TransactionSummary>>.error(e, stack).copyWithPrevious(state);
       }
     }
   }

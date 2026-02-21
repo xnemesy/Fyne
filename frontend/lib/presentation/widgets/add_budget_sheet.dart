@@ -32,9 +32,9 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
         right: 32,
         top: 32,
       ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBFBF9),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
         ),
@@ -52,12 +52,12 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
                   style: GoogleFonts.lora(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A1A1A),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(LucideIcons.x, color: Color(0xFF1A1A1A), size: 20),
+                  icon: Icon(LucideIcons.x, color: Theme.of(context).colorScheme.onSurface, size: 20),
                 ),
               ],
             ),
@@ -68,12 +68,12 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
               style: GoogleFonts.lora(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A1A),
+                color: Theme.of(context).colorScheme.primary,
               ),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: "0.00 €",
-                hintStyle: TextStyle(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                 border: InputBorder.none,
               ),
             ),
@@ -82,18 +82,18 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
               value: _selectedCategory,
               decoration: InputDecoration(
                 labelText: "CATEGORIA",
-                labelStyle: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+                labelStyle: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+                  borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFF4A6741)),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                 ),
-                prefixIcon: const Icon(LucideIcons.tag, color: Color(0xFF4A6741), size: 18),
+                prefixIcon: Icon(LucideIcons.tag, color: Theme.of(context).colorScheme.primary, size: 18),
               ),
               items: categories.map((cat) => DropdownMenuItem(
                 value: cat,
@@ -107,14 +107,14 @@ class _AddBudgetSheetState extends ConsumerState<AddBudgetSheet> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _saveBudget,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A6741),
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: _isSaving 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2))
                     : Text("SALVA BUDGET", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
               ),
             ),

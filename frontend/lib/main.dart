@@ -20,6 +20,7 @@ import 'presentation/widgets/privacy_blur_overlay.dart';
 import 'presentation/widgets/milestone_listener.dart';
 import 'providers/budget_provider.dart';
 import 'providers/transaction_provider.dart';
+import 'providers/theme_provider.dart';
 
 import 'services/analytics_service.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -71,17 +72,17 @@ void main() async {
   );
 }
 
-class FyneApp extends StatelessWidget {
+class FyneApp extends ConsumerWidget {
   const FyneApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Fyne Banking',
       debugShowCheckedModeBanner: false,
       theme: FyneTheme.light,
       darkTheme: FyneTheme.dark,
-      themeMode: ThemeMode.dark,
+      themeMode: ref.watch(themeProvider),
       home: const AuthWrapper(),
     );
   }

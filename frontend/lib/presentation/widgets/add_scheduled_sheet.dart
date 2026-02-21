@@ -32,9 +32,9 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
         right: 32,
         top: 32,
       ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBFBF9),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
         ),
@@ -52,12 +52,12 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
                   style: GoogleFonts.lora(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A1A1A),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(LucideIcons.x, color: Color(0xFF1A1A1A), size: 20),
+                  icon: Icon(LucideIcons.x, color: Theme.of(context).colorScheme.onSurface, size: 20),
                 ),
               ],
             ),
@@ -68,12 +68,12 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
               style: GoogleFonts.lora(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A1A),
+                color: Theme.of(context).colorScheme.primary,
               ),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: "0.00 €",
-                hintStyle: TextStyle(color: const Color(0xFF1A1A1A).withOpacity(0.1)),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                 border: InputBorder.none,
               ),
             ),
@@ -82,7 +82,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
                 "Inserisci solo se ha senso per te",
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: const Color(0xFF1A1A1A).withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -93,24 +93,24 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
               style: GoogleFonts.inter(fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 labelText: "DESCRIZIONE",
-                labelStyle: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+                labelStyle: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+                  borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFF4A6741)),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                 ),
-                prefixIcon: const Icon(LucideIcons.calendar, color: Color(0xFF4A6741), size: 18),
+                prefixIcon: Icon(LucideIcons.calendar, color: Theme.of(context).colorScheme.primary, size: 18),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               "INIZIO",
-              style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+              style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
             ),
             const SizedBox(height: 12),
             GestureDetector(
@@ -118,20 +118,20 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black.withOpacity(0.05)),
+                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.calendarDays, size: 18, color: Color(0xFF4A6741)),
+                    Icon(LucideIcons.calendarDays, size: 18, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(width: 12),
                     Text(
                       "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 14),
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
                     ),
                     const Spacer(),
-                    const Icon(LucideIcons.chevronDown, size: 16, color: Color(0xFF8E8E93)),
+                    Icon(LucideIcons.chevronDown, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                   ],
                 ),
               ),
@@ -139,7 +139,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
             const SizedBox(height: 24),
             Text(
               "FREQUENZA",
-              style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A).withOpacity(0.3)),
+              style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
             ),
             const SizedBox(height: 12),
             Row(
@@ -157,14 +157,14 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _saveScheduled,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A6741),
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: _isSaving 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2))
                     : Text("PROGRAMMA ORA", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
               ),
             ),
@@ -182,14 +182,14 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFF4A6741) : Colors.white,
+            color: active ? Theme.of(context).colorScheme.onSurface : Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: active ? Colors.transparent : Colors.black.withOpacity(0.05)),
+            border: Border.all(color: active ? Colors.transparent : Theme.of(context).dividerColor.withValues(alpha: 0.2)),
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: active ? Colors.white : const Color(0xFF1A1A1A).withOpacity(0.4)),
+            style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: active ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
           ),
         ),
       ),
@@ -204,11 +204,10 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF4A6741),
-              onPrimary: Colors.white,
-            ),
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).brightness == Brightness.light 
+               ? const ColorScheme.light(primary: Color(0xFF4A6741), onPrimary: Colors.white)
+               : const ColorScheme.dark(primary: Color(0xFF8FA68B), onPrimary: Color(0xFF1A1A1A)),
           ),
           child: child!,
         );

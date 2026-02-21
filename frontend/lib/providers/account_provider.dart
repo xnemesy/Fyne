@@ -85,7 +85,7 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
               updatedAt: DateTime.now(),
               isDeleted: existing.isDeleted,
               encryptionVersion: v,
-            );
+            )..isarId = existing.isarId;
             await isar.accounts.put(updated);
             return updated;
           });
@@ -115,6 +115,8 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
 
   Future<void> saveAccount(Account account) async {
     final isar = await ref.read(isarProvider.future);
+    final existing = await isar.accounts.where().idEqualTo(account.id).findFirst();
+
     final updatedAccount = Account(
       id: account.id,
       encryptedName: account.encryptedName,
@@ -126,6 +128,10 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
       updatedAt: DateTime.now(),
       isDeleted: false,
     );
+    
+    if (existing != null) {
+      updatedAccount.isarId = existing.isarId;
+    }
 
     await isar.writeTxn(() => isar.accounts.put(updatedAccount));
     ref.invalidateSelf();
@@ -161,7 +167,7 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
           group: existing.group,
           updatedAt: DateTime.now(),
           isDeleted: true,
-        );
+        )..isarId = existing.isarId;
         await isar.accounts.put(deletedAccount);
       }
     });
@@ -207,7 +213,7 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
         group: account.group,
         updatedAt: DateTime.now(),
         encryptionVersion: CryptoService.currentCryptoVersion,
-      );
+      )..isarId = account.isarId;
 
       await isar.accounts.put(updatedAccount);
     });
@@ -230,7 +236,7 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
           group: groupName ?? existing.group,
           updatedAt: DateTime.now(),
           isDeleted: existing.isDeleted,
-        );
+        )..isarId = existing.isarId;
         await isar.accounts.put(updated);
       }
     });

@@ -78,7 +78,17 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
   }
 
   Future<void> _init() async {
-    await refresh();
+    final isar = await ref.read(isarProvider.future);
+    
+    // Listen to account changes to keep total balance up to date
+    isar.accounts.where().isDeletedEqualTo(false).watch(fireImmediately: true).listen((_) {
+      refresh();
+    });
+
+    // Listen to transactions to keep monthly income/expenses up to date
+    isar.transactionModels.where().watch().listen((_) {
+      refresh();
+    });
   }
 
   /// Refresh completo di tutti i dati
@@ -113,8 +123,8 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
         }
       }
 
-      // 1. Carica tutti gli account cifrati
-      final encryptedAccounts = await isar.accounts.where().findAll();
+      // 1. Carica tutti gli account cifrati non marcati come cancellati
+      final encryptedAccounts = await isar.accounts.where().isDeletedEqualTo(false).findAll();
 
       // 2. Decifra in parallelo
       final cryptoService = ref.read(cryptoServiceProvider);
