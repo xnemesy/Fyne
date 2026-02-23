@@ -78,7 +78,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back_ios_new, size: 18, color: Theme.of(context).colorScheme.onSurface),
         ),
         title: Text(
           'Ripristino Vault',
@@ -139,7 +139,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                       prefixText: '${i + 1}. ',
                       prefixStyle: GoogleFonts.inter(
                         fontSize: 11,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -214,7 +214,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               Center(
                 child: Text(
                   'La chiave non viene inviata a nessun server.',
-                  style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er),
+                  style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
                 ),
               ),
             ],

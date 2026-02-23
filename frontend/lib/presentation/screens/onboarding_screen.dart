@@ -388,7 +388,7 @@ class _InAppTutorialOverlayState extends State<InAppTutorialOverlay> {
             children: [
               Text(
                 '${_currentStep + 1}/${widget.steps.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),

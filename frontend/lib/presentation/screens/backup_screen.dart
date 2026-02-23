@@ -422,7 +422,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.info_outline,
                           size: 20,
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -649,7 +649,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               else
-                const Icon(
+                Icon(
                   Icons.chevron_right,
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),

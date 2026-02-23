@@ -1,31 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'dart:ui';
 import 'core/theme/fyne_theme.dart';
 import 'presentation/screens/dashboard_screen.dart';
 import 'presentation/screens/onboarding_screen.dart';
 import 'presentation/screens/lock_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/master_key_wizard.dart';
-import 'services/notification_service.dart';
-import 'services/fcm_service.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'providers/auth_provider.dart';
-import 'providers/sync_provider.dart';
-import 'services/categorization_service.dart';
 import 'presentation/widgets/privacy_blur_overlay.dart';
 import 'presentation/widgets/milestone_listener.dart';
-import 'providers/budget_provider.dart';
-import 'providers/transaction_provider.dart';
-import 'providers/theme_provider.dart';
-
+import 'providers/auth_provider.dart';
+import 'providers/sync_provider.dart';
 import 'services/analytics_service.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'dart:ui';
-
+import 'services/notification_service.dart';
+import 'services/fcm_service.dart';
+import 'services/categorization_service.dart';
 import 'services/platform_security_service.dart';
 
 void main() async {
@@ -72,17 +65,20 @@ void main() async {
   );
 }
 
-class FyneApp extends ConsumerWidget {
+/// Fix Bug 1: FyneApp non osserva più themeProvider.
+/// themeMode è hardcoded a ThemeMode.dark — nessuna ricostruzione
+/// tardiva dell'albero che causa crash GlobalKey.
+class FyneApp extends StatelessWidget {
   const FyneApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fyne Banking',
       debugShowCheckedModeBanner: false,
-      theme: FyneTheme.light,
-      darkTheme: FyneTheme.dark,
-      themeMode: ref.watch(themeProvider),
+      // Solo dark — il toggle light è disabilitato per spec
+      theme: FyneTheme.dark,
+      themeMode: ThemeMode.dark,
       home: const AuthWrapper(),
     );
   }

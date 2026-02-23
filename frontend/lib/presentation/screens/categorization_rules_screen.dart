@@ -36,7 +36,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             if (rules.isEmpty)
-              _buildEmptyState()
+              _buildEmptyState(context)
             else
               ...rules.map((rule) => _buildRuleTile(context, ref, rule)),
             
@@ -46,7 +46,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
               style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.2),
             ),
             const SizedBox(height: 16),
-            _buildSystemRulesInfo(),
+            _buildSystemRulesInfo(context),
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -80,7 +80,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -106,7 +106,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSystemRulesInfo() {
+  Widget _buildSystemRulesInfo(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

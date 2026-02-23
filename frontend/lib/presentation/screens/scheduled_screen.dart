@@ -32,7 +32,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Icon(LucideIcons.calendar, size: 28, color: Color(0xFF4A6741)),
-                          _headerAction(LucideIcons.plus, () {
+                          _headerAction(context, LucideIcons.plus, () {
                             showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,
@@ -68,7 +68,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
               
               scheduledAsync.when(
                 data: (transactions) => transactions.isEmpty
-                    ? SliverToBoxAdapter(child: _buildEmptyState())
+                    ? SliverToBoxAdapter(child: _buildEmptyState(context))
                     : SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         sliver: SliverList(
@@ -185,7 +185,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _headerAction(IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
+  Widget _headerAction(BuildContext context, IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -199,7 +199,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),

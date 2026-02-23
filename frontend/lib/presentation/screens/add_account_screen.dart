@@ -20,46 +20,49 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   AccountType? _selectedType;
   final _nameController = TextEditingController();
   final _balanceController = TextEditingController();
-  final _cryptoIdController = TextEditingController(); // For crypto symbol/id
+  final _cryptoIdController = TextEditingController();
   bool _isSaving = false;
   String _selectedGroup = 'Personale';
 
+  // Fix Bug 2: chip gruppo usa colorScheme invece di Colors.white hardcoded
   Widget _buildGroupChip(String label, IconData icon) {
     final isSelected = _selectedGroup == label;
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () => setState(() => _selectedGroup = label),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A6741) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF4A6741)
+              // Fix Bug 2: sfondo chip non selezionato tema-aware
+              : cs.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: isSelected
-                  ? Colors.transparent
-                  : Colors.black.withOpacity(0.05)),
+            color: isSelected ? Colors.transparent : cs.outlineVariant,
+          ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                      color: const Color(0xFF4A6741).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4))
+                    color: const Color(0xFF4A6741).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
                 ]
               : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon,
-                size: 16,
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface),
+            Icon(icon, size: 16, color: isSelected ? Colors.white : cs.onSurface),
             const SizedBox(width: 8),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                color: isSelected ? Colors.white : cs.onSurface,
               ),
             ),
           ],
@@ -95,11 +98,15 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         title: Text(
           _selectedType == null ? "Tipo Conto" : "Dettagli Conto",
           style: GoogleFonts.lora(
-              fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+            fontWeight: FontWeight.bold,
+            // Fix Bug 2: colore AppBar titolo tema-aware
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
+        // Fix Bug 2: icona back tema-aware invece di 0xFF1A1A1A hardcoded
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -111,18 +118,18 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   }
 
   Widget _buildTypeSelection() {
+    final cs = Theme.of(context).colorScheme;
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        // Automatic Banking Option
+        // Connessione automatica (gradient — sempre leggibile white-on-green)
         Padding(
           padding: const EdgeInsets.only(bottom: 24),
           child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const BankSelectionScreen()),
+                MaterialPageRoute(builder: (context) => const BankSelectionScreen()),
               );
             },
             borderRadius: BorderRadius.circular(20),
@@ -151,8 +158,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(LucideIcons.zap,
-                        color: Colors.white, size: 24),
+                    child: const Icon(LucideIcons.zap, color: Colors.white, size: 24),
                   ),
                   const SizedBox(width: 20),
                   Column(
@@ -176,8 +182,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                     ],
                   ),
                   const Spacer(),
-                  const Icon(LucideIcons.chevronRight,
-                      color: Colors.white, size: 18),
+                  const Icon(LucideIcons.chevronRight, color: Colors.white, size: 18),
                 ],
               ),
             ),
@@ -187,6 +192,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         _buildInputLabel("O AGGIUNGI MANUALMENTE"),
         const SizedBox(height: 8),
 
+        // Fix Bug 2: container tipi conto usa colorScheme.surface
         ...AccountType.values.map((type) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
@@ -196,36 +202,40 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  // Fix Bug 2: sfondo tema-aware, leggibile in dark mode
+                  color: cs.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.black.withOpacity(0.05)),
+                  border: Border.all(color: cs.outlineVariant.withOpacity(0.5)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4A6741).withOpacity(0.1),
+                        color: const Color(0xFF4A6741).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(_typeIcons[type],
-                          color: const Color(0xFF4A6741), size: 24),
+                      child: Icon(_typeIcons[type], color: const Color(0xFF4A6741), size: 24),
                     ),
                     const SizedBox(width: 20),
                     Text(
                       _typeLabels[type]!,
                       style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600, fontSize: 16),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        // Fix Bug 2: testo tema-aware
+                        color: cs.onSurface,
+                      ),
                     ),
                     const Spacer(),
-                    Icon(LucideIcons.chevronRight,
-                        color: Colors.black.withOpacity(0.2), size: 18),
+                    // Fix Bug 2: icona chevron tema-aware
+                    Icon(LucideIcons.chevronRight, color: cs.onSurface.withOpacity(0.3), size: 18),
                   ],
                 ),
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -243,9 +253,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
             decoration: _inputDecoration("Es: My Bank, Wallet Personale"),
           ),
           const SizedBox(height: 24),
-          _buildInputLabel(_selectedType == AccountType.crypto
-              ? "QUANTITÀ"
-              : "SALDO INIZIALE"),
+          _buildInputLabel(_selectedType == AccountType.crypto ? "QUANTITÀ" : "SALDO INIZIALE"),
           TextField(
             controller: _balanceController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -280,18 +288,18 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               child: _isSaving
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
-                  : Text("SALVA CONTO",
-                      style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold, letterSpacing: 1)),
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(
+                      "SALVA CONTO",
+                      style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
             ),
           ),
         ],
@@ -305,22 +313,26 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       child: Text(
         label,
         style: GoogleFonts.inter(
-            letterSpacing: 2,
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+          letterSpacing: 2,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+        ),
       ),
     );
   }
 
+  // Fix Bug 2: fillColor usa surfaceContainerHighest invece di Colors.white
   InputDecoration _inputDecoration(String hint) {
+    final cs = Theme.of(context).colorScheme;
     return InputDecoration(
       hintText: hint,
+      hintStyle: GoogleFonts.inter(color: cs.onSurface.withOpacity(0.3)),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: cs.surfaceContainerHighest,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+        borderSide: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -332,9 +344,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   Future<void> _saveAccount() async {
     if (_nameController.text.isEmpty || _balanceController.text.isEmpty) return;
 
-    setState(() {
-      _isSaving = true;
-    });
+    setState(() => _isSaving = true);
 
     try {
       final crypto = ref.read(cryptoServiceProvider);
@@ -343,35 +353,29 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       if (masterKey == null) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
-          ..showSnackBar(const SnackBar(
-            content:
-                Text("Il vault non è ancora pronto. Riprova tra un momento."),
-          ));
+          ..showSnackBar(
+            const SnackBar(content: Text("Il vault non è ancora pronto. Riprova tra un momento.")),
+          );
         return;
       }
 
       if (!crypto.isUnlocked) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
-          ..showSnackBar(const SnackBar(
-            content: Text("Vault bloccato. Sbloccalo e riprova."),
-          ));
+          ..showSnackBar(const SnackBar(content: Text("Vault bloccato. Sbloccalo e riprova.")));
         return;
       }
 
-      final result =
-          await ref.read(accountsProvider.notifier).createAccountFromForm(
-                CreateAccountCommand(
-                  name: _nameController.text,
-                  balance: _balanceController.text,
-                  type: _selectedType!,
-                  group: _selectedGroup,
-                  providerId: _selectedType == AccountType.crypto
-                      ? _cryptoIdController.text
-                      : null,
-                  currency: 'EUR',
-                ),
-              );
+      final result = await ref.read(accountsProvider.notifier).createAccountFromForm(
+            CreateAccountCommand(
+              name: _nameController.text,
+              balance: _balanceController.text,
+              type: _selectedType!,
+              group: _selectedGroup,
+              providerId: _selectedType == AccountType.crypto ? _cryptoIdController.text : null,
+              currency: 'EUR',
+            ),
+          );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -380,7 +384,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           content: Text(
             result.syncStatus == AccountSyncStatus.pendingCreate
                 ? "Conto salvato. Sincronizzazione cloud in background."
-                : "Conto salvato.",
+                : "Conto salvato e sincronizzato.",
           ),
         ));
       Navigator.pop(context);
@@ -395,9 +399,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           ),
         ));
     } finally {
-      setState(() {
-        _isSaving = false;
-      });
+      setState(() => _isSaving = false);
     }
   }
 }

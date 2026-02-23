@@ -123,7 +123,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.hourglass_empty_rounded,
+              Icon(Icons.hourglass_empty_rounded,
                   size: 64, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
               const SizedBox(height: 16),
               Text(

@@ -163,18 +163,18 @@ class _TransactionDetailContent extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 48),
-            _buildInfoTile("DESCRIZIONE",
+            _buildInfoTile(context, "DESCRIZIONE",
                 transaction.description ?? "Nessuna descrizione"),
             const SizedBox(height: 24),
             _buildInfoTile(
-              "BENEFICIARIO",
+              context, "BENEFICIARIO",
               (transaction.counterParty == null ||
                       transaction.counterParty!.trim().isEmpty)
                   ? "Non specificato"
                   : transaction.counterParty!,
             ),
             const SizedBox(height: 24),
-            _buildInfoTile("CATEGORIA", transaction.categoryName ?? "Altro",
+            _buildInfoTile(context, "CATEGORIA", transaction.categoryName ?? "Altro",
                 icon: LucideIcons.tag),
             const SizedBox(height: 48),
             Container(
@@ -206,7 +206,7 @@ class _TransactionDetailContent extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoTile(String title, String value, {IconData? icon}) {
+  Widget _buildInfoTile(BuildContext context, String title, String value, {IconData? icon}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

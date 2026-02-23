@@ -1,52 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+/// ThemeNotifier — Fyne impone esclusivamente il Dark Theme.
+/// Il `_loadTheme()` asincrono precedente causava un crash GlobalKey
+/// perché emetteva `ThemeMode.light` dopo la build, forzando
+/// la ri-creazione di tutto l'albero widget (InkFeatures, NotificationListener).
+/// Soluzione: `build()` ritorna ThemeMode.dark in modo sincrono e definitivo.
 class ThemeNotifier extends Notifier<ThemeMode> {
-  static const _themePrefKey = 'fyne_theme_mode';
-
   @override
-  ThemeMode build() {
-    _loadTheme();
-    return ThemeMode.dark;
-  }
+  ThemeMode build() => ThemeMode.dark; // Dark forzato, sincrono, nessun async
 
-  Future<void> _loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedMode = prefs.getString(_themePrefKey);
-
-    if (savedMode != null) {
-      if (savedMode == 'light') {
-        state = ThemeMode.light;
-      } else if (savedMode == 'dark') {
-        state = ThemeMode.dark;
-      } else {
-        state = ThemeMode.system;
-      }
-    } else {
-      // Default fissemo Dark Theme for Fyne App as the historic fallback
-      state = ThemeMode.dark;
-    }
-  }
-
+  /// No-op: il toggle Light/System è disabilitato per spec Fyne.
+  /// Mantenuto per API compatibility (es. tile Settings che mostra lo stato).
   Future<void> setThemeMode(ThemeMode mode) async {
-    state = mode;
-    final prefs = await SharedPreferences.getInstance();
-    
-    String val;
-    switch (mode) {
-      case ThemeMode.light:
-        val = 'light';
-        break;
-      case ThemeMode.dark:
-        val = 'dark';
-        break;
-      case ThemeMode.system:
-        val = 'system';
-        break;
-    }
-    
-    await prefs.setString(_themePrefKey, val);
+    // Solo dark è accettato — fare override sarebbe un UX bug
+    if (mode == ThemeMode.dark) state = ThemeMode.dark;
   }
 }
 

@@ -395,7 +395,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
                                   text: '${i + 1}. ',
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er,
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -1078,7 +1078,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                  Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -1093,7 +1093,7 @@ class _MasterKeyWizardState extends ConsumerState<MasterKeyWizard> {
           const SizedBox(height: 12),
           Text(
             'Puoi sempre modificare questa impostazione nelle Impostazioni.',
-            style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)er),
+            style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
           ),
           const SizedBox(height: 40),
 

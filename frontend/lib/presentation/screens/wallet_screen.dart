@@ -107,15 +107,15 @@ class WalletScreen extends ConsumerWidget {
                           ),
                           Row(
                             children: [
-                               _headerAction(LucideIcons.sliders, () {
+                               _headerAction(context, LucideIcons.sliders, () {
                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
                                }),
                                const SizedBox(width: 12),
-                               _headerAction(LucideIcons.folderPlus, () {
+                               _headerAction(context, LucideIcons.folderPlus, () {
                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gestione gruppi conti (Prossimamente)")));
                                }),
                               const SizedBox(width: 12),
-                              _headerAction(LucideIcons.plus, () {
+                              _headerAction(context, LucideIcons.plus, () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => const AddAccountScreen()),
@@ -247,7 +247,7 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _headerAction(IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
+  Widget _headerAction(BuildContext context, IconData icon, VoidCallback onTap, {bool isPrimary = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

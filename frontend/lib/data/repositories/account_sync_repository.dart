@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar_community/isar.dart';
@@ -7,7 +9,6 @@ import '../../models/account.dart';
 import '../../models/transaction.dart';
 import '../../providers/isar_provider.dart';
 import '../../providers/master_key_provider.dart';
-import '../../services/api_service.dart';
 import '../../services/crypto_service.dart';
 
 class CreateAccountCommand {
@@ -46,8 +47,11 @@ class AccountSyncRepository {
   final Ref _ref;
   static const Uuid _uuid = Uuid();
 
-  Future<CreateAccountResult> createLocalFirst(
-      CreateAccountCommand command) async {
+  // Fix Bug 3: usa Firestore direttamente invece di ApiService legacy
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<CreateAccountResult> createLocalFirst(CreateAccountCommand command) async {
     final masterKey = _ref.read(masterKeyProvider);
     final crypto = _ref.read(cryptoServiceProvider);
     if (masterKey == null || !crypto.isUnlocked) {
@@ -55,12 +59,12 @@ class AccountSyncRepository {
     }
 
     final isar = await _ref.read(isarProvider.future);
-
     final name = command.name.trim();
     final balance = await compute(_normalizeBalance, command.balance);
     final tempId = 'tmp_${_uuid.v4()}';
     final now = DateTime.now();
 
+    // Il payload è già cifrato con AES-256-GCM + HMAC da CryptoService
     final encryptedName = await crypto.encrypt(
       name,
       scope: EncryptionScope.database,
@@ -78,8 +82,7 @@ class AccountSyncRepository {
       encryptedBalance: encryptedBalance,
       currency: command.currency,
       type: command.type,
-      providerId:
-          command.providerId?.isEmpty == true ? null : command.providerId,
+      providerId: command.providerId?.isEmpty == true ? null : command.providerId,
       group: command.group,
       updatedAt: now,
       encryptionVersion: CryptoService.currentCryptoVersion,
@@ -91,6 +94,7 @@ class AccountSyncRepository {
       await isar.accounts.put(local);
     });
 
+    debugPrint('🔐 [ACCOUNT_SYNC] Conto salvato localmente id=$tempId — sync Firestore in background');
     unawaited(syncPendingCreates());
 
     return CreateAccountResult(
@@ -101,8 +105,7 @@ class AccountSyncRepository {
 
   Future<void> syncPendingCreates() async {
     final isar = await _ref.read(isarProvider.future);
-    final allAccounts =
-        await isar.accounts.where().isDeletedEqualTo(false).findAll();
+    final allAccounts = await isar.accounts.where().isDeletedEqualTo(false).findAll();
     final pending = allAccounts
         .where(
           (a) =>
@@ -112,6 +115,7 @@ class AccountSyncRepository {
         .toList();
 
     if (pending.isEmpty) return;
+    debugPrint('🔐 [ACCOUNT_SYNC] ${pending.length} conti in attesa di sync Firestore');
 
     for (final account in pending) {
       await _syncSingleAccount(account);
@@ -123,8 +127,7 @@ class AccountSyncRepository {
     final isar = await _ref.read(isarProvider.future);
 
     await isar.writeTxn(() async {
-      final existing =
-          await isar.accounts.where().idEqualTo(tempId).findFirst();
+      final existing = await isar.accounts.where().idEqualTo(tempId).findFirst();
       if (existing == null) return;
 
       final promoted = Account(
@@ -143,12 +146,10 @@ class AccountSyncRepository {
       )..isarId = existing.isarId;
 
       await isar.accounts.put(promoted);
-      // Rimosso: await isar.accounts.delete(existing.isarId); dato che promoted ha lo stesso isarId e si sovrascrive.
 
-      final linkedTransactions = await isar.transactionModels
-          .where()
-          .accountIdEqualTo(tempId)
-          .findAll();
+      // Aggiorna le transazioni legate al tempId
+      final linkedTransactions =
+          await isar.transactionModels.where().accountIdEqualTo(tempId).findAll();
 
       for (final tx in linkedTransactions) {
         final updatedTx = TransactionModel(
@@ -172,58 +173,55 @@ class AccountSyncRepository {
     });
   }
 
+  /// Fix Bug 3: upload del blob cifrato direttamente su Firestore.
+  /// I campi `encrypted_name` e `encrypted_balance` sono già AES-256-GCM+HMAC
+  /// — non serve ri-cifrare, si inviano i byte cifrati così come sono.
   Future<void> _syncSingleAccount(Account account) async {
-    final api = _ref.read(apiServiceProvider);
     final isar = await _ref.read(isarProvider.future);
+    final uid = _auth.currentUser?.uid;
+
+    if (uid == null) {
+      debugPrint('🔐 [ACCOUNT_SYNC] ⚠️ Utente non autenticato — upload rimandato id=${account.id}');
+      return;
+    }
 
     try {
-      debugPrint('🔐 [ACCOUNT_SYNC] Remote create start id=${account.id}');
-      final response = await api.post('/api/accounts', data: {
-        'encrypted_name': account.encryptedName,
-        'encrypted_balance': account.encryptedBalance,
-        'currency': account.currency,
-        'type': account.type.name,
-        'provider_id': account.providerId,
-        'group_name': account.group,
-      });
+      debugPrint('🔐 [ACCOUNT_SYNC] Upload Firestore start id=${account.id}');
 
-      final data = response.data;
-      final remoteId =
-          data is Map<String, dynamic> ? data['id'] as String? : null;
+      // Payload cifrato: i blob partono già come AES-GCM+HMAC da CryptoService
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('accounts')
+          .doc(account.id)
+          .set(account.toJson());
 
-      if (remoteId != null && remoteId.isNotEmpty && remoteId != account.id) {
-        await promoteTempIdToServerId(account.id, remoteId);
-      } else {
-        await isar.writeTxn(() async {
-          final existing =
-              await isar.accounts.where().idEqualTo(account.id).findFirst();
-          if (existing == null) return;
-          final synced = Account(
-            id: existing.id,
-            encryptedName: existing.encryptedName,
-            encryptedBalance: existing.encryptedBalance,
-            currency: existing.currency,
-            type: existing.type,
-            providerId: existing.providerId,
-            group: existing.group,
-            updatedAt: DateTime.now(),
-            isDeleted: existing.isDeleted,
-            encryptionVersion: existing.encryptionVersion,
-            syncStatus: AccountSyncStatus.synced,
-            remoteError: null,
-          )..isarId = existing.isarId;
-          await isar.accounts.put(synced);
-        });
-      }
+      debugPrint('🔐 [ACCOUNT_SYNC] ✅ Firestore upload OK id=${account.id}');
 
-      debugPrint(
-          '🔐 [ACCOUNT_SYNC] Remote create success id=${account.id} remoteId=${remoteId ?? account.id}');
-    } catch (e) {
-      debugPrint(
-          '🔐 [ACCOUNT_SYNC] Remote create failed id=${account.id} error=$e');
+      // Aggiorna syncStatus su Isar
       await isar.writeTxn(() async {
-        final existing =
-            await isar.accounts.where().idEqualTo(account.id).findFirst();
+        final existing = await isar.accounts.where().idEqualTo(account.id).findFirst();
+        if (existing == null) return;
+        final synced = Account(
+          id: existing.id,
+          encryptedName: existing.encryptedName,
+          encryptedBalance: existing.encryptedBalance,
+          currency: existing.currency,
+          type: existing.type,
+          providerId: existing.providerId,
+          group: existing.group,
+          updatedAt: DateTime.now(),
+          isDeleted: existing.isDeleted,
+          encryptionVersion: existing.encryptionVersion,
+          syncStatus: AccountSyncStatus.synced,
+          remoteError: null,
+        )..isarId = existing.isarId;
+        await isar.accounts.put(synced);
+      });
+    } catch (e) {
+      debugPrint('🔐 [ACCOUNT_SYNC] ❌ Firestore upload FAILED id=${account.id} error=$e');
+      await isar.writeTxn(() async {
+        final existing = await isar.accounts.where().idEqualTo(account.id).findFirst();
         if (existing == null) return;
         final failed = Account(
           id: existing.id,
@@ -249,3 +247,4 @@ double _normalizeBalance(String rawValue) {
   final normalized = rawValue.replaceAll(',', '.').trim();
   return double.tryParse(normalized) ?? 0.0;
 }
+
