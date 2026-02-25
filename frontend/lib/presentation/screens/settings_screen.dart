@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/theme/fyne_theme.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/theme_provider.dart';
 import 'categorization_rules_screen.dart';
 import 'backup_screen.dart';
 import 'package:flutter/services.dart';
@@ -118,16 +116,34 @@ class SettingsScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Backup Chiave Privata"),
+        // Fix Bug 2: sfondo dialog usa colorScheme — leggibile in dark mode
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(
+          "Backup Chiave Privata",
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Questa chiave serve per recuperare i tuoi dati crittografati. Salvala in un luogo sicuro!"),
+            Text(
+              "Questa chiave serve per recuperare i tuoi dati crittografati. Salvala in un luogo sicuro!",
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8)),
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
-              color: Colors.grey[200],
-              child: Text(key.substring(0, 50) + "...", style: GoogleFonts.robotoMono(fontSize: 12)),
+              // Fix Bug 2: sostituito Colors.grey[200] hardcoded (light) con colorScheme
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                key.substring(0, 50) + "...",
+                style: GoogleFonts.robotoMono(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             ),
           ],
         ),
@@ -220,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
                   Text(
                     userEmail,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -251,80 +267,38 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  /// Fix Bug 1: Tema App è forzato su Dark per spec Fyne.
+  /// Il tile è ora solo informativo — nessun onTap, nessun dialog.
+  /// Questo elimina il trigger del crash GlobalKey che si verificava
+  /// quando il dialog emetteva un nuovo ThemeMode all'albero widget.
   Widget _buildThemeTile(BuildContext context, WidgetRef ref) {
-    final currentTheme = ref.watch(themeProvider);
-    String themeText = "Scuro";
-    switch (currentTheme) {
-      case ThemeMode.light:
-        themeText = "Chiaro";
-        break;
-      case ThemeMode.dark:
-        themeText = "Scuro";
-        break;
-      case ThemeMode.system:
-        themeText = "Sistema";
-        break;
-    }
-
     return ListTile(
-      onTap: () => _showThemeDialog(context, ref, currentTheme),
       leading: Icon(LucideIcons.moon, color: Theme.of(context).colorScheme.onSurface, size: 20),
-      title: Text("Tema App", style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
+      title: Text(
+        "Tema App",
+        style: GoogleFonts.inter(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(themeText, style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
-          const SizedBox(width: 8),
-          Icon(LucideIcons.chevronRight, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+          Text(
+            "Scuro 🔒",
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  void _showThemeDialog(BuildContext context, WidgetRef ref, ThemeMode currentTheme) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Text("Seleziona Tema", style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<ThemeMode>(
-              activeColor: Theme.of(context).colorScheme.primary,
-              title: Text("Chiaro", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-              value: ThemeMode.light,
-              groupValue: currentTheme,
-              onChanged: (val) {
-                Navigator.pop(context);
-                if (val != null) Future.microtask(() => ref.read(themeProvider.notifier).setThemeMode(val));
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              activeColor: Theme.of(context).colorScheme.primary,
-              title: Text("Scuro", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-              value: ThemeMode.dark,
-              groupValue: currentTheme,
-              onChanged: (val) {
-                Navigator.pop(context);
-                if (val != null) Future.microtask(() => ref.read(themeProvider.notifier).setThemeMode(val));
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              activeColor: Theme.of(context).colorScheme.primary,
-              title: Text("Predefinito di Sistema", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-              value: ThemeMode.system,
-              groupValue: currentTheme,
-              onChanged: (val) {
-                Navigator.pop(context);
-                if (val != null) Future.microtask(() => ref.read(themeProvider.notifier).setThemeMode(val));
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Fix Bug 1: _showThemeDialog rimosso — il toggle Light/System è disabilitato
+  // per spec Fyne (dark forzato). La sua presenza causava il crash GlobalKey.
 
   void _showMsg(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(

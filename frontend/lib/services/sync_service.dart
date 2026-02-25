@@ -201,42 +201,71 @@ class SyncService {
 
   Future<void> _pushLocalChanges(
       Isar isar, String uid, DateTime lastSyncAt) async {
+    int txOk = 0, txFail = 0;
+    int accOk = 0, accFail = 0;
+    int budOk = 0, budFail = 0;
+    int ruleOk = 0, ruleFail = 0;
+
     // 1. Transactions
     final localTxs = await isar.transactionModels
         .where()
         .updatedAtGreaterThan(lastSyncAt)
         .findAll();
     for (final tx in localTxs) {
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('transactions')
-          .doc(tx.uuid)
-          .set(tx.toJson());
+      try {
+        debugPrint("[Sync] ⬆️ Upload transactions/${tx.uuid}");
+        await _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('transactions')
+            .doc(tx.uuid)
+            .set(tx.toJson());
+        debugPrint("[Sync] ✅ transactions/${tx.uuid} confermata");
+        txOk++;
+      } catch (e) {
+        debugPrint("[Sync] ❌ transactions/${tx.uuid} fallita: $e");
+        txFail++;
+      }
     }
 
     // 2. Accounts
     final localAccounts =
         await isar.accounts.where().updatedAtGreaterThan(lastSyncAt).findAll();
     for (final acc in localAccounts) {
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('accounts')
-          .doc(acc.id)
-          .set(acc.toJson());
+      try {
+        debugPrint("[Sync] ⬆️ Upload accounts/${acc.id}");
+        await _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('accounts')
+            .doc(acc.id)
+            .set(acc.toJson());
+        debugPrint("[Sync] ✅ accounts/${acc.id} confermato");
+        accOk++;
+      } catch (e) {
+        debugPrint("[Sync] ❌ accounts/${acc.id} fallito: $e");
+        accFail++;
+      }
     }
 
     // 3. Budgets
     final localBudgets =
         await isar.budgets.where().updatedAtGreaterThan(lastSyncAt).findAll();
     for (final b in localBudgets) {
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('budgets')
-          .doc(b.id)
-          .set(b.toJson());
+      try {
+        debugPrint("[Sync] ⬆️ Upload budgets/${b.id}");
+        await _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('budgets')
+            .doc(b.id)
+            .set(b.toJson());
+        debugPrint("[Sync] ✅ budgets/${b.id} confermato");
+        budOk++;
+      } catch (e) {
+        debugPrint("[Sync] ❌ budgets/${b.id} fallito: $e");
+        budFail++;
+      }
     }
 
     // 4. Categorization Rules
@@ -245,19 +274,36 @@ class SyncService {
         .updatedAtGreaterThan(lastSyncAt)
         .findAll();
     for (final r in localRules) {
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('categorization_rules')
-          .doc(r.uuid)
-          .set(r.toJson());
+      try {
+        debugPrint("[Sync] ⬆️ Upload categorization_rules/${r.uuid}");
+        await _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('categorization_rules')
+            .doc(r.uuid)
+            .set(r.toJson());
+        debugPrint("[Sync] ✅ categorization_rules/${r.uuid} confermata");
+        ruleOk++;
+      } catch (e) {
+        debugPrint("[Sync] ❌ categorization_rules/${r.uuid} fallita: $e");
+        ruleFail++;
+      }
     }
 
-    if (localTxs.isNotEmpty ||
-        localAccounts.isNotEmpty ||
-        localBudgets.isNotEmpty ||
-        localRules.isNotEmpty) {
-      debugPrint("[Sync] Inviate modifiche locali al server.");
+    // Riepilogo finale per verifica backup
+    final totalOk = txOk + accOk + budOk + ruleOk;
+    final totalFail = txFail + accFail + budFail + ruleFail;
+    if (totalOk > 0 || totalFail > 0) {
+      debugPrint(
+        "[Sync] Push completato: $txOk tx, $accOk conti, $budOk budget, $ruleOk regole"
+        "${totalFail > 0 ? ' | ⚠️ Falliti: $txFail tx, $accFail conti, $budFail budget, $ruleFail regole' : ''}",
+      );
+    }
+    // Se almeno un'entità ha fallito il push, propaga l'errore
+    // così SyncNotifier setta error e l'UI può mostrare la notifica
+    if (totalFail > 0) {
+      throw Exception(
+          "[Sync] $totalFail entità non sincronizzate. Verranno ritentate al prossimo sync.");
     }
   }
 }
