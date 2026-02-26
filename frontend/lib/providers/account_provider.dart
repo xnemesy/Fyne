@@ -141,14 +141,16 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
       CreateAccountCommand command) async {
     final syncRepository = ref.read(accountSyncRepositoryProvider);
     final result = await syncRepository.createLocalFirst(command);
-    ref.invalidateSelf();
+    // Guard: il provider può essere disposto durante l'await
+    try { ref.invalidateSelf(); } catch (_) {}
     return result;
   }
 
   Future<void> syncPendingCreates() async {
     final syncRepository = ref.read(accountSyncRepositoryProvider);
     await syncRepository.syncPendingCreates();
-    ref.invalidateSelf();
+    // Guard: il provider può essere disposto durante l'await
+    try { ref.invalidateSelf(); } catch (_) {}
   }
 
   Future<void> deleteAccount(String accountId) async {
@@ -171,7 +173,8 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
         await isar.accounts.put(deletedAccount);
       }
     });
-    ref.invalidateSelf();
+    // Guard: il provider può essere disposto durante il writeTxn
+    try { ref.invalidateSelf(); } catch (_) {}
   }
 
   Future<void> refresh() async {

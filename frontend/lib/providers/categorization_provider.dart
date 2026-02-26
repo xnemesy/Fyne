@@ -34,7 +34,7 @@ class CategorizationNotifier
       final isar = await _ref.read(isarProvider.future);
       final rule = CategorizationRule(
         uuid: _uuid.v4(),
-        pattern: pattern,
+        pattern: pattern.trim().toLowerCase(),
         categoryId: categoryUuid,
         categoryName: categoryName,
         isCustom: true,
@@ -48,7 +48,7 @@ class CategorizationNotifier
 
       await _loadRules();
     } catch (e) {
-      print("Error adding rule: $e");
+      // Errore gestito silenziosamente per non bloccare la UI
     }
   }
 
@@ -75,8 +75,42 @@ class CategorizationNotifier
       });
       await _loadRules();
     } catch (e) {
-      print("Error deleting rule: $e");
+      // Errore gestito silenziosamente
     }
+  }
+
+  // ── Matching deterministico (No-AI Policy) ────────────────────────────────
+
+  /// Verifica in modo *strict* e case-insensitive se la descrizione matcha
+  /// una delle regole utente.
+  ///
+  /// Priorità: regole custom (isCustom=true) prima delle regole di sistema.
+  /// Algoritmo: `.toLowerCase().contains()` — niente fuzzy search.
+  /// Restituisce il [categoryId] della prima regola che fa match, o null.
+  String? matchKeyword(String description) {
+    final lower = description.toLowerCase().trim();
+    if (lower.isEmpty) return null;
+
+    final rules = state.value ?? [];
+
+    // 1. Priorità alle regole custom dell'utente
+    for (final rule in rules.where((r) => r.isCustom)) {
+      if (lower.contains(rule.pattern.toLowerCase())) return rule.categoryId;
+    }
+
+    // 2. Fallback: regole di sistema
+    for (final rule in rules.where((r) => !r.isCustom)) {
+      if (lower.contains(rule.pattern.toLowerCase())) return rule.categoryId;
+    }
+
+    return null;
+  }
+
+  /// Restituisce tutte le regole per un dato [categoryId].
+  List<CategorizationRule> rulesForCategory(String categoryId) {
+    return (state.value ?? [])
+        .where((r) => r.categoryId == categoryId)
+        .toList();
   }
 }
 

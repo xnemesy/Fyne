@@ -27,28 +27,29 @@ class SyncNotifier extends Notifier<SyncState> {
   Future<void> sync() async {
     if (state.isSyncing) return;
 
-    state = state.copyWith(isSyncing: true, error: null);
+    // Legge le dipendenze PRIMA di qualsiasi await per evitare il Riverpod async-gap
+    final accountNotifier   = ref.read(accountsProvider.notifier);
+    final syncService       = ref.read(syncServiceProvider);
 
     try {
-      // Sincronizza i conti pendenti (create locali non ancora su Firestore)
-      await ref.read(accountsProvider.notifier).syncPendingCreates();
+      state = state.copyWith(isSyncing: true, error: null);
+
+      await accountNotifier.syncPendingCreates();
 
       final isar = await ref.read(isarProvider.future);
-      final syncService = ref.read(syncServiceProvider);
-
       await syncService.performSync(isar);
 
-      // Fix Bug 3: dopo il pull dei dati cloud, invalida i provider
-      // così la UI mostra immediatamente i conti scaricati
-      ref.invalidate(accountsProvider);
-      ref.invalidate(accountOverviewProvider);
+      // Guard: dopo gli await il Notifier potrebbe essere stato disposto
+      try {
+        ref.invalidate(accountsProvider);
+        ref.invalidate(accountOverviewProvider);
+      } catch (_) {}
 
-      state = state.copyWith(
-        isSyncing: false,
-        lastSyncAt: DateTime.now(),
-      );
+      try {
+        state = state.copyWith(isSyncing: false, lastSyncAt: DateTime.now());
+      } catch (_) {}
     } catch (e) {
-      state = state.copyWith(isSyncing: false, error: e.toString());
+      try { state = state.copyWith(isSyncing: false, error: e.toString()); } catch (_) {}
       rethrow;
     }
   }

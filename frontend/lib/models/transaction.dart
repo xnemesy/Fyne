@@ -144,7 +144,7 @@ class TransactionModel {
   }
 }
 
-/// Lightweight representation for lists. 
+/// Lightweight representation for lists.
 /// Temporarily holds decrypted amount and minimal metadata.
 class TransactionSummary {
   final String uuid;
@@ -155,6 +155,9 @@ class TransactionSummary {
   final String? description;
   final String? counterParty;
   final String accountId;
+  /// true se la decifratura AES-GCM è fallita (HMAC mismatch / chiave diversa).
+  /// Il record va eliminato automaticamente — è irrecuperabile.
+  final bool isCorrupted;
 
   TransactionSummary({
     required this.uuid,
@@ -165,5 +168,6 @@ class TransactionSummary {
     this.categoryUuid,
     this.description,
     this.counterParty,
+    this.isCorrupted = false,
   });
 }

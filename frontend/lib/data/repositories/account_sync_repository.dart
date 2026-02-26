@@ -118,7 +118,8 @@ class AccountSyncRepository {
     debugPrint('🔐 [ACCOUNT_SYNC] ${pending.length} conti in attesa di sync Firestore');
 
     for (final account in pending) {
-      await _syncSingleAccount(account);
+      // Passa isar già risolto: evita _ref.read() post-await in _syncSingleAccount
+      await _syncSingleAccount(account, isar: isar);
     }
   }
 
@@ -173,11 +174,9 @@ class AccountSyncRepository {
     });
   }
 
-  /// Fix Bug 3: upload del blob cifrato direttamente su Firestore.
-  /// I campi `encrypted_name` e `encrypted_balance` sono già AES-256-GCM+HMAC
-  /// — non serve ri-cifrare, si inviano i byte cifrati così come sono.
-  Future<void> _syncSingleAccount(Account account) async {
-    final isar = await _ref.read(isarProvider.future);
+  /// Upload del blob cifrato su Firestore.
+  /// Riceve [isar] già risolto da [syncPendingCreates] per evitare _ref.read() post-await.
+  Future<void> _syncSingleAccount(Account account, {required Isar isar}) async {
     final uid = _auth.currentUser?.uid;
 
     if (uid == null) {

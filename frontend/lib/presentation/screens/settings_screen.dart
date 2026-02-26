@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/auth_provider.dart';
 import 'categorization_rules_screen.dart';
+import 'category_list_screen.dart';
 import 'backup_screen.dart';
 import 'package:flutter/services.dart';
 
@@ -57,6 +58,9 @@ class SettingsScreen extends ConsumerWidget {
                   _buildSection(context, "ACCOUNT", [
                     _buildProfileTile(context, userEmail, onTap: () => _showMsg(context, "Profilo utente")),
                     _buildTile(context, LucideIcons.shield, "Sicurezza & Privacy", "Gestisci", onTap: () => _showMsg(context, "Impostazioni sicurezza")),
+                    _buildTile(context, LucideIcons.layoutList, "Gestione Categorie", "Personalizza", onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CategoryListScreen()));
+                    }),
                     _buildTile(context, LucideIcons.tag, "Regole Categorizzazione", "Gestisci", onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const CategorizationRulesScreen()));
                     }),

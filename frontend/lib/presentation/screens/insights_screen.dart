@@ -15,6 +15,7 @@ import '../../presentation/widgets/insights/net_worth_chart.dart';
 import '../../presentation/widgets/insights/burn_rate_card.dart';
 import '../../presentation/widgets/insights/cash_flow_card.dart';
 import '../../presentation/widgets/insights/top_categories_list.dart';
+import '../../presentation/widgets/insights/category_pie_chart.dart';
 
 class InsightsScreen extends ConsumerStatefulWidget {
   const InsightsScreen({super.key});
@@ -121,14 +122,15 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 10),
                                 child: Container(
-                                  height: 240, // Reduced from 380
+                                  height: 240,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    // Fix dark theme: usa surface del tema invece di Colors.white
+                                    color: Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(24),
                                     boxShadow: [
                                       BoxShadow(
                                           color: Colors.black
-                                              .withValues(alpha: 0.02),
+                                              .withValues(alpha: 0.06),
                                           blurRadius: 10),
                                     ],
                                   ),
@@ -187,9 +189,25 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                             color: Theme.of(context).colorScheme.onSurface
                                                 .withValues(alpha: 0.4))),
                                     const SizedBox(height: 20),
-                                    TopCategoriesList(
-                                        categories:
-                                            insightsState.topCategories),
+                                    // Grafico a torta: breakdown uscite per categoria
+                                    CategoryPieChart(
+                                      breakdown: insightsState.categoryBreakdown,
+                                      totalExpenses: insightsState.expenses,
+                                    ),
+                                    const SizedBox(height: 32),
+                                    if (insightsState.topCategories.isNotEmpty) ...
+                                      [
+                                        Text("PER BUDGET",
+                                            style: GoogleFonts.inter(
+                                                letterSpacing: 2,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context).colorScheme.onSurface
+                                                    .withValues(alpha: 0.4))),
+                                        const SizedBox(height: 20),
+                                        TopCategoriesList(
+                                            categories: insightsState.topCategories),
+                                      ],
                                   ],
                                 ),
                               ),
@@ -270,7 +288,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F0),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -300,7 +318,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
+          color: active ? Theme.of(context).colorScheme.surface : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: active
               ? [

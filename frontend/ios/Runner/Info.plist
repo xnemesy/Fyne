@@ -79,5 +79,7 @@
 		<string>https</string>
 		<string>http</string>
 	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
 </dict>
 </plist>

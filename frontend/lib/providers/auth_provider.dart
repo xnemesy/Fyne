@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref, FutureProvider;
 import 'package:flutter_riverpod/legacy.dart'
     show StateNotifier, StateNotifierProvider;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:local_auth/local_auth.dart';
 import '../services/crypto_service.dart';
 import '../services/seed_service.dart';
 import 'master_key_provider.dart';
@@ -15,6 +16,7 @@ import 'storage_provider.dart';
 
 import 'dart:async';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 enum AuthStatus {
   unauthenticated,
@@ -49,17 +51,20 @@ class AuthNotifier extends StateNotifier<AuthState>
   final _googleSignIn = GoogleSignIn();
   late final FlutterSecureStorage _storage;
   late final CryptoService _crypto;
+  // LocalAuthentication lazy-init (evita overhead all'avvio)
+  late final LocalAuthentication _localAuth;
 
   Timer? _idleTimer;
   static const _idleTimeout = Duration(minutes: 5);
   static const _autoPassphraseKey = 'fyne_auto_passphrase';
-  static const _seedHashKey = 'fyne_seed_hash';
+  static const _seedHashKey       = 'fyne_seed_hash';
   final _seedService = SeedService();
 
   AuthNotifier(this.ref)
       : super(AuthState(status: AuthStatus.unauthenticated)) {
-    _storage = ref.read(secureStorageProvider);
-    _crypto = ref.read(cryptoServiceProvider);
+    _storage   = ref.read(secureStorageProvider);
+    _crypto    = ref.read(cryptoServiceProvider);
+    _localAuth = LocalAuthentication();
     WidgetsBinding.instance.addObserver(this);
     _checkInitialState();
   }
@@ -301,7 +306,7 @@ class AuthNotifier extends StateNotifier<AuthState>
       state = AuthState(status: AuthStatus.authenticated, user: user);
       resetIdleTimer();
     } catch (e) {
-      // Also try auto-passphrase as fallback
+      // Fallback: auto-passphrase (Opzione A)
       final autoPassphrase = await _getOrCreateAutoPassphrase();
       final success =
           await _unlockAndPopulateMasterKey(autoPassphrase, user.uid);
@@ -309,8 +314,91 @@ class AuthNotifier extends StateNotifier<AuthState>
         state = AuthState(status: AuthStatus.authenticated, user: user);
         resetIdleTimer();
       } else {
-        state = state.copyWith(error: "Passphrase errata o errore sblocco.");
+        state = state.copyWith(error: 'Passphrase errata o errore sblocco.');
       }
+    }
+  }
+
+  // ── Sblocco biometrico (FaceID / TouchID) ─────────────────────────────────
+
+  /// Verifica disponibilità biometrica sul device.
+  Future<bool> isBiometricAvailable() async {
+    try {
+      final canCheck = await _localAuth.canCheckBiometrics;
+      final isSupported = await _localAuth.isDeviceSupported();
+      return canCheck && isSupported;
+    } catch (e) {
+      debugPrint('⚠️ [Auth] Errore verifica biometrica: $e');
+      return false;
+    }
+  }
+
+  /// Sblocca il vault usando FaceID/TouchID.
+  ///
+  /// Flusso ZK:
+  ///   1. LocalAuthentication verifica l'identità biometrica
+  ///   2. Se ok → legge fyne_auto_passphrase da SecureStorage (protetto da Secure Enclave)
+  ///   3. Passa passphrase+userId a Argon2id via CryptoService
+  ///   4. MasterKey rigenerata in RAM → stato authenticated
+  Future<void> unlockWithBiometrics() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    // Pulizia errori precedenti
+    state = state.copyWith(error: null, status: AuthStatus.locked);
+
+    final available = await isBiometricAvailable();
+    if (!available) {
+      state = state.copyWith(error: 'Biometria non disponibile su questo device.');
+      return;
+    }
+
+    bool authenticated = false;
+    try {
+      // local_auth v3: parametri diretti su authenticate(), non AuthenticationOptions
+      authenticated = await _localAuth.authenticate(
+        localizedReason: 'Sblocca il tuo Fyne Vault',
+        biometricOnly: true,           // solo biometria — niente PIN di sistema
+        sensitiveTransaction: true,    // abilita hint visivo "operazione sensibile"
+        persistAcrossBackgrounding: true, // mantieni prompt se app va in background
+      );
+    } on PlatformException catch (e) {
+      // uiUnavailable (-1004): iOS blocca la biometria durante lo snapshot di background.
+      // Ignora silenziosamente — l'utente rimane sulla LockScreen senza messaggio di errore.
+      if (e.code == 'uiUnavailable' || (e.message ?? '').contains('1004')) {
+        debugPrint('[Auth] Biometria sospesa da iOS (background snapshot) — rimango su LockScreen.');
+        return;
+      }
+      debugPrint('⚠️ [Auth] PlatformException biometrica: ${e.code} ${e.message}');
+      state = state.copyWith(error: 'Autenticazione biometrica non disponibile.');
+      return;
+    } catch (e) {
+      debugPrint('⚠️ [Auth] Errore autenticazione biometrica: $e');
+      state = state.copyWith(error: 'Autenticazione biometrica fallita.');
+      return;
+    }
+
+    if (!authenticated) {
+      // Utente ha annullato — non mostrare errore, solo rimani su LockScreen
+      debugPrint('[Auth] Biometria annullata dall\'utente.');
+      return;
+    }
+
+    // Biometria OK → recupera passphrase da SecureStorage (Secure Enclave protegge)
+    final passphrase = await _storage.read(key: _autoPassphraseKey);
+    if (passphrase == null) {
+      debugPrint('[Auth] ⚠️ Auto-passphrase non trovata in storage.');
+      state = state.copyWith(error: 'Dati vault non trovati. Accedi con la passphrase.');
+      return;
+    }
+
+    final success = await _unlockAndPopulateMasterKey(passphrase, user.uid);
+    if (success) {
+      state = AuthState(status: AuthStatus.authenticated, user: user);
+      resetIdleTimer();
+      debugPrint('🔓 [Auth] Vault sbloccato via biometria.');
+    } else {
+      state = state.copyWith(error: 'Errore sblocco vault. Riprova.');
     }
   }
 
@@ -429,4 +517,19 @@ class AuthNotifier extends StateNotifier<AuthState>
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref);
+});
+
+// ── Provider biometrici ────────────────────────────────────────────────────
+
+/// True se FaceID/TouchID è disponibile e configurato sul device.
+final biometricAvailableProvider = FutureProvider<bool>((ref) async {
+  final notifier = ref.read(authProvider.notifier);
+  return notifier.isBiometricAvailable();
+});
+
+/// True se l'utente ha abilitato la biometria durante il wizard.
+final isBiometricEnabledProvider = FutureProvider<bool>((ref) async {
+  final storage = ref.read(secureStorageProvider);
+  final value = await storage.read(key: 'fyne_biometric_enabled');
+  return value == 'true';
 });

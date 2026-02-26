@@ -20,20 +20,19 @@ final transactionRepositoryProvider = Provider<TransactionRepository?>((ref) {
   return TransactionRepository(isar, crypto, rotation);
 });
 
-/// Fetches a specific page of transaction summaries (Decrypted in isolate)
+/// Fetches a specific page of transaction summaries (Decrypted in Isolate — 60fps)
 final transactionsPageProvider =
     FutureProvider.family<List<TransactionSummary>, int>((ref, page) async {
   final repo = ref.watch(transactionRepositoryProvider);
   if (repo == null) {
-    // Repository not ready yet — return empty, will reload when Isar is ready
     return <TransactionSummary>[];
   }
 
-  // 1. Fetch encrypted items (Instant)
+  // 1. Fetch encrypted items (Istantaneo — no CPU)
   final encrypted = await repo.getEncryptedPage(page: page);
 
-  // 2. Decrypt in isolate (Non-blocking)
-  return await repo.decryptPageForList(encrypted);
+  // 2. Decifra in Isolate separato (non blocca il main thread → 60fps)
+  return await repo.decryptPageInIsolate(encrypted);
 });
 
 /// Detailed Transaction decryption (On-demand)
@@ -84,9 +83,20 @@ class TransactionsNotifier
           state = AsyncValue.data(currentList);
         }
       } else {
+        // Purge automatico dei record irrecuperabili (chiave precedente / HMAC mismatch)
+        final corruptedUuids = newItems
+            .where((s) => s.isCorrupted)
+            .map((s) => s.uuid)
+            .toList();
+        if (corruptedUuids.isNotEmpty) {
+          final repo = ref.read(transactionRepositoryProvider);
+          repo?.purgeOrphansByUuids(corruptedUuids);
+        }
+        final validItems = newItems.where((s) => !s.isCorrupted).toList();
+
         _currentPage++;
         final currentList = state.value ?? <TransactionSummary>[];
-        state = AsyncValue.data([...currentList, ...newItems]);
+        state = AsyncValue.data([...currentList, ...validItems]);
       }
     } catch (e, stack) {
       debugPrint("Transactions loadMore error: $e\n$stack");
