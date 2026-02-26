@@ -10,7 +10,7 @@ import 'presentation/screens/dashboard_screen.dart';
 import 'presentation/screens/onboarding_screen.dart';
 import 'presentation/screens/lock_screen.dart';
 import 'presentation/screens/login_screen.dart';
-import 'presentation/screens/master_key_wizard.dart';
+import 'presentation/screens/onboarding_wizard_screen.dart';
 import 'presentation/widgets/privacy_blur_overlay.dart';
 import 'presentation/widgets/milestone_listener.dart';
 import 'providers/auth_provider.dart';
@@ -111,11 +111,11 @@ class AuthWrapper extends ConsumerWidget {
           case AuthStatus.locked:
             return const LockScreen();
           case AuthStatus.setupRequired:
-            return const MasterKeyWizard();
+            return const OnboardingWizardScreen();
           case AuthStatus.initializingKeys:
           case AuthStatus.signingIn:
             return Scaffold(
-              backgroundColor: FyneColors.paper,
+              backgroundColor: FyneColors.ink,
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -127,7 +127,7 @@ class AuthWrapper extends ConsumerWidget {
                         ? 'Inizializzazione vault...'
                         : 'Accesso in corso...',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: FyneColors.inkLight,
+                        color: FyneColors.paper,
                       ),
                     ),
                   ],

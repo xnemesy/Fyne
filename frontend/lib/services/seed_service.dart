@@ -3,14 +3,14 @@ import 'dart:math';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:crypto/crypto.dart';
 
-/// Service for BIP39 seed phrase generation, validation, and passphrase derivation.
-/// 
-/// The seed phrase is the ONLY way to recover the vault on a new device.
-/// Flow: 12 words → hex seed → first 32 bytes → base64 passphrase → Argon2id root key.
+/// Service per la generazione, validazione e derivazione della seed phrase BIP39.
+///
+/// La seed phrase è l'UNICO modo per recuperare il vault su un nuovo dispositivo.
+/// Flusso: 24 parole → hex seed → primi 32 byte → passphrase base64 → root key Argon2id.
 class SeedService {
-  /// Generates a new 12-word BIP39 mnemonic.
+  /// Genera un nuovo mnemonic BIP39 a 24 parole (256 bit di entropia).
   String generateMnemonic() {
-    return bip39.generateMnemonic(strength: 128); // 128 bits = 12 words
+    return bip39.generateMnemonic(strength: 256); // 256 bit = 24 parole
   }
 
   /// Validates a mnemonic string.
@@ -27,9 +27,10 @@ class SeedService {
     return base64.encode(seedBytes);
   }
 
-  /// Returns a list of random word indices for verification.
-  /// e.g. [2, 7, 10] means "verify word 3, 8, 11" (0-indexed).
-  List<int> getRandomVerificationIndices({int count = 3, int totalWords = 12}) {
+  /// Restituisce indici casuali per la verifica del seed.
+  /// e.g. [2, 7, 10] = "verifica parola 3, 8, 11" (0-indexed).
+  /// Default 24 parole (allineato al nuovo standard 256 bit).
+  List<int> getRandomVerificationIndices({int count = 3, int totalWords = 24}) {
     final rng = Random.secure();
     final indices = <int>{};
     while (indices.length < count) {
