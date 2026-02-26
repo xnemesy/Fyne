@@ -52,7 +52,15 @@ class TransactionsNotifier
   bool _hasMore = true;
 
   TransactionsNotifier(this.ref) : super(const AsyncValue.loading()) {
-    loadInitial();
+    // Risolve la race condition: Isar potrebbe non essere ancora pronto
+    // quando il notifier viene creato. Quando Isar transisce da loading a
+    // hasValue, ri-triggeriamo loadInitial() che resetta _hasMore e _currentPage.
+    ref.listen<AsyncValue<Isar>>(isarProvider, (prev, next) {
+      if (next.hasValue && !(prev?.hasValue ?? false)) {
+        loadInitial();
+      }
+    });
+    loadInitial(); // Caricamento diretto se Isar è già pronto
   }
 
   bool get hasMore => _hasMore;
