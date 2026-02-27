@@ -41,9 +41,9 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A6741) : Colors.white,
+          color: isSelected ? const Color(0xFF4A6741) : Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? Colors.transparent : Colors.black.withOpacity(0.05)),
+          border: Border.all(color: isSelected ? Colors.transparent : Theme.of(context).colorScheme.outline.withOpacity(0.12)),
           boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF4A6741).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
         ),
         child: Row(
@@ -198,10 +198,10 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: Colors.white,
+      fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.12)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

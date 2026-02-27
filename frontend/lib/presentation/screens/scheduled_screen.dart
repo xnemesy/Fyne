@@ -117,7 +117,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         return await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: Text("Elimina Spesa", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
             content: Text("Vuoi eliminare questa spesa programmata dal Vault?"),

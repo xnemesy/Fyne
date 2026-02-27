@@ -56,9 +56,9 @@ class SubscriptionList extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black.withOpacity(0.03)),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.08)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

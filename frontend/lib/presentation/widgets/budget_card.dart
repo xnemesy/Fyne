@@ -58,7 +58,7 @@ class BudgetCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 24),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
@@ -81,7 +81,7 @@ class BudgetCard extends StatelessWidget {
                 Text(
                   "Limite: ${effectiveBudget.limitAmount.toStringAsFixed(0)} €",
                   style: TextStyle(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -94,7 +94,7 @@ class BudgetCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress.clamp(0.0, 1.0),
                 minHeight: 6,
-                backgroundColor: const Color(0xFFF2F2F0),
+                backgroundColor: Theme.of(context).colorScheme.outline.withOpacity(0.15),
                 color: progressColor,
               ),
             ),
@@ -107,12 +107,12 @@ class BudgetCard extends StatelessWidget {
                   children: [
                     Text(
                       "Spesi",
-                      style: TextStyle(color: Colors.black.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     DecryptedValue(
                       value: spent.toStringAsFixed(2),
-                      style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ],
                 ),
@@ -121,7 +121,7 @@ class BudgetCard extends StatelessWidget {
                   children: [
                     Text(
                       isOver ? "Eccesso" : "Disponibili",
-                      style: TextStyle(color: Colors.black.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     DecryptedValue(
@@ -141,17 +141,18 @@ class BudgetCard extends StatelessWidget {
                Container(
                  padding: const EdgeInsets.all(12),
                  decoration: BoxDecoration(
-                   color: const Color(0xFFFFF3CD),
+                   // Amber tint: leggibile in dark (sfondo scuro+trasparente) e light
+                   color: const Color(0xFFD4A574).withOpacity(0.15),
                    borderRadius: BorderRadius.circular(12),
                  ),
                  child: Row(
                    children: [
-                     const Icon(LucideIcons.alertTriangle, size: 16, color: Color(0xFF856404)),
+                     const Icon(LucideIcons.alertTriangle, size: 16, color: Color(0xFFD4A574)),
                      const SizedBox(width: 8),
                      Expanded(
                        child: Text(
                          "Attenzione: a questo ritmo sforerai di ${(projectedSpend - effectiveBudget.limitAmount).toStringAsFixed(0)}€",
-                         style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF856404), fontWeight: FontWeight.w500),
+                         style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFFD4A574), fontWeight: FontWeight.w500),
                        ),
                      ),
                    ],
