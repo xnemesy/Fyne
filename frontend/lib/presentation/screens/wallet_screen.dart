@@ -43,7 +43,8 @@ class WalletScreen extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  // Bug B: era onSurface (chiaro in dark mode) → surface (scuro in dark mode)
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -52,14 +53,15 @@ class WalletScreen extends ConsumerWidget {
                     Text(
                       "Aggiungi la tua prima spesa",
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        // Bug B: era Colors.white hardcoded → onSurface per contrasto corretto
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(LucideIcons.arrowDown,
-                        color: Colors.white, size: 16),
+                    Icon(LucideIcons.arrowDown,
+                        color: Theme.of(context).colorScheme.onSurface, size: 16),
                   ],
                 ),
               ),
@@ -97,7 +99,8 @@ class WalletScreen extends ConsumerWidget {
                         children: [
                           CircleAvatar(
                             radius: 18,
-                            backgroundColor: Colors.white,
+                            // Theme-aware: evita cerchio bianco in dark mode
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                             child: Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: Image.network('https://moneywizapp.com/favicon.ico', 
