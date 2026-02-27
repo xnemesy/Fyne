@@ -34,7 +34,7 @@ class CategoryPickerSheet extends StatelessWidget {
               Navigator.of(context).pop();
             },
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            tileColor: isSelected ? const Color(0xFF4A6741).withValues(alpha: 0.1) : Colors.white,
+            tileColor: isSelected ? const Color(0xFF4A6741).withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
             title: Text(
               category.name,
               style: GoogleFonts.inter(

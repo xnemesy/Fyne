@@ -111,7 +111,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                         return await showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            backgroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).colorScheme.surface,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                             title: Text("Elimina Movimento", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                             content: Text("Sei sicuro di voler eliminare questo movimento?"),
