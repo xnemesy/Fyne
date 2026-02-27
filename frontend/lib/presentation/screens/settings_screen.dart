@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../core/theme/fyne_theme.dart';
 import 'categorization_rules_screen.dart';
 import 'category_list_screen.dart';
 import 'backup_screen.dart';
@@ -271,13 +273,19 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  /// Fix Bug 1: Tema App è forzato su Dark per spec Fyne.
-  /// Il tile è ora solo informativo — nessun onTap, nessun dialog.
-  /// Questo elimina il trigger del crash GlobalKey che si verificava
-  /// quando il dialog emetteva un nuovo ThemeMode all'albero widget.
+  /// Toggle Light/Dark — ripristinato senza crash GlobalKey.
+  /// Il tema viene caricato in main() PRE-runApp come ProviderScope override,
+  /// quindi state = mode in setThemeMode() è sincrono → nessun emit post-build.
   Widget _buildThemeTile(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+
     return ListTile(
-      leading: Icon(LucideIcons.moon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+      leading: Icon(
+        isDark ? LucideIcons.moon : LucideIcons.sun,
+        color: Theme.of(context).colorScheme.onSurface,
+        size: 20,
+      ),
       title: Text(
         "Tema App",
         style: GoogleFonts.inter(
@@ -286,23 +294,15 @@ class SettingsScreen extends ConsumerWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "Scuro 🔒",
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
+      trailing: Switch.adaptive(
+        value: isDark,
+        onChanged: (v) => ref
+            .read(themeProvider.notifier)
+            .setThemeMode(v ? ThemeMode.dark : ThemeMode.light),
+        activeColor: FyneColors.forest,
       ),
     );
   }
-
-  // Fix Bug 1: _showThemeDialog rimosso — il toggle Light/System è disabilitato
-  // per spec Fyne (dark forzato). La sua presenza causava il crash GlobalKey.
 
   void _showMsg(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(

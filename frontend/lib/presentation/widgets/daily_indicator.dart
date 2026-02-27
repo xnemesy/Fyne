@@ -14,7 +14,8 @@ class DailyIndicator extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // Theme-aware: scuro in dark mode, chiaro in light mode
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
@@ -86,7 +87,8 @@ class DailyIndicator extends ConsumerWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: info.isExhausted ? 1.0 : (info.dailyAllowance / (info.dailyAverageNeeded * 1.5)).clamp(0.0, 1.0),
-              backgroundColor: const Color(0xFFF2F2F0),
+              // Track color: semi-trasparente, leggibile in dark e light mode
+              backgroundColor: Theme.of(context).colorScheme.outline.withOpacity(0.2),
               color: info.isExhausted ? const Color(0xFFD63031) : const Color(0xFF4A6741),
               minHeight: 6,
             ),

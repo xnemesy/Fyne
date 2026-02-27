@@ -46,10 +46,13 @@ class SyncService {
       // 3. Aggiorna timestamp ultimo sync
       await _storage.write(
           key: _lastSyncKey, value: currentSyncStartTime.toIso8601String());
+      // Bug C: .update() crashava con [not-found] se il documento users/{uid}
+      // non esisteva ancora (utente nuovo o doc mai inizializzato).
+      // .set(merge: true) crea il documento se assente, aggiorna solo lastSync se presente.
       await _firestore
           .collection('users')
           .doc(user.uid)
-          .update({'lastSync': currentSyncStartTime});
+          .set({'lastSync': currentSyncStartTime}, SetOptions(merge: true));
 
       debugPrint("[Sync] Sincronizzazione completata con successo.");
     } catch (e) {

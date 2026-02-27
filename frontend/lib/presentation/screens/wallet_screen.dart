@@ -43,7 +43,8 @@ class WalletScreen extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  // Bug B: era onSurface (chiaro in dark mode) → surface (scuro in dark mode)
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -52,14 +53,15 @@ class WalletScreen extends ConsumerWidget {
                     Text(
                       "Aggiungi la tua prima spesa",
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        // Bug B: era Colors.white hardcoded → onSurface per contrasto corretto
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(LucideIcons.arrowDown,
-                        color: Colors.white, size: 16),
+                    Icon(LucideIcons.arrowDown,
+                        color: Theme.of(context).colorScheme.onSurface, size: 16),
                   ],
                 ),
               ),
@@ -97,7 +99,8 @@ class WalletScreen extends ConsumerWidget {
                         children: [
                           CircleAvatar(
                             radius: 18,
-                            backgroundColor: Colors.white,
+                            // Theme-aware: evita cerchio bianco in dark mode
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                             child: Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: Image.network('https://moneywizapp.com/favicon.ico', 
@@ -169,23 +172,28 @@ class WalletScreen extends ConsumerWidget {
                     },
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                      backgroundColor: Colors.white,
+                      // Theme-aware: surface del tema (scuro in dark, chiaro in light)
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: Colors.black.withOpacity(0.04)),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.12),
+                        ),
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(LucideIcons.list, size: 18, color: Color(0xFF1A1A1A)),
+                        Icon(LucideIcons.list, size: 18,
+                            color: Theme.of(context).colorScheme.onSurface),
                         const SizedBox(width: 12),
                         Text(
-                          "Tutte le transazioni", 
+                          "Tutte le transazioni",
                           style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)
                         ),
                         const Spacer(),
-                        const Icon(LucideIcons.chevronRight, size: 16, color: Colors.black26),
+                        Icon(LucideIcons.chevronRight, size: 16,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                       ],
                     ),
                   ),
@@ -193,10 +201,10 @@ class WalletScreen extends ConsumerWidget {
               ),
 
               // Dettagli Conti (Sotto i 3 blocchi principali)
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                  child: Divider(color: Colors.black12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.12)),
                 ),
               ),
 
@@ -253,7 +261,8 @@ class WalletScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
+          // Theme-aware: sfondo scuro in dark mode, grigio chiaro in light mode
+        color: isPrimary ? const Color(0xFF4A6741) : Theme.of(context).colorScheme.surfaceContainerHigh,
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
@@ -300,7 +309,8 @@ class WalletScreen extends ConsumerWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          // Theme-aware: surface scura in dark mode, chiara in light mode
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
@@ -327,7 +337,8 @@ class WalletScreen extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F7),
+              // Theme-aware: sfondo icona conto (neutro in dark e light)
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(typeIcon, size: 24, color: const Color(0xFF8E8E93)),

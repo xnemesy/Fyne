@@ -3,6 +3,7 @@ import '../services/sync_service.dart';
 import 'isar_provider.dart';
 import 'account_provider.dart';
 import 'account_overview_provider.dart';
+import 'transaction_provider.dart';
 
 class SyncState {
   final bool isSyncing;
@@ -43,6 +44,8 @@ class SyncNotifier extends Notifier<SyncState> {
       try {
         ref.invalidate(accountsProvider);
         ref.invalidate(accountOverviewProvider);
+        // Aggiorna anche la lista transazioni (bug #3: dati persi dopo reinstall)
+        ref.invalidate(transactionsProvider);
       } catch (_) {}
 
       try {

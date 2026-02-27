@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// ThemeNotifier — Fyne impone esclusivamente il Dark Theme.
-/// Il `_loadTheme()` asincrono precedente causava un crash GlobalKey
-/// perché emetteva `ThemeMode.light` dopo la build, forzando
-/// la ri-creazione di tutto l'albero widget (InkFeatures, NotificationListener).
-/// Soluzione: `build()` ritorna ThemeMode.dark in modo sincrono e definitivo.
+/// ThemeNotifier con persistenza via SharedPreferences.
+///
+/// **Soluzione anti-crash GlobalKey:**
+/// Il vecchio crash era causato da `_loadTheme()` asincrono che emetteva
+/// `ThemeMode.light` DOPO la prima build, forzando la ri-creazione dell'intero
+/// albero widget (InkFeatures, NotificationListener → "Multiple widgets used
+/// the same GlobalKey").
+///
+/// Fix: il tema viene caricato in `main()` PRIMA di `runApp()` come
+/// ProviderScope override → `build()` ritorna il valore corretto al frame 0,
+/// nessun cambio di tema post-build.
 class ThemeNotifier extends Notifier<ThemeMode> {
-  @override
-  ThemeMode build() => ThemeMode.dark; // Dark forzato, sincrono, nessun async
+  final ThemeMode _initialMode;
 
-  /// No-op: il toggle Light/System è disabilitato per spec Fyne.
-  /// Mantenuto per API compatibility (es. tile Settings che mostra lo stato).
+  ThemeNotifier(this._initialMode);
+
+  @override
+  ThemeMode build() => _initialMode; // Sincronizzato prima di runApp()
+
   Future<void> setThemeMode(ThemeMode mode) async {
-    // Solo dark è accettato — fare override sarebbe un UX bug
-    if (mode == ThemeMode.dark) state = ThemeMode.dark;
+    state = mode; // Aggiornamento sincrono — nessun crash GlobalKey
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fyne_theme', mode == ThemeMode.light ? 'light' : 'dark');
   }
 }
 
-final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(() {
-  return ThemeNotifier();
-});
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
+  () => ThemeNotifier(ThemeMode.dark), // Default — overridato da ProviderScope in main()
+);

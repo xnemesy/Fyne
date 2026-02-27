@@ -82,6 +82,14 @@ class FyneTheme {
       elevatedButtonTheme: _elevatedButtonThemeDark,
       textButtonTheme: _textButtonThemeDark,
       dividerTheme: _dividerThemeDark,
+      // SnackBar dark: senza questo, Material usa colorScheme.inverseSurface
+      // che in dark mode è FyneColors.paper (bianco) → illeggibile
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: const Color(0xFF323232),
+        contentTextStyle: GoogleFonts.inter(color: FyneColors.paper, fontSize: 14),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
     );
