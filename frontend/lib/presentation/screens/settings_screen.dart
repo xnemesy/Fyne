@@ -273,12 +273,12 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  /// Toggle Light/Dark — ripristinato senza crash GlobalKey.
-  /// Il tema viene caricato in main() PRE-runApp come ProviderScope override,
-  /// quindi state = mode in setThemeMode() è sincrono → nessun emit post-build.
+  /// Toggle Light/Dark — senza crash GlobalKey.
+  /// Legge il tema corrente via Theme.of(context).brightness (InheritedWidget cascade)
+  /// invece di ref.watch(themeProvider), evitando il double-rebuild che causava
+  /// "GlobalKey used multiple times — _InkFeatures" e "_dependents.isEmpty".
   Widget _buildThemeTile(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider);
-    final isDark = themeMode == ThemeMode.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
       leading: Icon(
