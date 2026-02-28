@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar_community/isar.dart';
 import '../models/account.dart';
@@ -6,7 +8,6 @@ import 'isar_provider.dart';
 import '../services/key_rotation_service.dart';
 import '../data/repositories/account_sync_repository.dart';
 import 'account_sync_provider.dart';
-import 'dart:convert';
 
 class AccountNotifier extends AsyncNotifier<List<Account>> {
   @override
@@ -14,16 +15,17 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
     final isar = await ref.watch(isarProvider.future);
 
     // Watch for changes in Isar to keep UI reactive
-    final stream = isar.accounts
+    final sub = isar.accounts
         .where()
         .isDeletedEqualTo(false)
-        .watch(fireImmediately: true);
-
-    // We handle the stream by updating the state when Isar changes
-    stream.listen((accounts) async {
+        .watch(fireImmediately: true)
+        .listen((accounts) async {
       await _processAccounts(accounts);
-      state = AsyncData(accounts);
+      if (ref.mounted) state = AsyncData(accounts);
     });
+
+    // Cancel stream on provider dispose to avoid "used after dispose"
+    ref.onDispose(sub.cancel);
 
     return _fetchAndProcessAccounts(isar);
   }
@@ -141,16 +143,14 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
       CreateAccountCommand command) async {
     final syncRepository = ref.read(accountSyncRepositoryProvider);
     final result = await syncRepository.createLocalFirst(command);
-    // Guard: il provider può essere disposto durante l'await
-    try { ref.invalidateSelf(); } catch (_) {}
+    if (ref.mounted) ref.invalidateSelf();
     return result;
   }
 
   Future<void> syncPendingCreates() async {
     final syncRepository = ref.read(accountSyncRepositoryProvider);
     await syncRepository.syncPendingCreates();
-    // Guard: il provider può essere disposto durante l'await
-    try { ref.invalidateSelf(); } catch (_) {}
+    if (ref.mounted) ref.invalidateSelf();
   }
 
   Future<void> deleteAccount(String accountId) async {
@@ -173,8 +173,7 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
         await isar.accounts.put(deletedAccount);
       }
     });
-    // Guard: il provider può essere disposto durante il writeTxn
-    try { ref.invalidateSelf(); } catch (_) {}
+    if (ref.mounted) ref.invalidateSelf();
   }
 
   Future<void> refresh() async {

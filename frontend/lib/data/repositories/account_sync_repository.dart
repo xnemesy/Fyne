@@ -104,7 +104,9 @@ class AccountSyncRepository {
   }
 
   Future<void> syncPendingCreates() async {
+    if (!_ref.mounted) return;
     final isar = await _ref.read(isarProvider.future);
+    if (!_ref.mounted) return;
     final allAccounts = await isar.accounts.where().isDeletedEqualTo(false).findAll();
     final pending = allAccounts
         .where(

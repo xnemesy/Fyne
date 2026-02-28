@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart'
     show StateNotifier, StateNotifierProvider;
@@ -72,31 +73,44 @@ class AccountSummary {
 
 class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
   final Ref ref;
+  StreamSubscription? _accountsSub;
+  StreamSubscription? _transactionsSub;
 
   AccountOverviewNotifier(this.ref) : super(AccountOverviewState()) {
     _init();
   }
 
+  @override
+  void dispose() {
+    _accountsSub?.cancel();
+    _transactionsSub?.cancel();
+    super.dispose();
+  }
+
   Future<void> _init() async {
+    if (!mounted) return;
     final isar = await ref.read(isarProvider.future);
-    
+    if (!mounted) return;
+
     // Listen to account changes to keep total balance up to date
-    isar.accounts.where().isDeletedEqualTo(false).watch(fireImmediately: true).listen((_) {
-      refresh();
+    _accountsSub = isar.accounts.where().isDeletedEqualTo(false).watch(fireImmediately: true).listen((_) {
+      if (mounted) refresh();
     });
 
     // Listen to transactions to keep monthly income/expenses up to date
-    isar.transactionModels.where().watch().listen((_) {
-      refresh();
+    _transactionsSub = isar.transactionModels.where().watch().listen((_) {
+      if (mounted) refresh();
     });
   }
 
   /// Refresh completo di tutti i dati
   Future<void> refresh() async {
+    if (!mounted) return;
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       final isar = await ref.read(isarProvider.future);
+      if (!mounted) return;
       final masterKey = ref.read(masterKeyProvider);
 
       if (masterKey == null) {
@@ -108,6 +122,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
           // This will trigger _checkInitialState or similar in AuthProvider which populates masterKey
           // Wait a bit and retry once
           await Future.delayed(const Duration(milliseconds: 300));
+          if (!mounted) return;
           final masterKeyRetry = ref.read(masterKeyProvider);
           if (masterKeyRetry == null) {
             debugPrint(
@@ -190,6 +205,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
         }
       }
 
+      if (!mounted) return;
       state = AccountOverviewState(
         accounts: accountSummaries,
         totalBalance: totalBal,
@@ -200,6 +216,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
       );
     } catch (e, stack) {
       print('❌ Errore refresh overview: $e\n$stack');
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
