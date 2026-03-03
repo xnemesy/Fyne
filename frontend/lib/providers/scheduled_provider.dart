@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/categorization_service.dart';
 import '../services/api_service.dart';
@@ -76,7 +77,7 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
       }
       return list;
     } catch (e) {
-      print("Scheduled fetch error: $e");
+      debugPrint("Scheduled fetch error: $e");
       return [];
     }
   }
@@ -101,7 +102,7 @@ class ScheduledNotifier extends AsyncNotifier<List<ScheduledTransaction>> {
     try {
       await api.post('/api/scheduled-transactions/delete', data: {'id': id});
     } catch (e) {
-      print("Delete scheduled error: $e");
+      debugPrint("Delete scheduled error: $e");
       // Rollback
       state = AsyncValue.data(previousState);
     }

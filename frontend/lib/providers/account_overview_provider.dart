@@ -171,7 +171,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
           totalBal += balance;
         } catch (e) {
           // Log ma continua con gli altri account
-          print('⚠️ Errore decifratura account ${acc.id}: $e');
+          debugPrint('⚠️ Errore decifratura account ${acc.id}: $e');
         }
       }
 
@@ -201,7 +201,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
             expenses += amount.abs();
           }
         } catch (e) {
-          print('⚠️ Errore decifratura transazione ${tx.uuid}: $e');
+          debugPrint('⚠️ Errore decifratura transazione ${tx.uuid}: $e');
         }
       }
 
@@ -215,7 +215,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
         isLoading: false,
       );
     } catch (e, stack) {
-      print('❌ Errore refresh overview: $e\n$stack');
+      debugPrint('❌ Errore refresh overview: $e\n$stack');
       if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
@@ -259,7 +259,7 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
       // Refresh overview
       await refresh();
     } catch (e) {
-      print('❌ Errore aggiornamento balance: $e');
+      debugPrint('❌ Errore aggiornamento balance: $e');
     }
   }
 

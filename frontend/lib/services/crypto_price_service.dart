@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class CryptoPriceService {
   final Dio _dio = Dio(BaseOptions(
@@ -22,7 +23,7 @@ class CryptoPriceService {
         return (response.data[id][vsCurrency.toLowerCase()] as num).toDouble();
       }
     } catch (e) {
-      print("CryptoPriceService Error: $e");
+      debugPrint("CryptoPriceService Error: $e");
     }
     return null;
   }

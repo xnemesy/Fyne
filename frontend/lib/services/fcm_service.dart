@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'crypto_service.dart';
@@ -51,7 +52,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         notificationDetails,
       );
     } catch (e) {
-      print("Error decrypting background notification: $e");
+      debugPrint("Error decrypting background notification: $e");
     }
   }
 }
@@ -92,9 +93,9 @@ class FcmService {
       final currentUser = await _api.dio.options.headers['Authorization']; // Just to check what's going on
       
       await _api.post('/api/banking/fcm-token', data: {'fcmToken': token});
-      print("FCM Token registered successfully for user: ${token.substring(0, 5)}...");
+      debugPrint("FCM Token registered successfully for user: ${token.substring(0, 5)}...");
     } catch (e) {
-      print("Error registering FCM token: $e");
+      debugPrint("Error registering FCM token: $e");
     }
   }
 

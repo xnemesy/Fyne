@@ -122,32 +122,6 @@ class TransactionsNotifier
     await loadInitial();
   }
 
-  Future<void> exportToCsv() async {
-    final repo = ref.read(transactionRepositoryProvider);
-    if (repo == null) return;
-
-    final isar = ref.read(isarProvider).value;
-    if (isar == null) return;
-
-    // 1. Fetch ALL transactions (encrypted)
-    final allEncrypted = await isar.transactionModels.where().findAll();
-
-    // 2. Decrypt ALL (Isolate)
-    final decrypted = await repo.decryptPageForList(allEncrypted);
-
-    // 3. User ExportService to handle auth and CSV creation
-    // To avoid dependency loops, we can use a provider for ExportService
-    // final exportService = ExportService();
-    // exportService.exportToCsv(decrypted.map((e) => {
-    //   'bookingDate': e.bookingDate,
-    //   'decryptedDescription': e.description,
-    //   'amount': e.amount,
-    //   'decryptedCategory': e.categoryName,
-    // }).toList());
-
-    print("Export requested for ${decrypted.length} items");
-  }
-
   Future<void> addTransaction(
     TransactionModel tx, {
     String? rawAmount,

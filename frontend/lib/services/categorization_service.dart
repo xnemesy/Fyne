@@ -2,6 +2,7 @@ import '../models/categorization_rule.dart';
 import 'package:isar_community/isar.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Category {
@@ -15,8 +16,6 @@ class Category {
 
 class CategorizationService {
   final _uuid = const Uuid();
-  // Interpreter? _interpreter;
-  // bool _isModelLoaded = false;
 
   // Categories Mapping (Order must match Model output indices)
   List<String> get supportedCategories => [
@@ -44,7 +43,7 @@ class CategorizationService {
   }
 
   Future<void> loadModel() async {
-    print("ℹ️ Categorization: Dynamic Rules Mode (No AI)");
+    debugPrint("ℹ️ Categorization: Dynamic Rules Mode (No AI)");
   }
 
   String getCategoryId(String name) {
@@ -66,16 +65,6 @@ class CategorizationService {
     // 2. Fallback to Hardcoded Rules
     return _keywordCategorize(desc);
   }
-
-/*
-  Map<String, dynamic> _runInference(String text) {
-    // ...
-  }
-
-  List<dynamic> _preprocess(String text) {
-    // ...
-  }
-*/
 
   Category _keywordCategorize(String desc) {
     // 1. Alimentari

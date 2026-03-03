@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import 'api_service.dart';
 import 'crypto_service.dart';
@@ -76,9 +77,9 @@ class SchedulerService {
         await isar.plannedTransactions.put(planned);
       });
       
-      print("Scheduler: Executed planned transaction ${planned.id}");
+      debugPrint("Scheduler: Executed planned transaction ${planned.id}");
     } catch (e) {
-      print("Scheduler Error: $e");
+      debugPrint("Scheduler Error: $e");
     }
   }
 }

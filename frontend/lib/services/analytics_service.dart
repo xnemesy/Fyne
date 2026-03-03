@@ -51,7 +51,7 @@ class AnalyticsService {
   /// Logga un errore non fatale su Crashlytics.
   Future<void> logError(dynamic exception, StackTrace? stack, {String? reason}) async {
     if (kDebugMode) {
-      print('[Crashlytics] Errore simulato: $exception');
+      debugPrint('[Crashlytics] Errore simulato: $exception');
       return;
     }
 

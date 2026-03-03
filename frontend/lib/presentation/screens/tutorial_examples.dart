@@ -44,7 +44,7 @@ class TransactionsScreenExample extends ConsumerWidget {
         ),
       ],
       onComplete: () {
-        print('✅ Tutorial transazioni completato!');
+        debugPrint('✅ Tutorial transazioni completato!');
       },
       child: Scaffold(
         appBar: AppBar(
@@ -158,7 +158,7 @@ class AccountDetailScreenExample extends ConsumerWidget {
         ),
       ],
       onComplete: () {
-        print('✅ Tutorial account completato!');
+        debugPrint('✅ Tutorial account completato!');
       },
       child: Scaffold(
         appBar: AppBar(

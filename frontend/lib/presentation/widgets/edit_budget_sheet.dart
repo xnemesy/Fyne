@@ -169,14 +169,8 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
       final amount = double.tryParse(_amountController.text.replaceAll(',', '.')) ?? 0.0;
 
       await api.put('/api/budgets/${widget.budget.id}', data: {
-        'limitAmount': amount, 
+        'limitAmount': amount,
       });
-      // Note: backend route in budgets.js uses "limitAmount" (camelCase) in destructuring: const { limitAmount } = req.body;
-      // But let's check the previous step view_file of budgets.js content:
-      // router.put('/:id', verifyToken, async (req, res) => {
-      //     const { limitAmount } = req.body;
-      
-      // So we send 'limitAmount'.
 
       ref.read(budgetsProvider.notifier).refresh();
       if (mounted) Navigator.pop(context);
