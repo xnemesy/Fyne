@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/master_key_provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../services/crypto_service.dart';
 import '../../services/api_service.dart';
 import '../../services/categorization_service.dart';

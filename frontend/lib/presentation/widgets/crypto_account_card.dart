@@ -33,7 +33,7 @@ class CryptoAccountCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha:0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -63,7 +63,7 @@ class CryptoAccountCard extends ConsumerWidget {
               letterSpacing: 2,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3),
             ),
           ),
           const SizedBox(height: 4),

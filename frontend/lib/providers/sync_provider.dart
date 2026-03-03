@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/sync_service.dart';
 import 'isar_provider.dart';
@@ -46,11 +47,11 @@ class SyncNotifier extends Notifier<SyncState> {
         ref.invalidate(accountOverviewProvider);
         // Aggiorna anche la lista transazioni (bug #3: dati persi dopo reinstall)
         ref.invalidate(transactionsProvider);
-      } catch (_) {}
+      } catch (e) { debugPrint('[Sync] Post-sync invalidation error (non-blocking): $e'); }
 
       try {
         state = state.copyWith(isSyncing: false, lastSyncAt: DateTime.now());
-      } catch (_) {}
+      } catch (e) { debugPrint('[Sync] Post-sync state update error: $e'); }
     } catch (e) {
       try { state = state.copyWith(isSyncing: false, error: e.toString()); } catch (_) {}
       rethrow;

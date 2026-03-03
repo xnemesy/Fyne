@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import 'api_service.dart';
 import 'crypto_service.dart';
-import 'categorization_service.dart';
 
 part 'scheduler_service.g.dart';
 

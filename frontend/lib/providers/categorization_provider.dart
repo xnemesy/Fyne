@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart'
     show StateNotifier, StateNotifierProvider;
@@ -48,7 +49,7 @@ class CategorizationNotifier
 
       await _loadRules();
     } catch (e) {
-      // Errore gestito silenziosamente per non bloccare la UI
+      debugPrint('[Categorization] Error adding rule: $e');
     }
   }
 
@@ -75,7 +76,7 @@ class CategorizationNotifier
       });
       await _loadRules();
     } catch (e) {
-      // Errore gestito silenziosamente
+      debugPrint('[Categorization] Error deleting rule: $e');
     }
   }
 

@@ -12,8 +12,6 @@ class BudgetsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final budgetsAsync = ref.watch(budgetsProvider);
-
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -54,7 +52,7 @@ class BudgetsScreen extends ConsumerWidget {
                         "Gestisci i tuoi limiti di spesa per categoria",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -163,7 +161,7 @@ class BudgetsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A6741).withOpacity(0.05),
+                color: const Color(0xFF4A6741).withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: const Icon(LucideIcons.box, size: 40, color: Color(0xFF4A6741)),
@@ -178,7 +176,7 @@ class BudgetsScreen extends ConsumerWidget {
               "Definisci i tuoi limiti di spesa quando sei pronto",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 height: 1.5,
               ),
             ),

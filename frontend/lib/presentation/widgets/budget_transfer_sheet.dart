@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../../models/budget.dart';
 import '../../providers/budget_provider.dart';
 import '../../services/api_service.dart';
@@ -64,7 +63,7 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
               hintText: "0.00",
               suffixText: "€",
               border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.black.withOpacity(0.1)),
+              hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.1)),
             ),
           ),
           
@@ -100,7 +99,7 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
           letterSpacing: 2,
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
         ),
       ),
     );
@@ -112,7 +111,7 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Budget>(

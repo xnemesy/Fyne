@@ -21,7 +21,7 @@ class DailyAllowanceCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A6741).withOpacity(0.3),
+            color: const Color(0xFF4A6741).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -35,7 +35,7 @@ class DailyAllowanceCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(LucideIcons.calendarCheck, size: 20, color: Colors.white),
@@ -47,7 +47,7 @@ class DailyAllowanceCard extends ConsumerWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -68,7 +68,7 @@ class DailyAllowanceCard extends ConsumerWidget {
               "Spazio disponibile oggi: 0 €",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -79,7 +79,7 @@ class DailyAllowanceCard extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.4,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontWeight: FontWeight.w400,
             ),
           ),

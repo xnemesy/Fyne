@@ -42,7 +42,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                             letterSpacing: 4,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -68,7 +68,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                         show: true,
                         drawVerticalLine: false,
                         getDrawingHorizontalLine: (value) => FlLine(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
                           strokeWidth: 1,
                         ),
                       ),
@@ -89,7 +89,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                                   ),
                                 ),
                               );
@@ -107,7 +107,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                           dotData: const FlDotData(show: false),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: const Color(0xFF4A6741).withOpacity(0.05),
+                            color: const Color(0xFF4A6741).withValues(alpha: 0.05),
                           ),
                         ),
                       ],
@@ -152,14 +152,14 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
         decoration: BoxDecoration(
           color: active ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: active ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : null,
+          boxShadow: active ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)] : null,
         ),
         child: Text(
           t,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: active ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            color: active ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
           ),
         ),
       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../core/theme/fyne_theme.dart';
 
 class FyneShimmer extends StatelessWidget {
   final double width;
@@ -19,8 +18,8 @@ class FyneShimmer extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Shimmer.fromColors(
-      baseColor: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
-      highlightColor: isDark ? Colors.white24 : Colors.black.withOpacity(0.02),
+      baseColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+      highlightColor: isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.02),
       child: Container(
         width: width,
         height: height,

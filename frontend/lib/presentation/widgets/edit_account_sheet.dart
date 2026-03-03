@@ -24,7 +24,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.account.decryptedName);
-    _selectedGroup = widget.account.group ?? 'Personale';
+    _selectedGroup = widget.account.group;
   }
 
   @override
@@ -43,8 +43,8 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF4A6741) : Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? Colors.transparent : Theme.of(context).colorScheme.outline.withOpacity(0.12)),
-          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF4A6741).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+          border: Border.all(color: isSelected ? Colors.transparent : Theme.of(context).colorScheme.outline.withValues(alpha: 0.12)),
+          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF4A6741).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -168,7 +168,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: const Color(0xFFFF3B30).withOpacity(0.2)),
+                    side: BorderSide(color: const Color(0xFFFF3B30).withValues(alpha: 0.2)),
                   ),
                 ),
               ),
@@ -188,7 +188,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
           letterSpacing: 2, 
           fontSize: 10, 
           fontWeight: FontWeight.bold, 
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
         ),
       ),
     );
@@ -201,7 +201,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
       fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.12)),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

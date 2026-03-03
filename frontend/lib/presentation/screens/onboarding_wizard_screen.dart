@@ -353,7 +353,7 @@ class _OnboardingWizardScreenState
                 IconButton(
                   onPressed: _previousStep,
                   icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                  color: _kPaper.withOpacity(0.5),
+                  color: _kPaper.withValues(alpha:0.5),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
@@ -364,7 +364,7 @@ class _OnboardingWizardScreenState
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: _kPaper.withOpacity(0.5),
+                  color: _kPaper.withValues(alpha:0.5),
                 ),
               ),
               const Spacer(),
@@ -407,7 +407,7 @@ class _OnboardingWizardScreenState
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: _kForest.withOpacity(0.12),
+                color: _kForest.withValues(alpha:0.12),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -435,7 +435,7 @@ class _OnboardingWizardScreenState
             'Solo tu controlli i tuoi dati finanziari.',
             style: GoogleFonts.inter(
               fontSize: 15,
-              color: _kPaper.withOpacity(0.65),
+              color: _kPaper.withValues(alpha:0.65),
               height: 1.6,
             ),
           ),
@@ -511,7 +511,7 @@ class _OnboardingWizardScreenState
       decoration: BoxDecoration(
         color: _kSurface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha:0.06)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,7 +519,7 @@ class _OnboardingWizardScreenState
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withValues(alpha:0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: iconColor, size: 22),
@@ -542,7 +542,7 @@ class _OnboardingWizardScreenState
                   subtitle,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: _kPaper.withOpacity(0.55),
+                    color: _kPaper.withValues(alpha:0.55),
                     height: 1.5,
                   ),
                 ),
@@ -568,9 +568,9 @@ class _OnboardingWizardScreenState
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: FyneColors.amber.withOpacity(0.08),
+              color: FyneColors.amber.withValues(alpha:0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: FyneColors.amber.withOpacity(0.3)),
+              border: Border.all(color: FyneColors.amber.withValues(alpha:0.3)),
             ),
             child: Row(
               children: [
@@ -616,7 +616,7 @@ class _OnboardingWizardScreenState
             'Salvale su carta o in un password manager offline.',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: _kPaper.withOpacity(0.6),
+              color: _kPaper.withValues(alpha:0.6),
               height: 1.5,
             ),
           ),
@@ -626,9 +626,9 @@ class _OnboardingWizardScreenState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: FyneColors.rust.withOpacity(0.08),
+              color: FyneColors.rust.withValues(alpha:0.08),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: FyneColors.rust.withOpacity(0.25)),
+              border: Border.all(color: FyneColors.rust.withValues(alpha:0.25)),
             ),
             child: Row(
               children: [
@@ -659,7 +659,7 @@ class _OnboardingWizardScreenState
                 color: _kSurface,
                 borderRadius: BorderRadius.circular(20),
                 border:
-                    Border.all(color: Colors.white.withOpacity(0.06)),
+                    Border.all(color: Colors.white.withValues(alpha:0.06)),
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -679,10 +679,10 @@ class _OnboardingWizardScreenState
                     itemBuilder: (context, i) {
                       return Container(
                         decoration: BoxDecoration(
-                          color: _kForest.withOpacity(0.08),
+                          color: _kForest.withValues(alpha:0.08),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: _kForest.withOpacity(0.18)),
+                              color: _kForest.withValues(alpha:0.18)),
                         ),
                         alignment: Alignment.center,
                         child: RichText(
@@ -717,7 +717,7 @@ class _OnboardingWizardScreenState
                   if (!_seedRevealed)
                     Container(
                       decoration: BoxDecoration(
-                        color: _kSurface.withOpacity(0.90),
+                        color: _kSurface.withValues(alpha:0.90),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.symmetric(
@@ -761,7 +761,7 @@ class _OnboardingWizardScreenState
               ),
               style: TextButton.styleFrom(
                 foregroundColor:
-                    _seedCopied ? _kForest : _kPaper.withOpacity(0.5),
+                    _seedCopied ? _kForest : _kPaper.withValues(alpha:0.5),
               ),
             ),
           ),
@@ -777,7 +777,7 @@ class _OnboardingWizardScreenState
                   color: (_secondsRemaining <= 10
                           ? FyneColors.rust
                           : FyneColors.amber)
-                      .withOpacity(0.10),
+                      .withValues(alpha:0.10),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: _secondsRemaining <= 10
@@ -863,7 +863,7 @@ class _OnboardingWizardScreenState
             'Inserisci le parole richieste per confermare di aver salvato correttamente la seed phrase.',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: _kPaper.withOpacity(0.6),
+              color: _kPaper.withValues(alpha:0.6),
               height: 1.5,
             ),
           ),
@@ -873,7 +873,7 @@ class _OnboardingWizardScreenState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: _kForest.withOpacity(0.10),
+              color: _kForest.withValues(alpha:0.10),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -908,7 +908,7 @@ class _OnboardingWizardScreenState
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: _kPaper.withOpacity(0.55),
+                      color: _kPaper.withValues(alpha:0.55),
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -926,7 +926,7 @@ class _OnboardingWizardScreenState
                     decoration: InputDecoration(
                       hintText: 'Inserisci la parola...',
                       hintStyle: GoogleFonts.inter(
-                          color: _kPaper.withOpacity(0.3), fontSize: 14),
+                          color: _kPaper.withValues(alpha:0.3), fontSize: 14),
                       filled: true,
                       fillColor: _kSurface,
                       suffixIcon: status == true
@@ -941,7 +941,7 @@ class _OnboardingWizardScreenState
                         borderSide: BorderSide(
                           color: status == false
                               ? FyneColors.rust
-                              : Colors.white.withOpacity(0.08),
+                              : Colors.white.withValues(alpha:0.08),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -966,7 +966,7 @@ class _OnboardingWizardScreenState
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: FyneColors.rust.withOpacity(0.10),
+                color: FyneColors.rust.withValues(alpha:0.10),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -1000,7 +1000,7 @@ class _OnboardingWizardScreenState
                 border: Border.all(
                   color: _biometricEnabled
                       ? _kForest
-                      : Colors.white.withOpacity(0.06),
+                      : Colors.white.withValues(alpha:0.06),
                 ),
               ),
               child: Row(
@@ -1009,7 +1009,7 @@ class _OnboardingWizardScreenState
                     Icons.fingerprint_rounded,
                     color: _biometricEnabled
                         ? _kForest
-                        : _kPaper.withOpacity(0.4),
+                        : _kPaper.withValues(alpha:0.4),
                     size: 26,
                   ),
                   const SizedBox(width: 14),
@@ -1030,7 +1030,7 @@ class _OnboardingWizardScreenState
                           'Sblocca rapidamente il vault con la biometria',
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: _kPaper.withOpacity(0.5),
+                            color: _kPaper.withValues(alpha:0.5),
                           ),
                         ),
                       ],
@@ -1050,7 +1050,7 @@ class _OnboardingWizardScreenState
               'Puoi modificare questa impostazione in qualsiasi momento nelle Impostazioni.',
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: _kPaper.withOpacity(0.35),
+                color: _kPaper.withValues(alpha:0.35),
               ),
             ),
             const SizedBox(height: 24),
@@ -1068,7 +1068,7 @@ class _OnboardingWizardScreenState
                 backgroundColor: _kForest,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: _kSurface,
-                disabledForegroundColor: _kPaper.withOpacity(0.3),
+                disabledForegroundColor: _kPaper.withValues(alpha:0.3),
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),

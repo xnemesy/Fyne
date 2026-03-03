@@ -27,7 +27,6 @@ class FeatureDiscovery extends StatefulWidget {
 
 class _FeatureDiscoveryState extends State<FeatureDiscovery> {
   bool _showHint = false;
-  bool _hasBeenSeen = false;
 
   @override
   void initState() {
@@ -47,7 +46,6 @@ class _FeatureDiscoveryState extends State<FeatureDiscovery> {
     if (!seen && mounted) {
       setState(() {
         _showHint = true;
-        _hasBeenSeen = false;
       });
 
       // Mostra dopo un breve delay per dare tempo al widget di renderizzarsi
@@ -62,7 +60,7 @@ class _FeatureDiscoveryState extends State<FeatureDiscovery> {
   Future<void> _markAsSeen() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('feature_seen_${widget.featureId}', true);
-    setState(() => _hasBeenSeen = true);
+    setState(() {});
   }
 
   void _showFeatureHint() {
@@ -115,7 +113,7 @@ class _FeatureHintDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: FyneColors.forest.withOpacity(0.1),
+                color: FyneColors.forest.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -140,7 +138,7 @@ class _FeatureHintDialog extends StatelessWidget {
             Text(
               description,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -247,7 +245,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           child: GestureDetector(
             onTap: () {}, // Previeni interazioni
             child: Container(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -341,7 +339,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: FyneColors.forest.withOpacity(0.1),
+                  color: FyneColors.forest.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

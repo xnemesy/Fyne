@@ -45,10 +45,10 @@ class FinancialInsightCard extends StatelessWidget {
                   letterSpacing: 1.5,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white.withOpacity(0.4),
+                  color: Colors.white.withValues(alpha:0.4),
                 ),
               ),
-              Icon(LucideIcons.sparkles, color: Colors.white.withOpacity(0.4), size: 14),
+              Icon(LucideIcons.sparkles, color: Colors.white.withValues(alpha:0.4), size: 14),
             ],
           ),
           const SizedBox(height: 20),
@@ -64,7 +64,7 @@ class FinancialInsightCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha:0.05),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -76,7 +76,7 @@ class FinancialInsightCard extends StatelessWidget {
                       Text(
                         isNegative ? "Scostamento rispetto al saldo ideale" : "Differenza del mese",
                         style: GoogleFonts.inter(
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha:0.4),
                           fontSize: 11,
                         ),
                       ),
@@ -95,7 +95,7 @@ class FinancialInsightCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -116,7 +116,7 @@ class FinancialInsightCard extends StatelessWidget {
               ? "Questo mese le uscite superano le entrate. Controlla i tuoi budget per rientrare nei limiti."
               : "Ottimo lavoro! Stai risparmiando il $savingRate% delle tue entrate. Continua così.",
             style: GoogleFonts.inter(
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha:0.4),
               fontSize: 12,
               height: 1.4,
             ),
@@ -130,7 +130,7 @@ class FinancialInsightCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: GoogleFonts.inter(letterSpacing: 1, fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withOpacity(0.4))),
+        Text(label.toUpperCase(), style: GoogleFonts.inter(letterSpacing: 1, fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withValues(alpha:0.4))),
         const SizedBox(height: 4),
         Text("${amount.toStringAsFixed(2)} €", style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
       ],

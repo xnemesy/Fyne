@@ -29,7 +29,7 @@ class NetWorthChart extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             "PATRIMONIO NETTO",
-            style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+            style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
           ),
           const SizedBox(height: 30),
           Expanded(
@@ -53,7 +53,7 @@ class NetWorthChart extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                    getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(
@@ -79,8 +79,8 @@ class NetWorthChart extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFF4A6741).withOpacity(0.15),
-                          const Color(0xFF4A6741).withOpacity(0.0),
+                          const Color(0xFF4A6741).withValues(alpha: 0.15),
+                          const Color(0xFF4A6741).withValues(alpha: 0.0),
                         ],
                       ),
                     ),
@@ -94,7 +94,7 @@ class NetWorthChart extends StatelessWidget {
             "Variazione dovuta a una spesa programmata",
             style: GoogleFonts.inter(
               fontSize: 11,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               fontStyle: FontStyle.italic,
             ),
           ),

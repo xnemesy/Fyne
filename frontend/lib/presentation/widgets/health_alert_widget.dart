@@ -32,14 +32,14 @@ class HealthAlertWidget extends ConsumerWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFFBFBF9),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(LucideIcons.flame, color: Colors.orange, size: 20),
@@ -62,7 +62,7 @@ class HealthAlertWidget extends ConsumerWidget {
                       "Hai registrato una spesa in ${tx.categoryName}. Ricorda il tuo obiettivo salute (BMI: 29.1). Ti senti ancora in linea con il tuo piano?",
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         height: 1.4,
                       ),
                     ),

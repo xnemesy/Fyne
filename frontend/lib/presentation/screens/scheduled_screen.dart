@@ -4,9 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../presentation/widgets/add_scheduled_sheet.dart';
-import '../../presentation/widgets/transaction_item.dart'; // Reusing helper methods from here or similar 
 import '../../providers/scheduled_provider.dart';
-import '../../services/categorization_service.dart'; // Need this if we use Category model directly? No, string based.
 
 class ScheduledTransactionsScreen extends ConsumerWidget {
   const ScheduledTransactionsScreen({super.key});
@@ -55,7 +53,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                         "Pagamenti ricorrenti e spese future",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -143,7 +141,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black.withOpacity(0.03)),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.03)),
         ),
         child: Row(
           children: [
@@ -170,7 +168,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                   ),
                   Text(
                     "Prossima: ${DateFormat('d MMM').format(tx.nextOccurrence)} • ${tx.frequency}",
-                    style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+                    style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
                   ),
                 ],
               ),
@@ -205,16 +203,16 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            Icon(LucideIcons.calendarClock, size: 64, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
+            Icon(LucideIcons.calendarClock, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)),
             const SizedBox(height: 24),
             Text(
               "Nessun pagamento programmato",
-              style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+              style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
             ),
             const SizedBox(height: 16),
             Text(
               "Aggiungi affitti, abbonamenti o rate.",
-              style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+              style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
             ),
           ],
         ),

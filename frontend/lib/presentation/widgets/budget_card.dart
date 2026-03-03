@@ -62,7 +62,7 @@ class BudgetCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha:0.03),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -81,7 +81,7 @@ class BudgetCard extends StatelessWidget {
                 Text(
                   "Limite: ${effectiveBudget.limitAmount.toStringAsFixed(0)} €",
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -94,7 +94,7 @@ class BudgetCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress.clamp(0.0, 1.0),
                 minHeight: 6,
-                backgroundColor: Theme.of(context).colorScheme.outline.withOpacity(0.15),
+                backgroundColor: Theme.of(context).colorScheme.outline.withValues(alpha:0.15),
                 color: progressColor,
               ),
             ),
@@ -107,7 +107,7 @@ class BudgetCard extends StatelessWidget {
                   children: [
                     Text(
                       "Spesi",
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3), fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     DecryptedValue(
@@ -121,7 +121,7 @@ class BudgetCard extends StatelessWidget {
                   children: [
                     Text(
                       isOver ? "Eccesso" : "Disponibili",
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3), fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     DecryptedValue(
@@ -142,7 +142,7 @@ class BudgetCard extends StatelessWidget {
                  padding: const EdgeInsets.all(12),
                  decoration: BoxDecoration(
                    // Amber tint: leggibile in dark (sfondo scuro+trasparente) e light
-                   color: const Color(0xFFD4A574).withOpacity(0.15),
+                   color: const Color(0xFFD4A574).withValues(alpha:0.15),
                    borderRadius: BorderRadius.circular(12),
                  ),
                  child: Row(

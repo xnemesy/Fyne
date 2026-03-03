@@ -97,8 +97,8 @@ class CompactCashFlowChart extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFF4A6741).withOpacity(0.15),
-                          const Color(0xFF4A6741).withOpacity(0.0),
+                          const Color(0xFF4A6741).withValues(alpha: 0.15),
+                          const Color(0xFF4A6741).withValues(alpha: 0.0),
                         ],
                       ),
                     ),

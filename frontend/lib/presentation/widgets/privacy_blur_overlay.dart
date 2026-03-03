@@ -22,7 +22,7 @@ class PrivacyBlurOverlay extends ConsumerWidget {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: Container(
-                  color: const Color(0xFFFBFBF9).withOpacity(0.4),
+                  color: const Color(0xFFFBFBF9).withValues(alpha:0.4),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +36,7 @@ class PrivacyBlurOverlay extends ConsumerWidget {
                         Text(
                           "CONTENUTO PROTETTO",
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
                             fontSize: 12,

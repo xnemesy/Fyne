@@ -19,10 +19,10 @@ class DailyAllowanceWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFFBFBF9), // Paper White
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: const Color(0xFF4A6741).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFF4A6741).withValues(alpha:0.1)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A6741).withOpacity(0.03),
+            color: const Color(0xFF4A6741).withValues(alpha:0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -37,7 +37,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
               fontSize: 11,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
             ),
           ),
           const SizedBox(height: 24),
@@ -61,7 +61,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                   style: GoogleFonts.lora(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3),
                   ),
                 ),
               ],
@@ -72,7 +72,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: (allowance > 0 ? const Color(0xFF4A6741) : const Color(0xFFFF3B30)).withOpacity(0.08),
+                color: (allowance > 0 ? const Color(0xFF4A6741) : const Color(0xFFFF3B30)).withValues(alpha:0.08),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -93,7 +93,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 height: 4,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.05),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -117,7 +117,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 "Calcolato su ${DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day - DateTime.now().day + 1} giorni rimanenti",
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -126,7 +126,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
                 ),
               ),
             ],

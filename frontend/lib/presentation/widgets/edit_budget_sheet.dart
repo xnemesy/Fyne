@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/budget_provider.dart';
-import '../../providers/master_key_provider.dart';
 import '../../services/api_service.dart';
 import '../../models/budget.dart';
 
@@ -79,7 +78,7 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: "0.00 €",
-                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                 border: InputBorder.none,
               ),
             ),
@@ -119,7 +118,7 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: const Color(0xFFFF3B30).withOpacity(0.2)),
+                    side: BorderSide(color: const Color(0xFFFF3B30).withValues(alpha: 0.2)),
                   ),
                 ),
               ),

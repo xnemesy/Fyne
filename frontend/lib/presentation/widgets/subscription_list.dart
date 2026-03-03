@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../models/transaction.dart';
-import 'package:intl/intl.dart';
 
 class SubscriptionList extends StatelessWidget {
   final List<TransactionSummary> transactions;
@@ -39,7 +38,7 @@ class SubscriptionList extends StatelessWidget {
               letterSpacing: 1.5,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
           ),
         ),
@@ -58,7 +57,7 @@ class SubscriptionList extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.08)),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +88,7 @@ class SubscriptionList extends StatelessWidget {
                           "Previsto il 27", // Mocking prediction
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                         ),
                         const SizedBox(height: 4),

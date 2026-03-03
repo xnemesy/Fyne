@@ -104,7 +104,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               const SizedBox(height: 8),
               Text(
                 'Inserisci le 12 parole che hai salvato durante la configurazione iniziale.',
-                style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), height: 1.5),
+                style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6), height: 1.5),
               ),
               const SizedBox(height: 24),
 
@@ -139,7 +139,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                       prefixText: '${i + 1}. ',
                       prefixStyle: GoogleFonts.inter(
                         fontSize: 11,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -166,7 +166,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: FyneColors.rust.withOpacity(0.08),
+                    color: FyneColors.rust.withValues(alpha:0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -214,7 +214,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               Center(
                 child: Text(
                   'La chiave non viene inviata a nessun server.',
-                  style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+                  style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4)),
                 ),
               ),
             ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class DecryptedValue extends StatelessWidget {
   final String? value;
@@ -44,7 +43,7 @@ class DecryptedValue extends StatelessWidget {
               width: isLarge ? 120 : 60,
               height: isLarge ? 32 : 16,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

@@ -22,7 +22,7 @@ class CashFlowCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("FLUSSO DI CASSA (MESE CORRENTE)", 
-          style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))),
+          style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3))),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(24),
@@ -35,8 +35,8 @@ class CashFlowCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _cashFlowItem("Entrate", income, Colors.white.withOpacity(0.7)),
-                  _cashFlowItem("Uscite", expenses, Colors.white.withOpacity(0.7)),
+                  _cashFlowItem("Entrate", income, Colors.white.withValues(alpha: 0.7)),
+                  _cashFlowItem("Uscite", expenses, Colors.white.withValues(alpha: 0.7)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -46,7 +46,7 @@ class CashFlowCard extends StatelessWidget {
                     height: 8,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -71,14 +71,14 @@ class CashFlowCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("${savings < 0 ? 'Deficit' : 'Differenza'} del mese: ${savings.abs().toStringAsFixed(2)} €", 
-                      style: GoogleFonts.inter(color: Colors.white.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w600)),
+                      style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.9), fontSize: 11, fontWeight: FontWeight.w600)),
                     Text(income > 0 ? "${(savingsRate * 100).abs().toStringAsFixed(0)}%" : "0%", 
                       style: GoogleFonts.inter(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                   ],

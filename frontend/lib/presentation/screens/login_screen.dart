@@ -102,7 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   : 'Accesso in corso...',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -125,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: FyneColors.forest.withOpacity(0.1),
+                  color: FyneColors.forest.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -151,7 +151,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 'Il tuo vault finanziario',
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 48),
@@ -161,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: FyneColors.softRed.withOpacity(0.1),
+                    color: FyneColors.softRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -214,7 +214,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Text(
                 'I dati restano solo sul tuo dispositivo',
                 style: GoogleFonts.inter(
-                  fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 32),
@@ -228,7 +228,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       'oppure',
                       style: GoogleFonts.inter(
-                        fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -323,7 +323,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     _isSignUp
                       ? 'Hai già un account? Accedi'
                       : 'Non hai un account? Registrati',
-                    style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                    style: GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                 ),
               ],

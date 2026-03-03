@@ -20,12 +20,12 @@ class BurnRateCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("RITMO DI SPESA MEDIO", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))),
+          Text("RITMO DI SPESA MEDIO", style: GoogleFonts.inter(letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3))),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -48,7 +48,7 @@ class BurnRateCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text("/ giorno (ultimi 30gg)", style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 12)),
+          Text("/ giorno (ultimi 30gg)", style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), fontSize: 12)),
         ],
       ),
     );

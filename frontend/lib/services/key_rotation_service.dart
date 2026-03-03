@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'crypto_service.dart';
-import '../providers/isar_provider.dart';
-import 'package:isar_community/isar.dart';
 
 /**
  * Service for Progressive Key Rotation (v2.5).
@@ -37,10 +35,6 @@ class KeyRotationService {
     // 0. Safety Checks
     if (!_isMigrationEnabled) return null;
     if (currentVersion >= CryptoService.currentCryptoVersion) return null;
-
-    // 1. Concurrency Check: Don't migrate during active sync to avoid race conditions
-    // (Simulated: ref.read(syncProvider).isSyncing)
-    // if (_ref.read(syncStatusProvider).isSyncing) return null;
 
     // 2. Acquire per-record lock
     if (_migrationLocks.containsKey(recordUuid)) {

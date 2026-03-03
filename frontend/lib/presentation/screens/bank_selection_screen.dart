@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/api_service.dart';
-import '../../providers/budget_provider.dart';
 
 class BankSelectionScreen extends ConsumerStatefulWidget {
   const BankSelectionScreen({super.key});
@@ -123,7 +122,7 @@ class _BankSelectionScreenState extends ConsumerState<BankSelectionScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.black.withOpacity(0.05)),
+                        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
                       ),
                       child: ListTile(
                         leading: inst['logo'] != null 

@@ -64,7 +64,7 @@ class _RecoveryKeyScreenState extends State<RecoveryKeyScreen> {
             Text(
               "Nessuno, nemmeno Fyne, può recuperare i tuoi dati senza queste 24 parole. Scrivile o salva il PDF.\n\nServe solo per non perdere l’accesso. Mai per leggere i tuoi dati.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, height: 1.4),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13, height: 1.4),
             ),
             const SizedBox(height: 32),
             Expanded(
@@ -79,9 +79,9 @@ class _RecoveryKeyScreenState extends State<RecoveryKeyScreen> {
                 itemBuilder: (context, index) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     child: Center(
                       child: Text(

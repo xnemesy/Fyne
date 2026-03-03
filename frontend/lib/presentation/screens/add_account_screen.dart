@@ -45,7 +45,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF4A6741).withOpacity(0.3),
+                    color: const Color(0xFF4A6741).withValues(alpha:0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   )
@@ -144,7 +144,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4A6741).withOpacity(0.3),
+                    color: const Color(0xFF4A6741).withValues(alpha:0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -155,7 +155,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(LucideIcons.zap, color: Colors.white, size: 24),
@@ -176,7 +176,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                         "Collega la tua banca reale",
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha:0.7),
                         ),
                       ),
                     ],
@@ -205,14 +205,14 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                   // Fix Bug 2: sfondo tema-aware, leggibile in dark mode
                   color: cs.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: cs.outlineVariant.withOpacity(0.5)),
+                  border: Border.all(color: cs.outlineVariant.withValues(alpha:0.5)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4A6741).withOpacity(0.15),
+                        color: const Color(0xFF4A6741).withValues(alpha:0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(_typeIcons[type], color: const Color(0xFF4A6741), size: 24),
@@ -229,7 +229,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                     ),
                     const Spacer(),
                     // Fix Bug 2: icona chevron tema-aware
-                    Icon(LucideIcons.chevronRight, color: cs.onSurface.withOpacity(0.3), size: 18),
+                    Icon(LucideIcons.chevronRight, color: cs.onSurface.withValues(alpha:0.3), size: 18),
                   ],
                 ),
               ),
@@ -316,7 +316,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           letterSpacing: 2,
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3),
         ),
       ),
     );
@@ -327,12 +327,12 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
     final cs = Theme.of(context).colorScheme;
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.inter(color: cs.onSurface.withOpacity(0.3)),
+      hintStyle: GoogleFonts.inter(color: cs.onSurface.withValues(alpha:0.3)),
       filled: true,
       fillColor: cs.surfaceContainerHighest,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
+        borderSide: BorderSide(color: cs.outlineVariant.withValues(alpha:0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

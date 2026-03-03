@@ -1,7 +1,5 @@
 import '../models/categorization_rule.dart';
-import 'package:isar_community/isar.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

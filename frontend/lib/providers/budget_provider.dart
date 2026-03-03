@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import '../models/budget.dart';
 import '../services/crypto_service.dart';
@@ -15,11 +14,15 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
     final isar = await ref.watch(isarProvider.future);
 
     // Watch Isar for changes
-    final stream = isar.budgets.where().isDeletedEqualTo(false).watch(fireImmediately: true);
-    stream.listen((budgets) async {
+    final sub = isar.budgets.where().isDeletedEqualTo(false)
+        .watch(fireImmediately: true)
+        .listen((budgets) async {
       await _processBudgets(budgets);
-      state = AsyncData(budgets);
+      if (ref.mounted) state = AsyncData(budgets);
     });
+
+    // Cancel stream on provider dispose to avoid memory leak
+    ref.onDispose(sub.cancel);
 
     return _fetchAndProcessBudgets(isar);
   }

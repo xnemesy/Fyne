@@ -57,7 +57,7 @@ class MilestoneListener extends ConsumerWidget {
         content: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.95),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(

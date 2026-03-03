@@ -45,7 +45,7 @@ class HomeCompassWidget extends ConsumerWidget {
               letterSpacing: 2,
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3),
             ),
           ),
           const SizedBox(height: 12), // Reduced from 16
@@ -62,7 +62,7 @@ class HomeCompassWidget extends ConsumerWidget {
             homeState.subtitle,
             style: GoogleFonts.inter(
               fontSize: 14, // Reduced from 15
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.5),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -98,7 +98,7 @@ class HomeCompassWidget extends ConsumerWidget {
             fontSize: 11, 
             fontWeight: FontWeight.bold,
             letterSpacing: 1.0,
-            color: allowanceColor.withOpacity(0.8),
+            color: allowanceColor.withValues(alpha:0.8),
           ),
         ),
         const SizedBox(height: 20), 
@@ -118,7 +118,7 @@ class HomeCompassWidget extends ConsumerWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
                 ),
               ),
               const SizedBox(height: 4),
@@ -127,7 +127,7 @@ class HomeCompassWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
                 ),
               ),
             ],
@@ -143,7 +143,7 @@ class HomeCompassWidget extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.info, size: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+          Icon(LucideIcons.info, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.2)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -151,7 +151,7 @@ class HomeCompassWidget extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 11, // Reduced from 12
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.3),
                 fontStyle: FontStyle.italic,
               ),
             ),

@@ -12,9 +12,7 @@ import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
 import '../widgets/edit_account_sheet.dart';
 import '../widgets/wallet/wallet_summary_card.dart';
-import '../widgets/daily_allowance_card.dart';
 import '../widgets/home_compass_widget.dart';
-import '../../providers/home_state_provider.dart';
 import '../../providers/transaction_provider.dart';
 
 class WalletScreen extends ConsumerWidget {
@@ -134,7 +132,7 @@ class WalletScreen extends ConsumerWidget {
                         "${authState.user?.email ?? (authState.user?.isAnonymous == true ? 'Utente Verificato' : 'utente@fyne.it')} / $formattedDate",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -178,7 +176,7 @@ class WalletScreen extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                         side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline.withOpacity(0.12),
+                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12),
                         ),
                       ),
                     ),
@@ -193,7 +191,7 @@ class WalletScreen extends ConsumerWidget {
                         ),
                         const Spacer(),
                         Icon(LucideIcons.chevronRight, size: 16,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                       ],
                     ),
                   ),
@@ -204,7 +202,7 @@ class WalletScreen extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                  child: Divider(color: Theme.of(context).colorScheme.outline.withOpacity(0.12)),
+                  child: Divider(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12)),
                 ),
               ),
 
@@ -217,7 +215,7 @@ class WalletScreen extends ConsumerWidget {
                       letterSpacing: 2,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -313,7 +311,7 @@ class WalletScreen extends ConsumerWidget {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: ListTile(
@@ -369,7 +367,7 @@ class WalletScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A6741).withOpacity(0.05),
+                color: const Color(0xFF4A6741).withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: const Icon(LucideIcons.wallet, size: 40, color: Color(0xFF4A6741)),
@@ -384,7 +382,7 @@ class WalletScreen extends ConsumerWidget {
               "Aggiungi un conto per vedere il tuo patrimonio prendere forma.\nNon c'è fretta, inizia con quello che usi di più.",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 height: 1.5,
               ),
             ),

@@ -65,7 +65,7 @@ class WalletSummaryCard extends ConsumerWidget {
         // Fix Bug 1: sfondo coerente con il tema (chiaro/scuro)
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outlineVariant.withOpacity(0.5)),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha:0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +76,7 @@ class WalletSummaryCard extends ConsumerWidget {
               fontSize: 9,
               fontWeight: FontWeight.bold,
               // Fix Bug 1: colore label tema-aware
-              color: accentColor.withOpacity(0.7),
+              color: accentColor.withValues(alpha:0.7),
               letterSpacing: 1.0,
             ),
           ),

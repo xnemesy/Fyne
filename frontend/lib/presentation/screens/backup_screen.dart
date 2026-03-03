@@ -212,7 +212,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                 const SizedBox(height: 16),
                 Text(
                   'Esportato il: ${_formatDate(info['exported_at'])}',
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6)),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -292,7 +292,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: FyneColors.forest.withOpacity(0.1),
+                      color: FyneColors.forest.withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -425,7 +425,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                         Icon(
                           Icons.info_outline,
                           size: 20,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -616,7 +616,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: FyneColors.forest.withOpacity(0.1),
+                  color: FyneColors.forest.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -651,7 +651,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
               else
                 Icon(
                   Icons.chevron_right,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
                 ),
             ],
           ),
