@@ -89,9 +89,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   itemCount: visibleSummaries.length + (notifier.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == visibleSummaries.length) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 32),
-                        child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                      return const Column(
+                        children: [
+                          FyneTransactionShimmer(),
+                          FyneTransactionShimmer(),
+                          FyneTransactionShimmer(),
+                        ],
                       );
                     }
 
