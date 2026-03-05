@@ -22,6 +22,9 @@ class TransactionModel {
   final String? encryptedDescription;
   final String? encryptedCounterParty;
   final String? encryptedCategoryName;
+  final String? encryptedCategoryIcon;
+  final String? encryptedCategoryColor;
+  final String? encryptedTransactionStatus;
   @Index()
   final String? categoryUuid;
   
@@ -47,6 +50,9 @@ class TransactionModel {
     this.encryptedDescription,
     this.encryptedCounterParty,
     this.encryptedCategoryName,
+    this.encryptedCategoryIcon,
+    this.encryptedCategoryColor,
+    this.encryptedTransactionStatus,
     this.categoryUuid,
     required this.createdAt,
     required this.updatedAt,
@@ -60,6 +66,9 @@ class TransactionModel {
     String? description,
     String? counterParty,
     String? categoryName,
+    String? categoryIcon,
+    String? categoryColor,
+    String? transactionStatus,
   }) {
     final model = TransactionModel(
       id: id,
@@ -71,6 +80,9 @@ class TransactionModel {
       encryptedDescription: encryptedDescription,
       encryptedCounterParty: encryptedCounterParty,
       encryptedCategoryName: encryptedCategoryName,
+      encryptedCategoryIcon: encryptedCategoryIcon,
+      encryptedCategoryColor: encryptedCategoryColor,
+      encryptedTransactionStatus: encryptedTransactionStatus,
       categoryUuid: categoryUuid,
       createdAt: createdAt,
       updatedAt: updatedAt,
@@ -81,6 +93,9 @@ class TransactionModel {
     model._decryptedDescription = description;
     model._decryptedCounterParty = counterParty;
     model._decryptedCategoryName = categoryName;
+    model._decryptedCategoryIcon = categoryIcon;
+    model._decryptedCategoryColor = categoryColor;
+    model._decryptedTransactionStatus = transactionStatus;
     return model;
   }
 
@@ -96,12 +111,24 @@ class TransactionModel {
   
   @ignore
   String? _decryptedCategoryName;
+  
+  @ignore
+  String? _decryptedCategoryIcon;
+  
+  @ignore
+  String? _decryptedCategoryColor;
+  
+  @ignore
+  String? _decryptedTransactionStatus;
 
   // Secure Getters
   double? get amount => _decryptedAmount;
   String? get description => _decryptedDescription;
   String? get counterParty => _decryptedCounterParty;
   String? get categoryName => _decryptedCategoryName;
+  String? get categoryIcon => _decryptedCategoryIcon;
+  String? get categoryColor => _decryptedCategoryColor;
+  String? get transactionStatus => _decryptedTransactionStatus;
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
     return TransactionModel(
@@ -113,6 +140,9 @@ class TransactionModel {
       encryptedDescription: json['encrypted_description'],
       encryptedCounterParty: json['encrypted_counter_party'],
       encryptedCategoryName: json['encrypted_category_name'],
+      encryptedCategoryIcon: json['encrypted_category_icon'],
+      encryptedCategoryColor: json['encrypted_category_color'],
+      encryptedTransactionStatus: json['encrypted_transaction_status'],
       categoryUuid: json['category_uuid'],
       createdAt: json['created_at'] != null 
           ? DateTime.parse(json['created_at']) 
@@ -135,6 +165,9 @@ class TransactionModel {
       'encrypted_description': encryptedDescription,
       'encrypted_counter_party': encryptedCounterParty,
       'encrypted_category_name': encryptedCategoryName,
+      'encrypted_category_icon': encryptedCategoryIcon,
+      'encrypted_category_color': encryptedCategoryColor,
+      'encrypted_transaction_status': encryptedTransactionStatus,
       'category_uuid': categoryUuid,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -155,6 +188,9 @@ class TransactionSummary {
   final String? description;
   final String? counterParty;
   final String accountId;
+  final String? categoryIcon;
+  final String? categoryColor;
+  final String? transactionStatus;
   /// true se la decifratura AES-GCM è fallita (HMAC mismatch / chiave diversa).
   /// Il record va eliminato automaticamente — è irrecuperabile.
   final bool isCorrupted;
@@ -168,6 +204,9 @@ class TransactionSummary {
     this.categoryUuid,
     this.description,
     this.counterParty,
+    this.categoryIcon,
+    this.categoryColor,
+    this.transactionStatus,
     this.isCorrupted = false,
   });
 }

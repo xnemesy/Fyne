@@ -57,6 +57,9 @@ class TransactionRepository {
             encryptedAmount: newAmount,
             encryptedDescription: newDesc,
             categoryUuid: existing.categoryUuid,
+            encryptedCategoryIcon: existing.encryptedCategoryIcon,
+            encryptedCategoryColor: existing.encryptedCategoryColor,
+            encryptedTransactionStatus: existing.encryptedTransactionStatus,
             createdAt: existing.createdAt,
             updatedAt: DateTime.now(),
             isDeleted: existing.isDeleted,
@@ -75,12 +78,18 @@ class TransactionRepository {
     final descText = active.encryptedDescription != null ? await _crypto.decrypt(active.encryptedDescription!, scope: EncryptionScope.database, type: 'transaction_description', version: active.encryptionVersion) : null;
     final cpText = active.encryptedCounterParty != null ? await _crypto.decrypt(active.encryptedCounterParty!, scope: EncryptionScope.database, type: 'transaction_counterparty', version: active.encryptionVersion) : null;
     final catText = active.encryptedCategoryName != null ? await _crypto.decrypt(active.encryptedCategoryName!, scope: EncryptionScope.database, type: 'transaction_category_name', version: active.encryptionVersion) : null;
+    final iconText = active.encryptedCategoryIcon != null ? await _crypto.decrypt(active.encryptedCategoryIcon!, scope: EncryptionScope.database, type: 'transaction_category_icon', version: active.encryptionVersion) : null;
+    final colorText = active.encryptedCategoryColor != null ? await _crypto.decrypt(active.encryptedCategoryColor!, scope: EncryptionScope.database, type: 'transaction_category_color', version: active.encryptionVersion) : null;
+    final statusText = active.encryptedTransactionStatus != null ? await _crypto.decrypt(active.encryptedTransactionStatus!, scope: EncryptionScope.database, type: 'transaction_status', version: active.encryptionVersion) : null;
 
     return active.copyWithDecrypted(
       amount: double.tryParse(amountText),
       description: descText,
       counterParty: cpText,
       categoryName: catText,
+      categoryIcon: iconText,
+      categoryColor: colorText,
+      transactionStatus: statusText,
     );
   }
 
@@ -99,6 +108,9 @@ class TransactionRepository {
           description: decrypted.description,
           accountId: decrypted.accountId,
           categoryName: decrypted.categoryName,
+          categoryIcon: decrypted.categoryIcon,
+          categoryColor: decrypted.categoryColor,
+          transactionStatus: decrypted.transactionStatus,
           categoryUuid: decrypted.categoryUuid,
           counterParty: decrypted.counterParty,
         ));
@@ -150,6 +162,9 @@ class TransactionRepository {
               'encryptedDescription': m.encryptedDescription,
               'encryptedCounterParty': m.encryptedCounterParty,
               'encryptedCategoryName': m.encryptedCategoryName,
+              'encryptedCategoryIcon': m.encryptedCategoryIcon,
+              'encryptedCategoryColor': m.encryptedCategoryColor,
+              'encryptedTransactionStatus': m.encryptedTransactionStatus,
               'categoryUuid': m.categoryUuid,
               'encryptionVersion': m.encryptionVersion,
             })
@@ -186,6 +201,9 @@ class TransactionRepository {
     String? rawDesc,
     String? rawCounterParty,
     String? rawCategoryName,
+    String? rawCategoryIcon,
+    String? rawCategoryColor,
+    String? rawTransactionStatus,
   }) async {
     final amount = rawAmount ?? tx.amount?.toString() ?? '0.0';
     final desc = rawDesc ?? tx.description;
@@ -214,6 +232,24 @@ class TransactionRepository {
       type: 'transaction_category_name',
     ) : null;
 
+    final encryptedIcon = rawCategoryIcon != null ? await _crypto.encrypt(
+      rawCategoryIcon,
+      scope: EncryptionScope.database,
+      type: 'transaction_category_icon',
+    ) : null;
+
+    final encryptedColor = rawCategoryColor != null ? await _crypto.encrypt(
+      rawCategoryColor,
+      scope: EncryptionScope.database,
+      type: 'transaction_category_color',
+    ) : null;
+
+    final encryptedStatus = rawTransactionStatus != null ? await _crypto.encrypt(
+      rawTransactionStatus,
+      scope: EncryptionScope.database,
+      type: 'transaction_status',
+    ) : null;
+
     final modelToPut = TransactionModel(
       id: tx.id,
       uuid: tx.uuid,
@@ -224,6 +260,9 @@ class TransactionRepository {
       encryptedDescription: encryptedDesc,
       encryptedCounterParty: encryptedCp,
       encryptedCategoryName: encryptedCat,
+      encryptedCategoryIcon: encryptedIcon,
+      encryptedCategoryColor: encryptedColor,
+      encryptedTransactionStatus: encryptedStatus,
       categoryUuid: tx.categoryUuid,
       createdAt: tx.createdAt,
       updatedAt: DateTime.now(),
@@ -251,6 +290,9 @@ class TransactionRepository {
           encryptedDescription: existing.encryptedDescription,
           encryptedCounterParty: existing.encryptedCounterParty,
           encryptedCategoryName: existing.encryptedCategoryName,
+          encryptedCategoryIcon: existing.encryptedCategoryIcon,
+          encryptedCategoryColor: existing.encryptedCategoryColor,
+          encryptedTransactionStatus: existing.encryptedTransactionStatus,
           categoryUuid: existing.categoryUuid,
           createdAt: existing.createdAt,
           updatedAt: DateTime.now(),
@@ -340,6 +382,9 @@ Future<List<TransactionSummary>> _batchDecryptInBackground(
       final descStr   = await decryptField(json['encryptedDescription'] as String?);
       final cpStr     = await decryptField(json['encryptedCounterParty'] as String?);
       final catStr    = await decryptField(json['encryptedCategoryName'] as String?);
+      final iconStr   = await decryptField(json['encryptedCategoryIcon'] as String?);
+      final colorStr  = await decryptField(json['encryptedCategoryColor'] as String?);
+      final statusStr = await decryptField(json['encryptedTransactionStatus'] as String?);
 
       final corrupted = amountStr == null;
       summaries.add(TransactionSummary(
@@ -350,6 +395,9 @@ Future<List<TransactionSummary>> _batchDecryptInBackground(
         description:  corrupted ? 'Dato Corrotto 🔒' : (descStr ?? ''),
         counterParty: cpStr,
         categoryName: catStr,
+        categoryIcon: iconStr,
+        categoryColor: colorStr,
+        transactionStatus: statusStr,
         categoryUuid: json['categoryUuid'] as String?,
         isCorrupted:  corrupted,
       ));

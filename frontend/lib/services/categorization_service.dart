@@ -7,9 +7,17 @@ class Category {
 // ... (imports and class start)
   final String id;
   final String name;
+  final String icon;
+  final String color;
   final bool isHealthFocus;
 
-  Category({required this.id, required this.name, this.isHealthFocus = false});
+  Category({
+    required this.id, 
+    required this.name, 
+    required this.icon,
+    required this.color,
+    this.isHealthFocus = false
+  });
 }
 
 class CategorizationService {
@@ -35,9 +43,39 @@ class CategorizationService {
         _uuid.v5(Uuid.NAMESPACE_URL, name): Category(
           id: _uuid.v5(Uuid.NAMESPACE_URL, name),
           name: name,
+          icon: _getIconForCategory(name),
+          color: _getColorForCategory(name),
           isHealthFocus: name == 'Wellness',
         )
     };
+  }
+
+  String _getIconForCategory(String name) {
+    switch (name) {
+      case 'Abbonamenti': return 'subscriptions';
+      case 'Alimentari': return 'shopping_cart';
+      case 'Fast Food': return 'fastfood';
+      case 'Shopping': return 'local_mall';
+      case 'Trasporti': return 'directions_car';
+      case 'Vizi': return 'smoking_rooms';
+      case 'Wellness': return 'fitness_center';
+      case 'Altro':
+      default: return 'category';
+    }
+  }
+
+  String _getColorForCategory(String name) {
+    switch (name) {
+      case 'Abbonamenti': return '#FF9800'; // Orange
+      case 'Alimentari': return '#4CAF50'; // Green
+      case 'Fast Food': return '#F44336'; // Red
+      case 'Shopping': return '#2196F3'; // Blue
+      case 'Trasporti': return '#607D8B'; // Blue Grey
+      case 'Vizi': return '#795548'; // Brown
+      case 'Wellness': return '#9C27B0'; // Purple
+      case 'Altro':
+      default: return '#9E9E9E'; // Grey
+    }
   }
 
   Future<void> loadModel() async {
