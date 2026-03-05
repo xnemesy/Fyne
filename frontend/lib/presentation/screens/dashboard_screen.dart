@@ -4,12 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/fyne_theme.dart';
 import '../../providers/account_overview_provider.dart';
-import '../../models/account.dart';
 import 'wallet_screen.dart';
 import 'insights_screen.dart';
 import 'transactions_screen.dart';
 import 'backup_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
+import '../widgets/dashboard/account_carousel.dart';
+import '../widgets/dashboard/balance_chart.dart';
 import '../../providers/sync_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,19 +86,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildHomeTab(AccountOverviewState state) {
-    if (state.isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Caricamento dati...'),
-          ],
-        ),
-      );
-    }
-
     if (state.error != null) {
       // Translate technical errors to user-friendly messages
       String userMessage;
@@ -142,34 +130,80 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       );
     }
 
+    // SafeArea top: sì — protegge la notch iOS.
+    // SafeArea bottom: no — gestiamo noi il padding con SliverPadding finale.
     return SafeArea(
-      child: SingleChildScrollView(
+      bottom: false,
+      child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          // Header con saluto e Sync
-          _buildGreetingHeader(context),
-          const SizedBox(height: 24),
+        slivers: [
+          // ── Intestazione con saluto e pulsante sync ──────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: _buildGreetingHeader(context),
+            ),
+          ),
 
-          // Card Overview Totale
-          _buildTotalBalanceCard(state),
-          const SizedBox(height: 24),
+          // ── Card patrimonio totale ────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+              child: _buildTotalBalanceCard(state),
+            ),
+          ),
 
-          // Cash Flow Card
-          _buildCashFlowCard(state),
-          const SizedBox(height: 24),
+          // ── Titolo sezione conti ──────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+              child: Text(
+                'I Tuoi Conti',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          ),
 
-          // Accounts by Type
-          _buildAccountsByTypeSection(state),
-          const SizedBox(height: 24),
+          // ── Carousel orizzontale dei conti (AccountCarousel) ─────────────
+          // padding solo a sinistra: la card si affaccia sul bordo destro
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(left: 16),
+              child: AccountCarousel(),
+            ),
+          ),
 
-          // Quick Actions
-          _buildQuickActions(context),
-          const SizedBox(height: 16),
-          ],
-        ),
+          // ── Titolo sezione grafico ────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+              child: BalanceChart(),
+            ),
+          ),
+
+          // ── Cash Flow mensile ─────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: _buildCashFlowCard(state),
+            ),
+          ),
+
+          // ── Azioni rapide ─────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: _buildQuickActions(context),
+            ),
+          ),
+
+          // ── Padding inferiore: home indicator iOS + margine extra ─────────
+          SliverPadding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 24,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -464,82 +498,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildAccountsByTypeSection(AccountOverviewState state) {
-    final groupedAccounts = <AccountType, List<AccountSummary>>{};
-
-    for (final account in state.accounts) {
-      groupedAccounts.putIfAbsent(account.type, () => []).add(account);
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'I Tuoi Conti',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 16),
-        ...groupedAccounts.entries.map((entry) {
-          final type = entry.key;
-          final accounts = entry.value;
-          final total = accounts.fold(0.0, (sum, a) => sum + a.balance);
-
-          return _buildAccountTypeCard(type, accounts, total);
-        }),
-      ],
-    );
-  }
-
-  Widget _buildAccountTypeCard(
-      AccountType type, List<AccountSummary> accounts, double total) {
-    final typeInfo = _getAccountTypeInfo(type);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ExpansionTile(
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: typeInfo['color'].withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(typeInfo['icon'], color: typeInfo['color']),
-        ),
-        title: Text(typeInfo['label']),
-        subtitle: Text(
-            '${accounts.length} ${accounts.length == 1 ? 'conto' : 'conti'}'),
-        trailing: Text(
-          _formatCurrency(total),
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: typeInfo['color'],
-          ),
-        ),
-        children: accounts.map((acc) => _buildAccountListTile(acc)).toList(),
-      ),
-    );
-  }
-
-  Widget _buildAccountListTile(AccountSummary account) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-      title: Text(account.name),
-      subtitle: Text(account.group),
-      trailing: Text(
-        _formatCurrency(account.balance),
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: account.balance >= 0 ? FyneColors.forest : FyneColors.rust,
-        ),
-      ),
-      onTap: () {
-        // TODO: Navigate to account detail
-      },
-    );
-  }
-
   Widget _buildQuickActions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -616,53 +574,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
       ),
     );
-  }
-
-  Map<String, dynamic> _getAccountTypeInfo(AccountType type) {
-    switch (type) {
-      case AccountType.checking:
-        return {
-          'label': 'Conti Correnti',
-          'icon': Icons.account_balance,
-          'color': FyneColors.forest,
-        };
-      case AccountType.savings:
-        return {
-          'label': 'Risparmi',
-          'icon': Icons.savings_outlined,
-          'color': FyneColors.gold,
-        };
-      case AccountType.credit:
-        return {
-          'label': 'Carte di Credito',
-          'icon': Icons.credit_card,
-          'color': FyneColors.rust,
-        };
-      case AccountType.investment:
-        return {
-          'label': 'Investimenti',
-          'icon': Icons.trending_up,
-          'color': FyneColors.amber,
-        };
-      case AccountType.loan:
-        return {
-          'label': 'Prestiti',
-          'icon': Icons.attach_money,
-          'color': FyneColors.rust,
-        };
-      case AccountType.cash:
-        return {
-          'label': 'Contanti',
-          'icon': Icons.account_balance_wallet,
-          'color': FyneColors.moss,
-        };
-      case AccountType.crypto:
-        return {
-          'label': 'Crypto',
-          'icon': Icons.currency_bitcoin,
-          'color': FyneColors.amber,
-        };
-    }
   }
 
   String _formatCurrency(double amount) {
