@@ -10,6 +10,7 @@ import 'add_account_screen.dart';
 import 'transactions_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/add_transaction_sheet.dart';
+import '../widgets/fyne_shimmer.dart';
 import '../widgets/edit_account_sheet.dart';
 import '../widgets/wallet/wallet_summary_card.dart';
 import '../widgets/home_compass_widget.dart';
@@ -237,8 +238,11 @@ class WalletScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                loading: () => const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                loading: () => SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, __) => const FyneAccountShimmer(),
+                    childCount: 4,
+                  ),
                 ),
                 error: (err, stack) => SliverToBoxAdapter(
                   child: Center(child: Text("Errore: $err", style: const TextStyle(color: Colors.red))),
