@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/transaction_provider.dart';
+import '../widgets/fyne_shimmer.dart';
 import '../widgets/transaction_item.dart';
 import 'transaction_detail_screen.dart';
 
@@ -148,7 +149,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+              loading: () => ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                itemCount: 8,
+                itemBuilder: (_, __) => const FyneTransactionShimmer(),
+              ),
               error: (err, _) => Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
