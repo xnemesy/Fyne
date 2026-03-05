@@ -11,6 +11,7 @@ import '../../providers/budget_provider.dart';
 import '../../providers/transaction_provider.dart';
 import '../../providers/insights_provider.dart';
 
+import '../widgets/fyne_shimmer.dart';
 import '../../presentation/widgets/insights/net_worth_chart.dart';
 import '../../presentation/widgets/insights/burn_rate_card.dart';
 import '../../presentation/widgets/insights/cash_flow_card.dart';
@@ -77,12 +78,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                 transitionKey:
                     'insights-body-${insightsState.selectedPeriod.name}-${insightsState.isLoading}',
                 child: insightsState.isLoading
-                    ? const SizedBox(
-                        height: 300,
-                        child: Center(
-                            child: CircularProgressIndicator(
-                                color: Color(0xFF4A6741))),
-                      )
+                    ? const FyneInsightsShimmer()
                     : (insightsState.netWorth == 0 &&
                             insightsState.income == 0 &&
                             insightsState.expenses == 0)
