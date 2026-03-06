@@ -17,6 +17,7 @@ import '../../presentation/widgets/insights/burn_rate_card.dart';
 import '../../presentation/widgets/insights/cash_flow_card.dart';
 import '../../presentation/widgets/insights/top_categories_list.dart';
 import '../../presentation/widgets/insights/category_pie_chart.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class InsightsScreen extends ConsumerStatefulWidget {
   const InsightsScreen({super.key});
@@ -33,7 +34,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     return Scaffold(
       // backgroundColor rimosso per supportare il dark mode
       body: RefreshIndicator(
-        color: const Color(0xFF4A6741),
+        color: FyneColors.forest,
         onRefresh: () async {
           await FyneHaptics.onPullRefresh();
           await ref.read(accountsProvider.notifier).refresh();
@@ -51,7 +52,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(LucideIcons.pieChart,
-                        size: 28, color: Color(0xFF34C759)),
+                        size: 28, color: FyneColors.income),
                     const SizedBox(height: 20),
                     Text(
                       "Rapporti",
@@ -125,7 +126,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                     borderRadius: BorderRadius.circular(24),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: Colors.black
+                                          color: FyneColors.ink
                                               .withValues(alpha: 0.06),
                                           blurRadius: 10),
                                     ],
@@ -143,7 +144,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFA0665F)
+                                      color: FyneColors.rust
                                           .withValues(alpha: 0.05),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
@@ -152,7 +153,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
                                       style: GoogleFonts.inter(
                                         fontSize: 13,
                                         height: 1.5,
-                                        color: const Color(0xFFA0665F),
+                                        color: FyneColors.rust,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -228,11 +229,11 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF34C759).withValues(alpha: 0.05),
+              color: FyneColors.income.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
             child: const Icon(LucideIcons.barChart3,
-                size: 40, color: Color(0xFF34C759)),
+                size: 40, color: FyneColors.income),
           ),
           const SizedBox(height: 24),
           Text(
@@ -319,7 +320,7 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
           boxShadow: active
               ? [
                   BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: FyneColors.ink.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 2))
                 ]

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/account.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/master_key_provider.dart';
@@ -41,22 +42,22 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A6741) : Theme.of(context).colorScheme.surfaceContainerHigh,
+          color: isSelected ? FyneColors.forest : Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: isSelected ? Colors.transparent : Theme.of(context).colorScheme.outline.withValues(alpha: 0.12)),
-          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF4A6741).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+          boxShadow: isSelected ? [BoxShadow(color: FyneColors.forest.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface),
+            Icon(icon, size: 16, color: isSelected ? FyneColors.paper : Theme.of(context).colorScheme.onSurface),
             const SizedBox(width: 8),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                color: isSelected ? FyneColors.paper : Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],
@@ -74,9 +75,9 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
         right: 32,
         top: 32,
       ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBFBF9),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
         ),
@@ -101,7 +102,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(LucideIcons.x, color: Color(0xFF1A1A1A), size: 20),
+                  icon: const Icon(LucideIcons.x, color: FyneColors.ink, size: 20),
                 ),
               ],
             ),
@@ -138,14 +139,14 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _saveAccount,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A6741),
-                  foregroundColor: Colors.white,
+                  backgroundColor: FyneColors.forest,
+                  foregroundColor: FyneColors.paper,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: _isSaving 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                child: _isSaving
+                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: FyneColors.paper, strokeWidth: 2))
                     : Text("AGGIORNA CONTO", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
             ),
@@ -154,21 +155,21 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
               width: double.infinity,
               child: TextButton.icon(
                 onPressed: _isSaving ? null : _deleteAccount,
-                icon: const Icon(LucideIcons.trash2, size: 18, color: Color(0xFFFF3B30)),
+                icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.danger),
                 label: Text(
                   "ELIMINA CONTO",
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
                     fontSize: 13,
-                    color: const Color(0xFFFF3B30),
+                    color: const FyneColors.danger,
                   ),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: const Color(0xFFFF3B30).withValues(alpha: 0.2)),
+                    side: BorderSide(color: const FyneColors.danger.withValues(alpha: 0.2)),
                   ),
                 ),
               ),
@@ -205,7 +206,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF4A6741)),
+        borderSide: const BorderSide(color: FyneColors.forest),
       ),
     );
   }
@@ -220,7 +221,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
           TextButton(
             onPressed: () => Navigator.pop(context, true), 
-            child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30))),
+            child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger)),
           ),
         ],
       ),

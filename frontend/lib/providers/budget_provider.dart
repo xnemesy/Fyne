@@ -172,21 +172,30 @@ class BudgetStatus {
   bool get isOverBudget => spent > budget.limitAmount;
 }
 
-final budgetSummaryProvider = Provider<List<BudgetStatus>>((ref) {
-  final budgets = ref.watch(budgetsProvider).value ?? [];
-  final transactions = ref.watch(transactionsProvider).value ?? [];
-  
-  final now = DateTime.now();
+/// Spesa del mese corrente aggregata per categoryUuid.
+/// Usa il repository direttamente (non la lista paginata) per precisione totale.
+/// Si aggiorna automaticamente quando cambia `transactionsProvider`.
+final monthlyCategorySpentProvider = FutureProvider<Map<String, double>>((ref) async {
+  // Ascolta i cambiamenti della lista paginata per triggherare il ricalcolo
+  ref.watch(transactionsProvider);
+
+  final repo = ref.watch(transactionRepositoryProvider);
+  if (repo == null) return {};
+
+  final now          = DateTime.now();
   final firstOfMonth = DateTime(now.year, now.month, 1);
-  
+  final endOfMonth   = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+
+  return repo.getSpentByCategoriesInRange(firstOfMonth, endOfMonth);
+});
+
+final budgetSummaryProvider = Provider<List<BudgetStatus>>((ref) {
+  final budgets       = ref.watch(budgetsProvider).value ?? [];
+  // Usa i dati precisi dal repository; fallback {} durante il caricamento
+  final categorySpent = ref.watch(monthlyCategorySpentProvider).value ?? {};
+
   return budgets.map((budget) {
-    final categorySpent = transactions
-        .where((tx) => 
-          tx.categoryUuid == budget.categoryUuid && 
-          tx.bookingDate.isAfter(firstOfMonth) &&
-          tx.amount < 0)
-        .fold(0.0, (sum, tx) => sum + tx.amount.abs());
-        
-    return BudgetStatus(budget: budget, spent: categorySpent);
+    final spent = categorySpent[budget.categoryUuid] ?? 0.0;
+    return BudgetStatus(budget: budget, spent: spent);
   }).toList();
 });

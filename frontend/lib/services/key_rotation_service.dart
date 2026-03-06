@@ -9,16 +9,13 @@ import 'crypto_service.dart';
  * Standards: Crash-safe, Atomic, Race-safe.
  */
 class KeyRotationService {
-  final CryptoService _crypto;
-  final Ref _ref;
-
   // Emergency Kill-switch (Configurable via Remote Config)
   bool _isMigrationEnabled = true;
 
   // Per-record migration locks to prevent double migration
   final Map<String, Future<void>> _migrationLocks = {};
 
-  KeyRotationService(this._ref, this._crypto);
+  KeyRotationService();
 
   void setMigrationEnabled(bool enabled) {
     _isMigrationEnabled = enabled;
@@ -74,6 +71,5 @@ class KeyRotationService {
 }
 
 final keyRotationProvider = Provider((ref) {
-  final crypto = ref.watch(cryptoServiceProvider);
-  return KeyRotationService(ref, crypto);
+  return KeyRotationService();
 });

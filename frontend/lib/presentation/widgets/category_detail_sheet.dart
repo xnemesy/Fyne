@@ -280,7 +280,7 @@ class _CategoryDetailSheetState extends ConsumerState<CategoryDetailSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _kForest,
                   disabledBackgroundColor: _kSurface,
-                  foregroundColor: Colors.white,
+                  foregroundColor: _kPaper,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
@@ -291,7 +291,7 @@ class _CategoryDetailSheetState extends ConsumerState<CategoryDetailSheet> {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2, color: _kPaper),
                       )
                     : Text(
                         isEdit ? 'SALVA MODIFICHE' : 'CREA CATEGORIA',
@@ -393,7 +393,7 @@ class _ColorPicker extends StatelessWidget {
                   : null,
             ),
             child: isSelected
-                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                ? const Icon(Icons.check, color: _kPaper, size: 18)
                 : null,
           ),
         );

@@ -25,6 +25,20 @@ class FyneColors {
   static const Color gold = Color(0xFFC9A227);
   static const Color softRed = Color(0xFFE57373);
 
+  // Gradiente endpoint per card tipo conto
+  static const Color goldDark = Color(0xFFA07010);
+  static const Color rustDark = Color(0xFF8B3A37);
+  static const Color amberDark = Color(0xFF8B6A3A);
+  static const Color maroon = Color(0xFF5C2222);
+
+  // Semantici transazionali
+  static const Color income = Color(0xFF2D7A5F);  // Entrate positive
+  static const Color danger = Color(0xFFFF3B30);  // Azioni distruttive
+
+  // Struttura dark mode
+  static const Color surfaceDark = Color(0xFF2A2A2A);  // Card/surface dark
+  static const Color dividerDark = Color(0xFF3A3A3A);  // Divider/border dark
+
   // Overlay
   static const Color blind = Color(0x801A1A1A);
   static const Color subtle = Color(0x1A1A1A1A);

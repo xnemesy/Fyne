@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/privacy_provider.dart';
 
 class PrivacyBlurOverlay extends ConsumerWidget {
@@ -22,14 +23,14 @@ class PrivacyBlurOverlay extends ConsumerWidget {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: Container(
-                  color: const Color(0xFFFBFBF9).withValues(alpha:0.4),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha:0.4),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
                           Icons.lock_outline,
-                          color: Color(0xFF4A6741),
+                          color: FyneColors.forest,
                           size: 48,
                         ),
                         const SizedBox(height: 16),

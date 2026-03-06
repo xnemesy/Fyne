@@ -57,4 +57,76 @@ class NotificationService {
     }
     return scheduledDate;
   }
+
+  // ── Spese programmate ──────────────────────────────────────────────────────
+
+  /// Schedula un reminder per la prossima occorrenza di una spesa programmata.
+  /// [description] deve essere già decifrato — mai testo cifrato nella notifica.
+  Future<void> scheduleTransactionReminder({
+    required String id,
+    required String description,
+    required double amount,
+    required DateTime nextOccurrence,
+  }) async {
+    // Salta date già passate
+    if (nextOccurrence.isBefore(DateTime.now())) return;
+
+    // UUID → int positivo in range sicuro per il plugin
+    final notifId = id.hashCode.abs() % 2147483647;
+
+    final scheduledDate = tz.TZDateTime.from(nextOccurrence, tz.local);
+
+    await _notificationsPlugin.zonedSchedule(
+      notifId,
+      'Pagamento in scadenza',
+      '$description • ${amount.abs().toStringAsFixed(2)} €',
+      scheduledDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'scheduled_tx_channel',
+          'Spese Programmate',
+          channelDescription: 'Promemoria pagamenti programmati',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: false,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
+  /// Cancella il reminder per la spesa con l'ID specificato.
+  Future<void> cancelTransactionReminder(String id) async {
+    final notifId = id.hashCode.abs() % 2147483647;
+    await _notificationsPlugin.cancel(notifId);
+  }
+
+  /// Rischedula i reminder per tutte le spese programmate attive.
+  /// Cancella prima i reminder precedenti (per ID noti) e ne crea di nuovi.
+  /// I dati passati devono essere già decifrati.
+  Future<void> rescheduleTransactionReminders({
+    required List<String> previousIds,
+    required List<Map<String, dynamic>> transactions,
+  }) async {
+    // Cancella i reminder delle transazioni precedenti
+    for (final oldId in previousIds) {
+      await cancelTransactionReminder(oldId);
+    }
+
+    // Schedula i reminder aggiornati
+    for (final tx in transactions) {
+      await scheduleTransactionReminder(
+        id:             tx['id'] as String,
+        description:    tx['description'] as String,
+        amount:         tx['amount'] as double,
+        nextOccurrence: tx['nextOccurrence'] as DateTime,
+      );
+    }
+  }
 }

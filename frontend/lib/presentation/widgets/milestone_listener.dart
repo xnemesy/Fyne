@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/transaction_provider.dart';
 import '../../providers/budget_provider.dart';
@@ -65,7 +66,7 @@ class MilestoneListener extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: Colors.white,
+              color: FyneColors.paper,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
             ),

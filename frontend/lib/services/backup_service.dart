@@ -216,8 +216,17 @@ class BackupService {
   }
 
   /// Helper per migrare vecchi formati di backup alla versione corrente.
+  /// Fail-fast: nessuna migrazione implicita — versioni sconosciute causerebbero
+  /// silent data corruption se il payload venisse importato invariato.
   Future<Map<String, dynamic>> _migratePayload(String fromVersion, Map<String, dynamic> payload) async {
-    return payload;
+    // v1.0.0 → v1.0.0: nessuna migrazione necessaria (stesso schema)
+    // Aggiungere qui i path di migrazione futuri, es:
+    //   if (fromVersion == '0.9.0') return _migrate_0_9_to_1_0(payload);
+    throw Exception(
+      'Versione backup non supportata: $fromVersion. '
+      'Versione attuale: $currentBackupVersion. '
+      'Impossibile importare: il formato non è compatibile e la migrazione automatica non è definita.',
+    );
   }
 }
 

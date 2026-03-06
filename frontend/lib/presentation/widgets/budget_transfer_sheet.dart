@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/budget.dart';
 import '../../providers/budget_provider.dart';
 import '../../services/api_service.dart';
@@ -30,9 +31,9 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
         left: 24,
         right: 24,
       ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBFBF9),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -63,7 +64,7 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
               hintText: "0.00",
               suffixText: "€",
               border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.1)),
+              hintStyle: TextStyle(color: FyneColors.ink.withValues(alpha: 0.1)),
             ),
           ),
           
@@ -74,13 +75,13 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
             child: ElevatedButton(
               onPressed: _isProcessing ? null : _handleTransfer,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A6741),
-                foregroundColor: Colors.white,
+                backgroundColor: FyneColors.forest,
+                foregroundColor: FyneColors.paper,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               child: _isProcessing 
-                ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: FyneColors.paper, strokeWidth: 2))
                 : Text("CONFERMA TRASFERIMENTO", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
             ),
           ),
@@ -109,9 +110,9 @@ class _BudgetTransferSheetState extends ConsumerState<BudgetTransferSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        border: Border.all(color: FyneColors.ink.withValues(alpha: 0.05)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Budget>(

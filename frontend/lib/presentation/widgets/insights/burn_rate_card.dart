@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/theme/fyne_theme.dart';
 
 class BurnRateCard extends StatelessWidget {
   final double dailyBurn;
@@ -15,12 +16,13 @@ class BurnRateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 20, offset: const Offset(0, 10))],
+        boxShadow: [BoxShadow(color: FyneColors.ink.withValues(alpha: 0.03), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,14 +35,14 @@ class BurnRateCard extends StatelessWidget {
               const Spacer(),
               Icon(
                 trend <= 0 ? LucideIcons.trendingDown : LucideIcons.trendingUp,
-                color: trend <= 0 ? const Color(0xFF4A6741) : const Color(0xFFD63031),
+                color: trend <= 0 ? FyneColors.forest : colorScheme.error,
                 size: 20
               ),
               const SizedBox(width: 4),
               Text(
-                "${trend.abs().toStringAsFixed(0)}%", 
+                "${trend.abs().toStringAsFixed(0)}%",
                 style: GoogleFonts.inter(
-                  color: trend <= 0 ? const Color(0xFF4A6741) : const Color(0xFFD63031), 
+                  color: trend <= 0 ? FyneColors.forest : colorScheme.error,
                   fontWeight: FontWeight.bold, 
                   fontSize: 14
                 )

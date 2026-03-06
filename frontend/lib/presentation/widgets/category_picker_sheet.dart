@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../services/categorization_service.dart';
 
 class CategoryPickerSheet extends StatelessWidget {
@@ -34,7 +35,7 @@ class CategoryPickerSheet extends StatelessWidget {
               Navigator.of(context).pop();
             },
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            tileColor: isSelected ? const Color(0xFF4A6741).withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
+            tileColor: isSelected ? FyneColors.forest.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
             title: Text(
               category.name,
               style: GoogleFonts.inter(
@@ -43,8 +44,8 @@ class CategoryPickerSheet extends StatelessWidget {
               ),
             ),
             trailing: isSelected
-                ? const Icon(Icons.check_circle, color: Color(0xFF4A6741))
-                : const Icon(Icons.chevron_right, color: Color(0xFFB0B0B0)),
+                ? const Icon(Icons.check_circle, color: FyneColors.forest)
+                : const Icon(Icons.chevron_right, color: FyneColors.inkLighter),
           );
         },
       ),

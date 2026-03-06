@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/categorization_provider.dart';
 import '../../services/categorization_service.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class CategorizationRulesScreen extends ConsumerWidget {
   const CategorizationRulesScreen({super.key});
@@ -18,7 +19,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1A1A1A)),
+          icon: const Icon(LucideIcons.chevronLeft, color: FyneColors.ink),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -32,7 +33,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
           children: [
             Text(
               "KEYWORDS PERSONALIZZATE",
-              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.2),
+              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: FyneColors.inkLight, letterSpacing: 1.2),
             ),
             const SizedBox(height: 16),
             if (rules.isEmpty)
@@ -43,7 +44,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
             const SizedBox(height: 40),
             Text(
               "REGOLE DI SISTEMA (READ-ONLY)",
-              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.2),
+              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: FyneColors.inkLight, letterSpacing: 1.2),
             ),
             const SizedBox(height: 16),
             _buildSystemRulesInfo(context),
@@ -54,7 +55,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddRuleSheet(context, ref, service),
-        backgroundColor: const Color(0xFF4A6741),
+        backgroundColor: FyneColors.forest,
         icon: const Icon(LucideIcons.plus),
         label: Text("AGGIUNGI REGOLA", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
       ),
@@ -65,7 +66,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.05)),
       ),
@@ -73,7 +74,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
         title: Text(rule.pattern, style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
         subtitle: Text("Categoria: ${rule.categoryName}", style: GoogleFonts.inter(fontSize: 12)),
         trailing: IconButton(
-          icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.redAccent),
+          icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.danger),
           onPressed: () => ref.read(categorizationRulesProvider.notifier).deleteRule(rule.id),
         ),
       ),
@@ -84,7 +85,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -93,13 +94,13 @@ class CategorizationRulesScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             "Nessuna keyword personalizzata",
-            style: GoogleFonts.inter(fontWeight: FontWeight.w500, color: Colors.grey),
+            style: GoogleFonts.inter(fontWeight: FontWeight.w500, color: FyneColors.inkLight),
           ),
           const SizedBox(height: 8),
           Text(
             "Aggiungi parole chiave per categorizzare automaticamente le tue transazioni.",
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.withValues(alpha:0.6)),
+            style: GoogleFonts.inter(fontSize: 12, color: FyneColors.inkLight.withValues(alpha:0.6)),
           ),
         ],
       ),
@@ -148,12 +149,12 @@ class CategorizationRulesScreen extends ConsumerWidget {
               decoration: InputDecoration(
                 hintText: "es. Coop, Benzinaio, Amazon...",
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
             ),
             const SizedBox(height: 24),
-            Text("ASSEGNA A CATEGORIA", style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+            Text("ASSEGNA A CATEGORIA", style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: FyneColors.inkLight)),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -167,9 +168,9 @@ class CategorizationRulesScreen extends ConsumerWidget {
                     selectedCategory = cat;
                     (context as Element).markNeedsBuild();
                   },
-                  selectedColor: const Color(0xFF4A6741),
+                  selectedColor: FyneColors.forest,
                   labelStyle: GoogleFonts.inter(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? FyneColors.paper : FyneColors.ink,
                     fontSize: 12,
                   ),
                 );
@@ -191,12 +192,12 @@ class CategorizationRulesScreen extends ConsumerWidget {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A6741),
+                  backgroundColor: FyneColors.forest,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text("SALVA REGOLA", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text("SALVA REGOLA", style: GoogleFonts.inter(color: FyneColors.paper, fontWeight: FontWeight.bold)),
               ),
             ),
           ],

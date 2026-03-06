@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/budget.dart';
 import '../../providers/budget_provider.dart'; // Add this import
 import 'decrypted_value.dart';
@@ -34,11 +35,11 @@ class BudgetCard extends StatelessWidget {
 
     Color progressColor;
     if (progress >= 1.0) {
-      progressColor = const Color(0xFFD63031);
+      progressColor = FyneColors.rust;
     } else if (progress >= 0.8) {
-      progressColor = const Color(0xFFE6A23C);
+      progressColor = FyneColors.amber;
     } else {
-      progressColor = const Color(0xFF4A6741);
+      progressColor = FyneColors.forest;
     }
 
     if (effectiveBudget == null) {
@@ -62,7 +63,7 @@ class BudgetCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:0.03),
+              color: FyneColors.ink.withValues(alpha:0.03),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -127,7 +128,7 @@ class BudgetCard extends StatelessWidget {
                     DecryptedValue(
                       value: remaining.abs().toStringAsFixed(2),
                       style: TextStyle(
-                        color: isOver ? const Color(0xFFD63031) : Theme.of(context).colorScheme.onSurface,
+                        color: isOver ? FyneColors.rust : Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -142,17 +143,17 @@ class BudgetCard extends StatelessWidget {
                  padding: const EdgeInsets.all(12),
                  decoration: BoxDecoration(
                    // Amber tint: leggibile in dark (sfondo scuro+trasparente) e light
-                   color: const Color(0xFFD4A574).withValues(alpha:0.15),
+                   color: const FyneColors.amber.withValues(alpha:0.15),
                    borderRadius: BorderRadius.circular(12),
                  ),
                  child: Row(
                    children: [
-                     const Icon(LucideIcons.alertTriangle, size: 16, color: Color(0xFFD4A574)),
+                     const Icon(LucideIcons.alertTriangle, size: 16, color: FyneColors.amber),
                      const SizedBox(width: 8),
                      Expanded(
                        child: Text(
                          "Attenzione: a questo ritmo sforerai di ${(projectedSpend - effectiveBudget.limitAmount).toStringAsFixed(0)}€",
-                         style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFFD4A574), fontWeight: FontWeight.w500),
+                         style: GoogleFonts.inter(fontSize: 12, color: const FyneColors.amber, fontWeight: FontWeight.w500),
                        ),
                      ),
                    ],

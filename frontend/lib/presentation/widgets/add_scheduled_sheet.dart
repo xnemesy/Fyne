@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/haptics/fyne_haptics.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/master_key_provider.dart';
 import '../../services/crypto_service.dart';
 import '../../services/api_service.dart';
@@ -203,9 +205,9 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).brightness == Brightness.light 
-               ? const ColorScheme.light(primary: Color(0xFF4A6741), onPrimary: Colors.white)
-               : const ColorScheme.dark(primary: Color(0xFF8FA68B), onPrimary: Color(0xFF1A1A1A)),
+            colorScheme: Theme.of(context).brightness == Brightness.light
+               ? const ColorScheme.light(primary: FyneColors.forest, onPrimary: FyneColors.paper)
+               : const ColorScheme.dark(primary: FyneColors.forestLight, onPrimary: FyneColors.ink),
           ),
           child: child!,
         );
@@ -218,6 +220,7 @@ class _AddScheduledTransactionSheetState extends ConsumerState<AddScheduledTrans
 
   Future<void> _saveScheduled() async {
     if (_amountController.text.isEmpty || _descriptionController.text.isEmpty) return;
+    FyneHaptics.medium();
     setState(() => _isSaving = true);
 
     try {

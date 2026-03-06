@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/formatters/currency_formatter.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../core/formatters/date_formatter.dart';
 import '../../core/haptics/fyne_haptics.dart';
 import '../../models/transaction.dart';
@@ -37,7 +38,7 @@ class TransactionDetailScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(color: Color(0xFF4A6741)),
+            const CircularProgressIndicator(color: FyneColors.forest),
             const SizedBox(height: 24),
             Text(
               "Accesso al Vault Sicuro...",
@@ -69,7 +70,7 @@ class TransactionDetailScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(LucideIcons.shieldAlert,
-                size: 48, color: Color(0xFFFF3B30)),
+                size: 48, color: FyneColors.danger),
             const SizedBox(height: 16),
             Text(message,
                 style: GoogleFonts.lora(
@@ -96,7 +97,7 @@ class _TransactionDetailContent extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1A1A1A)),
+          icon: const Icon(LucideIcons.chevronLeft, color: FyneColors.ink),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -108,7 +109,7 @@ class _TransactionDetailContent extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.trash2, color: Color(0xFFFF3B30)),
+            icon: const Icon(LucideIcons.trash2, color: FyneColors.danger),
             onPressed: () => _deleteTransaction(context, ref),
           ),
         ],
@@ -125,8 +126,8 @@ class _TransactionDetailContent extends ConsumerWidget {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: (isExpense
-                              ? const Color(0xFFFF3B30)
-                              : const Color(0xFF34C759))
+                              ? FyneColors.danger
+                              : FyneColors.income)
                           .withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
@@ -135,9 +136,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                           ? LucideIcons.arrowUpRight
                           : LucideIcons.arrowDownLeft,
                       size: 40,
-                      color: isExpense
-                          ? const Color(0xFFFF3B30)
-                          : const Color(0xFF34C759),
+                      color: isExpense ? FyneColors.danger : FyneColors.income,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -180,13 +179,13 @@ class _TransactionDetailContent extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE9E9EB).withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
                   const Icon(LucideIcons.shieldCheck,
-                      color: Color(0xFF4A6741), size: 16),
+                      color: FyneColors.forest, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -224,14 +223,14 @@ class _TransactionDetailContent extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+            border: Border.all(color: FyneColors.ink.withValues(alpha: 0.05)),
           ),
           child: Row(
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 18, color: const Color(0xFF4A6741)),
+                Icon(icon, size: 18, color: FyneColors.forest),
                 const SizedBox(width: 12),
               ],
               Expanded(
@@ -262,7 +261,7 @@ class _TransactionDetailContent extends ConsumerWidget {
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: const Text("ELIMINA",
-                  style: TextStyle(color: Color(0xFFFF3B30)))),
+                  style: TextStyle(color: FyneColors.danger))),
         ],
       ),
     );

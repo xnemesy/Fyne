@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../providers/transaction_provider.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../widgets/fyne_shimmer.dart';
 import '../widgets/transaction_item.dart';
 import 'transaction_detail_screen.dart';
@@ -54,7 +55,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
         leading: widget.accountId != null ? IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Color(0xFF1A1A1A)),
+          icon: const Icon(LucideIcons.chevronLeft, color: FyneColors.ink),
           onPressed: () => Navigator.pop(context),
         ) : null,
         title: Text(
@@ -81,11 +82,19 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 
                 if (visibleSummaries.isEmpty) return _buildEmptyState();
 
-                return ListView.builder(
+                return RefreshIndicator(
+                  color: FyneColors.forest,
+                  onRefresh: () async {
+                    HapticFeedback.mediumImpact();
+                    await ref.read(transactionsNotifierProvider.notifier).refresh();
+                  },
+                  child: ListView.builder(
                   key: ValueKey(widget.accountId ?? 'all-transactions'),
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  physics: const BouncingScrollPhysics(),
+                  // AlwaysScrollableScrollPhysics: obbligatorio perché RefreshIndicator
+                  // si attivi anche quando la lista è più corta dello schermo
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: visibleSummaries.length + (notifier.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == visibleSummaries.length) {
@@ -106,10 +115,10 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF3B30),
+                          color: FyneColors.danger,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(LucideIcons.trash2, color: Colors.white),
+                        child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
                       ),
                       confirmDismiss: (direction) async {
                         return await showDialog(
@@ -122,11 +131,11 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: Text("ANNULLA", style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.bold)),
+                                child: Text("ANNULLA", style: GoogleFonts.inter(color: FyneColors.inkLight, fontWeight: FontWeight.bold)),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: Text("ELIMINA", style: GoogleFonts.inter(color: const Color(0xFFFF3B30), fontWeight: FontWeight.bold)),
+                                child: Text("ELIMINA", style: GoogleFonts.inter(color: FyneColors.danger, fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
@@ -150,6 +159,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                       ),
                     );
                   },
+                  ),
                 );
               },
               loading: () => ListView.builder(
@@ -164,7 +174,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, color: Color(0xFFA0665F), size: 48),
+                      const Icon(Icons.error_outline, color: FyneColors.rust, size: 48),
                       const SizedBox(height: 16),
                       Text(
                         "Errore caricamento: $err",
@@ -192,13 +202,13 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF4A6741).withValues(alpha: 0.05),
+        color: FyneColors.forest.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF4A6741).withValues(alpha: 0.1)),
+        border: Border.all(color: FyneColors.forest.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
-          const Icon(LucideIcons.lock, color: Color(0xFF4A6741), size: 18),
+          const Icon(LucideIcons.lock, color: FyneColors.forest, size: 18),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -206,7 +216,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF4A6741).withValues(alpha: 0.8),
+                color: FyneColors.forest.withValues(alpha: 0.8),
               ),
             ),
           ),

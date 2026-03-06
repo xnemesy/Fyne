@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/fyne_theme.dart';
 import '../../../providers/budget_provider.dart';
 
 
@@ -23,7 +24,7 @@ class TopCategoriesList extends StatelessWidget {
           status.budget.decryptedCategoryName ?? "Sconosciuta",
           "${status.spent.toStringAsFixed(0)} €",
           status.progress,
-          status.isOverBudget ? const Color(0xFFD63031) : const Color(0xFF4A6741),
+          status.isOverBudget ? FyneColors.rust : FyneColors.forest,
         );
       }).toList(),
     );
@@ -46,7 +47,7 @@ class TopCategoriesList extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
-              backgroundColor: const Color(0xFFF2F2F0),
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               color: color,
               minHeight: 4,
             ),

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/api_service.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class BankSelectionScreen extends ConsumerStatefulWidget {
   const BankSelectionScreen({super.key});
@@ -88,7 +89,7 @@ class _BankSelectionScreenState extends ConsumerState<BankSelectionScreen> {
         title: Text("Seleziona la tua Banca", style: GoogleFonts.lora(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
+        iconTheme: const IconThemeData(color: FyneColors.ink),
       ),
       body: Column(
         children: [
@@ -101,7 +102,7 @@ class _BankSelectionScreenState extends ConsumerState<BankSelectionScreen> {
                 hintText: "Cerca banca...",
                 prefixIcon: const Icon(LucideIcons.search, size: 20),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -111,7 +112,7 @@ class _BankSelectionScreenState extends ConsumerState<BankSelectionScreen> {
           ),
           Expanded(
             child: _isLoading 
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFF4A6741)))
+              ? const Center(child: CircularProgressIndicator(color: FyneColors.forest))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   itemCount: _filteredInstitutions.length,
@@ -120,14 +121,14 @@ class _BankSelectionScreenState extends ConsumerState<BankSelectionScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                        border: Border.all(color: FyneColors.ink.withValues(alpha: 0.05)),
                       ),
                       child: ListTile(
                         leading: inst['logo'] != null 
                           ? Image.network(inst['logo'], width: 32, height: 32)
-                          : const Icon(LucideIcons.landmark, color: Color(0xFF4A6741)),
+                          : const Icon(LucideIcons.landmark, color: FyneColors.forest),
                         title: Text(inst['name'], style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                         subtitle: Text(inst['bic'] ?? "", style: GoogleFonts.inter(fontSize: 12)),
                         trailing: const Icon(LucideIcons.chevronRight, size: 18),

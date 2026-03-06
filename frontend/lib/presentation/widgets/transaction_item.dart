@@ -5,6 +5,7 @@ import '../../models/transaction.dart';
 import '../../core/formatters/currency_formatter.dart';
 import '../../core/formatters/date_formatter.dart';
 import '../../core/haptics/fyne_haptics.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class TransactionItem extends StatelessWidget {
   final TransactionSummary summary;
@@ -14,15 +15,20 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Placeholder per transazioni con decifratura fallita (HMAC mismatch / vault locked)
+    if (summary.isCorrupted) {
+      return _buildCorruptedPlaceholder(context);
+    }
+
     final isIncome = summary.amount > 0;
     final absAmount = summary.amount.abs();
 
     // Color Logic (Matching existing design)
     Color amountColor = Theme.of(context).colorScheme.onSurface;
     if (isIncome) {
-      amountColor = const Color(0xFF2D7A5F);
+      amountColor = FyneColors.income;
     } else if (absAmount > 200) {
-      amountColor = const Color(0xFFA0665F);
+      amountColor = FyneColors.rust;
     }
 
     final dateStr = FyneDateFormatter.formatFull(summary.bookingDate);
@@ -40,20 +46,20 @@ class TransactionItem extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
               bottom: BorderSide(
-                  color: Colors.black.withValues(alpha: 0.05), width: 0.5)),
+                  color: FyneColors.ink.withValues(alpha: 0.05), width: 0.5)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFE9E9EB).withValues(alpha: 0.5),
+                color: _getBackgroundColor(summary.categoryColor),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                _getCategoryIcon(summary.categoryName),
+                _getMappedIcon(summary.categoryIcon, summary.categoryName),
                 size: 20,
-                color: const Color(0xFF4A6741),
+                color: _getIconColor(summary.categoryColor),
               ),
             ),
             const SizedBox(width: 16),
@@ -96,25 +102,77 @@ class TransactionItem extends StatelessWidget {
     );
   }
 
-  IconData _getCategoryIcon(String? category) {
-    switch (category) {
-      case 'Alimentari':
-        return LucideIcons.shoppingCart;
-      case 'Wellness':
-        return LucideIcons.heart;
-      case 'Shopping':
-        return LucideIcons.shoppingBag;
-      case 'Trasporti':
-        return LucideIcons.car;
-      case 'Abbonamenti':
-        return LucideIcons.refreshCw;
-      case 'Vizi':
-        return LucideIcons.flame;
-      case 'Fast Food':
-        return LucideIcons.utensils;
-      default:
-        return LucideIcons.creditCard;
+  /// Riga placeholder per transazioni inaccessibili per fallimento crittografico.
+  Widget _buildCorruptedPlaceholder(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: FyneColors.ink.withValues(alpha: 0.05),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: FyneColors.rust.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(LucideIcons.lock, size: 20, color: FyneColors.rust),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Dato protetto o non disponibile',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: FyneColors.rust.withValues(alpha: 0.7),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ===============================
+  // AI/Offline Classification Logic
+  // ===============================
+
+  Color _parseHex(String? hexColor, Color fallback) {
+    if (hexColor == null || hexColor.isEmpty) return fallback;
+    try {
+      final hex = hexColor.replaceAll('#', '');
+      return Color(int.parse('0xFF$hex'));
+    } catch (_) {
+      return fallback;
     }
+  }
+
+  Color _getBackgroundColor(String? categoryColor) {
+    // Sfondo dell'icona: 15% opacity del colore principale
+    final baseColor = _parseHex(categoryColor, FyneColors.paperDark);
+    return baseColor.withValues(alpha: 0.15);
+  }
+
+  Color _getIconColor(String? categoryColor) {
+    // Colore primario dell'icona. Default verde di Fyne se mancante.
+    return _parseHex(categoryColor, FyneColors.forest);
+  }
+
+  IconData _getMappedIcon(String? iconName, String? categoryName) {
+    // Mapping da chiavi Material (se impostate via service) o nome categoria a Lucide
+    if (iconName == 'subscriptions' || categoryName == 'Abbonamenti') return LucideIcons.refreshCw;
+    if (iconName == 'shopping_cart' || categoryName == 'Alimentari') return LucideIcons.shoppingCart;
+    if (iconName == 'fastfood' || categoryName == 'Fast Food') return LucideIcons.utensils;
+    if (iconName == 'local_mall' || categoryName == 'Shopping') return LucideIcons.shoppingBag;
+    if (iconName == 'directions_car' || categoryName == 'Trasporti') return LucideIcons.car;
+    if (iconName == 'smoking_rooms' || categoryName == 'Vizi') return LucideIcons.flame;
+    if (iconName == 'fitness_center' || categoryName == 'Wellness') return LucideIcons.heart;
+    return LucideIcons.creditCard;
   }
 
   String get _displayTitle {

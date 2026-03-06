@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/fyne_theme.dart';
 import '../../../providers/wallet_provider.dart';
 
 /// Card "Saldo Netto / Passivo" nella WalletScreen.
@@ -35,7 +36,7 @@ class WalletSummaryCard extends ConsumerWidget {
               context: context,
               label: "SALDO NETTO",
               value: "${summary.netWorth.toStringAsFixed(2)} €",
-              accentColor: const Color(0xFF4A6741),
+              accentColor: FyneColors.forest,
             ),
           ),
           const SizedBox(width: 12),
@@ -44,7 +45,7 @@ class WalletSummaryCard extends ConsumerWidget {
               context: context,
               label: "PASSIVO",
               value: "${summary.liabilities.toStringAsFixed(2)} €",
-              accentColor: const Color(0xFFA0665F),
+              accentColor: FyneColors.rust,
             ),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/fyne_theme.dart';
 import '../../../providers/insights_provider.dart';
 
 // ─── CategoryPieChart ─────────────────────────────────────────────────────────
@@ -89,7 +90,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
         titleStyle: GoogleFonts.inter(
           fontSize:   13,
           fontWeight: FontWeight.bold,
-          color:      Colors.white,
+          color:      FyneColors.paper,
         ),
         badgeWidget:  !isTouched ? null : null,
       );
@@ -104,7 +105,7 @@ class _CategoryPieChartState extends State<CategoryPieChart> {
         style: GoogleFonts.lora(
           fontSize:   16,
           fontWeight: FontWeight.bold,
-          color:      const Color(0xFFB85450),
+          color:      FyneColors.rust,
         ),
       ),
     );

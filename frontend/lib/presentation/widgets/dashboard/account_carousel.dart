@@ -165,6 +165,11 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Placeholder per account con decifratura fallita
+    if (account.isCorrupted) {
+      return _buildLockedCard(context);
+    }
+
     final info = _accountTypeInfo(account.type);
 
     return Container(
@@ -193,22 +198,22 @@ class _AccountCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
+                  color: FyneColors.paper.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(info.icon, color: Colors.white, size: 20),
+                child: Icon(info.icon, color: FyneColors.paper, size: 20),
               ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
+                  color: FyneColors.paper.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   account.currency,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: FyneColors.paper,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
@@ -224,7 +229,7 @@ class _AccountCard extends StatelessWidget {
           Text(
             info.label,
             style: GoogleFonts.inter(
-              color: Colors.white.withValues(alpha: 0.65),
+              color: FyneColors.paper.withValues(alpha: 0.65),
               fontSize: 11,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.3,
@@ -236,7 +241,7 @@ class _AccountCard extends StatelessWidget {
           Text(
             account.name,
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: FyneColors.paper,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -249,7 +254,7 @@ class _AccountCard extends StatelessWidget {
           Text(
             _formatCurrency(account.balance, account.currency),
             style: GoogleFonts.lora(
-              color: Colors.white,
+              color: FyneColors.paper,
               fontSize: 26,
               fontWeight: FontWeight.bold,
               letterSpacing: -0.5,
@@ -268,6 +273,34 @@ class _AccountCard extends StatelessWidget {
       symbol: symbol,
       decimalDigits: 2,
     ).format(amount);
+  }
+
+  /// Placeholder per account con decifratura fallita (HMAC mismatch / vault locked).
+  Widget _buildLockedCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: FyneColors.rust.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: FyneColors.rust.withValues(alpha: 0.3)),
+      ),
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(LucideIcons.lock, color: FyneColors.rust, size: 28),
+          const SizedBox(height: 12),
+          Text(
+            'Dato protetto\no non disponibile',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: FyneColors.rust,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -297,25 +330,25 @@ _AccountTypeInfo _accountTypeInfo(AccountType type) {
       return _AccountTypeInfo(
         label: 'Risparmi',
         icon: LucideIcons.piggyBank,
-        gradientColors: [FyneColors.gold, const Color(0xFFA07010)],
+        gradientColors: [FyneColors.gold, FyneColors.goldDark],
       );
     case AccountType.credit:
       return const _AccountTypeInfo(
         label: 'Carta di Credito',
         icon: LucideIcons.creditCard,
-        gradientColors: [FyneColors.rust, Color(0xFF8B3A37)],
+        gradientColors: [FyneColors.rust, FyneColors.rustDark],
       );
     case AccountType.investment:
       return const _AccountTypeInfo(
         label: 'Investimenti',
         icon: LucideIcons.trendingUp,
-        gradientColors: [FyneColors.amber, Color(0xFFA07010)],
+        gradientColors: [FyneColors.amber, FyneColors.goldDark],
       );
     case AccountType.loan:
       return const _AccountTypeInfo(
         label: 'Prestito',
         icon: LucideIcons.receipt,
-        gradientColors: [Color(0xFF8B3A37), Color(0xFF5C2222)],
+        gradientColors: [FyneColors.rustDark, FyneColors.maroon],
       );
     case AccountType.cash:
       return const _AccountTypeInfo(
@@ -327,7 +360,7 @@ _AccountTypeInfo _accountTypeInfo(AccountType type) {
       return const _AccountTypeInfo(
         label: 'Crypto',
         icon: LucideIcons.bitcoin,
-        gradientColors: [Color(0xFFD4A574), Color(0xFF8B6A3A)],
+        gradientColors: [FyneColors.amber, FyneColors.amberDark],
       );
   }
 }

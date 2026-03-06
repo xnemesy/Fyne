@@ -245,7 +245,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           child: GestureDetector(
             onTap: () {}, // Previeni interazioni
             child: Container(
-              color: Colors.black.withValues(alpha: 0.7),
+              color: FyneColors.ink.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -264,10 +264,10 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           right: 20,
           child: TextButton.icon(
             onPressed: _skipTutorial,
-            icon: const Icon(Icons.close, color: Colors.white),
+            icon: const Icon(Icons.close, color: FyneColors.paper),
             label: const Text(
               'Salta',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: FyneColors.paper),
             ),
           ),
         ),

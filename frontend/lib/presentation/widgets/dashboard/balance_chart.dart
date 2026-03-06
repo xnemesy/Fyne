@@ -160,7 +160,7 @@ class BalanceChart extends ConsumerWidget {
                     decimalDigits: 0,
                   ).format(spot.y),
                   GoogleFonts.lora(
-                    color: Colors.white,
+                    color: FyneColors.paper,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),

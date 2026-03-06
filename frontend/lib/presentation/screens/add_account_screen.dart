@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/account.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/master_key_provider.dart';
@@ -35,7 +36,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF4A6741)
+              ? FyneColors.forest
               // Fix Bug 2: sfondo chip non selezionato tema-aware
               : cs.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
@@ -45,7 +46,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF4A6741).withValues(alpha:0.3),
+                    color: FyneColors.forest.withValues(alpha:0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   )
@@ -55,14 +56,14 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: isSelected ? Colors.white : cs.onSurface),
+            Icon(icon, size: 16, color: isSelected ? FyneColors.paper : cs.onSurface),
             const SizedBox(width: 8),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : cs.onSurface,
+                color: isSelected ? FyneColors.paper : cs.onSurface,
               ),
             ),
           ],
@@ -137,14 +138,14 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF4A6741), Color(0xFF2D3436)],
+                  colors: [FyneColors.forest, FyneColors.ink],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4A6741).withValues(alpha:0.3),
+                    color: FyneColors.forest.withValues(alpha:0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -155,10 +156,10 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha:0.2),
+                      color: FyneColors.paper.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(LucideIcons.zap, color: Colors.white, size: 24),
+                    child: const Icon(LucideIcons.zap, color: FyneColors.paper, size: 24),
                   ),
                   const SizedBox(width: 20),
                   Column(
@@ -169,20 +170,20 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.white,
+                          color: FyneColors.paper,
                         ),
                       ),
                       Text(
                         "Collega la tua banca reale",
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: Colors.white.withValues(alpha:0.7),
+                          color: FyneColors.paper.withValues(alpha:0.7),
                         ),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  const Icon(LucideIcons.chevronRight, color: Colors.white, size: 18),
+                  const Icon(LucideIcons.chevronRight, color: FyneColors.paper, size: 18),
                 ],
               ),
             ),
@@ -212,10 +213,10 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4A6741).withValues(alpha:0.15),
+                        color: FyneColors.forest.withValues(alpha:0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(_typeIcons[type], color: const Color(0xFF4A6741), size: 24),
+                      child: Icon(_typeIcons[type], color: FyneColors.forest, size: 24),
                     ),
                     const SizedBox(width: 20),
                     Text(
@@ -284,8 +285,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
             child: ElevatedButton(
               onPressed: _isSaving ? null : _saveAccount,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A6741),
-                foregroundColor: Colors.white,
+                backgroundColor: FyneColors.forest,
+                foregroundColor: FyneColors.paper,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -294,7 +295,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(color: FyneColors.paper, strokeWidth: 2),
                     )
                   : Text(
                       "SALVA CONTO",
@@ -336,7 +337,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF4A6741)),
+        borderSide: const BorderSide(color: FyneColors.forest),
       ),
     );
   }

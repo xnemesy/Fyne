@@ -15,6 +15,7 @@ import '../widgets/edit_account_sheet.dart';
 import '../widgets/wallet/wallet_summary_card.dart';
 import '../widgets/home_compass_widget.dart';
 import '../../providers/transaction_provider.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -75,15 +76,15 @@ class WalletScreen extends ConsumerWidget {
                 builder: (context) => const AddTransactionSheet(),
               );
             },
-            backgroundColor: const Color(0xFF4A6741),
-            child: const Icon(LucideIcons.plus, color: Colors.white),
+            backgroundColor: FyneColors.forest,
+            child: const Icon(LucideIcons.plus, color: FyneColors.paper),
           ),
         ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(accountsProvider.notifier).refresh(),
-          color: const Color(0xFF4A6741),
+          color: FyneColors.forest,
           child: CustomScrollView(
             slivers: [
               // Custom MoneyWiz Header
@@ -103,7 +104,7 @@ class WalletScreen extends ConsumerWidget {
                             child: Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: Image.network('https://moneywizapp.com/favicon.ico', 
-                                errorBuilder: (c, e, s) => const Icon(LucideIcons.wallet, size: 20, color: Color(0xFF4A6741)),
+                                errorBuilder: (c, e, s) => const Icon(LucideIcons.wallet, size: 20, color: FyneColors.forest),
                               ),
                             ),
                           ),
@@ -245,7 +246,7 @@ class WalletScreen extends ConsumerWidget {
                   ),
                 ),
                 error: (err, stack) => SliverToBoxAdapter(
-                  child: Center(child: Text("Errore: $err", style: const TextStyle(color: Colors.red))),
+                  child: Center(child: Text("Errore: $err", style: const TextStyle(color: FyneColors.rust))),
                 ),
               ),
               
@@ -264,10 +265,10 @@ class WalletScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           // Theme-aware: sfondo scuro in dark mode, grigio chiaro in light mode
-        color: isPrimary ? const Color(0xFF4A6741) : Theme.of(context).colorScheme.surfaceContainerHigh,
+        color: isPrimary ? FyneColors.forest : Theme.of(context).colorScheme.surfaceContainerHigh,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
+        child: Icon(icon, color: isPrimary ? FyneColors.paper : Theme.of(context).colorScheme.onSurface, size: 18),
       ),
     );
   }
@@ -287,10 +288,10 @@ class WalletScreen extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFFF3B30),
+          color: FyneColors.danger,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Icon(LucideIcons.trash2, color: Colors.white),
+        child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
       ),
       confirmDismiss: (direction) async {
         return await showDialog(
@@ -300,7 +301,7 @@ class WalletScreen extends ConsumerWidget {
             content: const Text("Sei sicuro di voler eliminare questo conto? Questa azione non può essere annullata."),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger))),
             ],
           ),
         );
@@ -315,7 +316,7 @@ class WalletScreen extends ConsumerWidget {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: FyneColors.ink.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: ListTile(
@@ -343,7 +344,7 @@ class WalletScreen extends ConsumerWidget {
               color: Theme.of(context).colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(typeIcon, size: 24, color: const Color(0xFF8E8E93)),
+            child: Icon(typeIcon, size: 24, color: FyneColors.inkLight),
           ),
           title: Text(
             account.decryptedName ?? "Conto",
@@ -354,7 +355,7 @@ class WalletScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 15, 
               fontWeight: FontWeight.bold, 
-              color: bal >= 0 ? const Color(0xFF34C759) : const Color(0xFFFF3B30)
+              color: bal >= 0 ? FyneColors.income : FyneColors.danger
             ),
           ),
         ),
@@ -371,10 +372,10 @@ class WalletScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A6741).withValues(alpha: 0.05),
+                color: FyneColors.forest.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(LucideIcons.wallet, size: 40, color: Color(0xFF4A6741)),
+              child: const Icon(LucideIcons.wallet, size: 40, color: FyneColors.forest),
             ),
             const SizedBox(height: 24),
             Text(
@@ -391,7 +392,7 @@ class WalletScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Icon(LucideIcons.arrowUp, color: Color(0xFF4A6741), size: 24),
+            const Icon(LucideIcons.arrowUp, color: FyneColors.forest, size: 24),
             const SizedBox(height: 16),
             TextButton(
               onPressed: () {
@@ -401,8 +402,8 @@ class WalletScreen extends ConsumerWidget {
                 );
               },
               style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFF4A6741),
-                foregroundColor: Colors.white,
+                backgroundColor: FyneColors.forest,
+                foregroundColor: FyneColors.paper,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),

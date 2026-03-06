@@ -54,7 +54,7 @@ class CategoryListScreen extends ConsumerWidget {
               preferredSize: const Size.fromHeight(1),
               child: Container(
                 height: 1,
-                color: Colors.white.withValues(alpha: 0.06),
+                color: _kPaper.withValues(alpha: 0.06),
               ),
             ),
           ),
@@ -102,7 +102,7 @@ class CategoryListScreen extends ConsumerWidget {
       // ── FAB Aggiungi categoria ─────────────────────────────────────────────
       floatingActionButton: FloatingActionButton(
         backgroundColor: _kForest,
-        foregroundColor: Colors.white,
+        foregroundColor: _kPaper,
         elevation: 4,
         onPressed: () => _openDetail(context, ref, null),
         child: const Icon(LucideIcons.plus),

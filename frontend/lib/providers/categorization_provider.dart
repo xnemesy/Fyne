@@ -18,7 +18,7 @@ class CategorizationNotifier
 
   Future<void> _loadRules() async {
     try {
-      final isar = await _ref.watch(isarProvider.future);
+      final isar = await _ref.read(isarProvider.future);
       final rules = await isar.categorizationRules
           .where()
           .isDeletedEqualTo(false)

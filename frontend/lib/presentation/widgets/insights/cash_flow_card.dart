@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/fyne_theme.dart';
 
 class CashFlowCard extends StatelessWidget {
   final double income;
@@ -27,7 +28,7 @@ class CashFlowCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF4A6741),
+            color: FyneColors.forest,
             borderRadius: BorderRadius.circular(32),
           ),
           child: Column(
@@ -35,8 +36,8 @@ class CashFlowCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _cashFlowItem("Entrate", income, Colors.white.withValues(alpha: 0.7)),
-                  _cashFlowItem("Uscite", expenses, Colors.white.withValues(alpha: 0.7)),
+                  _cashFlowItem("Entrate", income, FyneColors.paper.withValues(alpha: 0.7)),
+                  _cashFlowItem("Uscite", expenses, FyneColors.paper.withValues(alpha: 0.7)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -46,7 +47,7 @@ class CashFlowCard extends StatelessWidget {
                     height: 8,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: FyneColors.paper.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -59,7 +60,7 @@ class CashFlowCard extends StatelessWidget {
                         height: 8,
                         width: incomeWidth,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: FyneColors.paper,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       );
@@ -71,16 +72,16 @@ class CashFlowCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: FyneColors.paper.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("${savings < 0 ? 'Deficit' : 'Differenza'} del mese: ${savings.abs().toStringAsFixed(2)} €", 
-                      style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.9), fontSize: 11, fontWeight: FontWeight.w600)),
+                      style: GoogleFonts.inter(color: FyneColors.paper.withValues(alpha: 0.9), fontSize: 11, fontWeight: FontWeight.w600)),
                     Text(income > 0 ? "${(savingsRate * 100).abs().toStringAsFixed(0)}%" : "0%", 
-                      style: GoogleFonts.inter(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                      style: GoogleFonts.inter(color: FyneColors.paper, fontSize: 11, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -97,7 +98,7 @@ class CashFlowCard extends StatelessWidget {
       children: [
         Text(label.toUpperCase(), style: GoogleFonts.inter(letterSpacing: 2, fontSize: 9, fontWeight: FontWeight.bold, color: textColor)),
         const SizedBox(height: 4),
-        Text("${amount.toStringAsFixed(2)} €", style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text("${amount.toStringAsFixed(2)} €", style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold, color: FyneColors.paper)),
       ],
     );
   }

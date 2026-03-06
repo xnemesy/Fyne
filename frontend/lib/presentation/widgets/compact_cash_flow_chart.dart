@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/transaction.dart';
 
 class CompactCashFlowChart extends StatelessWidget {
@@ -87,7 +88,7 @@ class CompactCashFlowChart extends StatelessWidget {
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
-                    color: const Color(0xFF4A6741),
+                    color: const FyneColors.forest,
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
@@ -97,8 +98,8 @@ class CompactCashFlowChart extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFF4A6741).withValues(alpha: 0.15),
-                          const Color(0xFF4A6741).withValues(alpha: 0.0),
+                          const FyneColors.forest.withValues(alpha: 0.15),
+                          const FyneColors.forest.withValues(alpha: 0.0),
                         ],
                       ),
                     ),

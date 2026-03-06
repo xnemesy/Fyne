@@ -305,7 +305,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen>
                           ),
                           child: const Icon(
                             Icons.shield,
-                            color: Colors.white,
+                            color: FyneColors.paper,
                             size: 32,
                           ),
                         ),

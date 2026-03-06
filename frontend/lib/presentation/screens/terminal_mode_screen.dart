@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/account.dart';
 import '../../presentation/widgets/decrypted_value.dart';
 import '../../providers/wallet_provider.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class TerminalModeScreen extends ConsumerStatefulWidget {
   final List<Account> accounts;
@@ -102,12 +103,12 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
                         LineChartBarData(
                           spots: _generateHistoricalSpots(totalNetWorth),
                           isCurved: true,
-                          color: const Color(0xFF4A6741),
+                          color: FyneColors.forest,
                           barWidth: 2,
                           dotData: const FlDotData(show: false),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: const Color(0xFF4A6741).withValues(alpha: 0.05),
+                            color: FyneColors.forest.withValues(alpha: 0.05),
                           ),
                         ),
                       ],
@@ -122,7 +123,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
             right: 40,
             child: IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.close, color: Color(0xFF1A1A1A)),
+              icon: const Icon(Icons.close, color: FyneColors.ink),
             ),
           ),
         ],
@@ -134,7 +135,7 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F0),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -150,9 +151,9 @@ class _TerminalModeScreenState extends ConsumerState<TerminalModeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
+          color: active ? Theme.of(context).colorScheme.surface : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: active ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)] : null,
+          boxShadow: active ? [BoxShadow(color: FyneColors.ink.withValues(alpha: 0.05), blurRadius: 4)] : null,
         ),
         child: Text(
           t,

@@ -191,7 +191,7 @@ class _OnboardingWizardScreenState
               content: Row(
                 children: [
                   const Icon(Icons.error_outline,
-                      color: Colors.white, size: 18),
+                      color: _kPaper, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -228,7 +228,7 @@ class _OnboardingWizardScreenState
       ..showSnackBar(SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+            const Icon(Icons.check_circle_rounded, color: _kPaper, size: 18),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -264,7 +264,7 @@ class _OnboardingWizardScreenState
           ..showSnackBar(SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.lock_rounded, color: Colors.white, size: 18),
+                const Icon(Icons.lock_rounded, color: _kPaper, size: 18),
                 const SizedBox(width: 10),
                 Text(
                   'Appunti cancellati per sicurezza',
@@ -481,7 +481,7 @@ class _OnboardingWizardScreenState
               onPressed: _nextStep,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _kForest,
-                foregroundColor: Colors.white,
+                foregroundColor: _kPaper,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -511,7 +511,7 @@ class _OnboardingWizardScreenState
       decoration: BoxDecoration(
         color: _kSurface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha:0.06)),
+        border: Border.all(color: _kPaper.withValues(alpha:0.06)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -659,7 +659,7 @@ class _OnboardingWizardScreenState
                 color: _kSurface,
                 borderRadius: BorderRadius.circular(20),
                 border:
-                    Border.all(color: Colors.white.withValues(alpha:0.06)),
+                    Border.all(color: _kPaper.withValues(alpha:0.06)),
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -820,7 +820,7 @@ class _OnboardingWizardScreenState
               onPressed: _nextStep,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _kForest,
-                foregroundColor: Colors.white,
+                foregroundColor: _kPaper,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -941,7 +941,7 @@ class _OnboardingWizardScreenState
                         borderSide: BorderSide(
                           color: status == false
                               ? FyneColors.rust
-                              : Colors.white.withValues(alpha:0.08),
+                              : _kPaper.withValues(alpha:0.08),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -1000,7 +1000,7 @@ class _OnboardingWizardScreenState
                 border: Border.all(
                   color: _biometricEnabled
                       ? _kForest
-                      : Colors.white.withValues(alpha:0.06),
+                      : _kPaper.withValues(alpha:0.06),
                 ),
               ),
               child: Row(
@@ -1066,7 +1066,7 @@ class _OnboardingWizardScreenState
                   (_allVerified && !_isProcessing) ? _completeSetup : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _kForest,
-                foregroundColor: Colors.white,
+                foregroundColor: _kPaper,
                 disabledBackgroundColor: _kSurface,
                 disabledForegroundColor: _kPaper.withValues(alpha:0.3),
                 padding: const EdgeInsets.symmetric(vertical: 18),
@@ -1079,7 +1079,7 @@ class _OnboardingWizardScreenState
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
+                          color: _kPaper, strokeWidth: 2),
                     )
                   : Text(
                       _allVerified

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../presentation/widgets/add_scheduled_sheet.dart';
+import '../../presentation/widgets/fyne_shimmer.dart';
 import '../../providers/scheduled_provider.dart';
 
 class ScheduledTransactionsScreen extends ConsumerWidget {
@@ -17,7 +19,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(scheduledProvider.notifier).refresh(),
-          color: const Color(0xFF4A6741),
+          color: FyneColors.forest,
           child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
@@ -29,7 +31,7 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(LucideIcons.calendar, size: 28, color: Color(0xFF4A6741)),
+                          const Icon(LucideIcons.calendar, size: 28, color: FyneColors.forest),
                           _headerAction(context, LucideIcons.plus, () {
                             showModalBottomSheet(
                               context: context,
@@ -79,13 +81,16 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                loading: () => const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                loading: () => const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: FyneScheduledShimmer(),
+                  ),
                 ),
                 error: (err, __) => SliverToBoxAdapter(
                   child: Center(child: Padding(
                     padding: const EdgeInsets.all(40),
-                    child: Text("Errore: $err", textAlign: TextAlign.center, style: GoogleFonts.inter(color: Colors.red)),
+                    child: Text("Errore: $err", textAlign: TextAlign.center, style: GoogleFonts.inter(color: FyneColors.rust)),
                   )),
                 ),
               ),
@@ -106,10 +111,10 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFFF3B30),
+          color: FyneColors.danger,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Icon(LucideIcons.trash2, color: Colors.white),
+        child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
       ),
       confirmDismiss: (direction) async {
         return await showDialog(
@@ -122,11 +127,11 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text("ANNULLA", style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.bold)),
+                child: Text("ANNULLA", style: GoogleFonts.inter(color: FyneColors.inkLight, fontWeight: FontWeight.bold)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text("ELIMINA", style: GoogleFonts.inter(color: const Color(0xFFFF3B30), fontWeight: FontWeight.bold)),
+                child: Text("ELIMINA", style: GoogleFonts.inter(color: FyneColors.danger, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -139,16 +144,16 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black.withValues(alpha: 0.03)),
+          border: Border.all(color: FyneColors.ink.withValues(alpha: 0.03)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFE9E9EB),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -189,10 +194,10 @@ class ScheduledTransactionsScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
+          color: isPrimary ? FyneColors.forest : Theme.of(context).colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
+        child: Icon(icon, color: isPrimary ? FyneColors.paper : Theme.of(context).colorScheme.onSurface, size: 18),
       ),
     );
   }

@@ -128,10 +128,10 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
   }
 
   Future<void> _recalculate() async {
-    final repo = ref.read(transactionRepositoryProvider);
-    final accountsState      = ref.read(accountsProvider);
-    final transactionsState  = ref.read(transactionsProvider);
-    final budgetSummaries    = ref.read(budgetSummaryProvider);
+    final repo            = ref.read(transactionRepositoryProvider);
+    final accountsState   = ref.read(accountsProvider);
+    final transactionsState = ref.read(transactionsProvider);
+    final budgetSummaries = ref.read(budgetSummaryProvider);
 
     if (accountsState.isLoading || transactionsState.isLoading || repo == null) {
       state = state.copyWith(isLoading: true);
@@ -140,7 +140,9 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
 
     final accounts     = accountsState.value ?? [];
     final transactions = transactionsState.value ?? [];
-    final periodTxs    = _filterByPeriod(transactions, state.selectedPeriod);
+
+    // Calcola range per il periodo selezionato
+    final (start, end) = _periodRange(state.selectedPeriod);
 
     // 1. Patrimonio netto (somma saldi decifrati)
     double currentNetWorth = 0;
@@ -149,19 +151,22 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
       currentNetWorth += double.tryParse(balStr) ?? 0;
     }
 
-    // 2. Storia patrimonio netto (ultimi 7 giorni)
+    // 2. Storia patrimonio netto (ultimi 7 giorni — usa lista paginata per performance)
     final historySpots = _generateDynamicSpots(currentNetWorth, transactions);
 
     // 3. Burn rate rolling 30 giorni
-    final now             = DateTime.now();
-    final thirtyDaysAgo   = now.subtract(const Duration(days: 30));
-    final totalSpent30    = await repo.getTotalSpentInRange(thirtyDaysAgo, now);
-    final dailyBurn       = totalSpent30 / 30;
+    final now           = DateTime.now();
+    final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+    final totalSpent30  = await repo.getTotalSpentInRange(thirtyDaysAgo, now);
+    final dailyBurn     = totalSpent30 / 30;
 
-    // 4. Cash Flow del periodo selezionato
+    // 4+6. Carica TUTTE le transazioni del periodo dal repository in Isolate.
+    //      Garantisce breakdown e cash flow corretti su range 3/6/12 mesi.
+    final allPeriodTxs = await repo.getDecryptedTransactionsInRange(start, end);
+
     double income   = 0;
     double expenses = 0;
-    for (final tx in periodTxs) {
+    for (final tx in allPeriodTxs) {
       if (tx.amount > 0) income   += tx.amount;
       else               expenses += tx.amount.abs();
     }
@@ -173,7 +178,7 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
       ..sort((a, b) => b.spent.compareTo(a.spent));
 
     // 6. Breakdown spese per categoria (alimenta il PieChart)
-    final breakdown = _buildCategoryBreakdown(periodTxs);
+    final breakdown = _buildCategoryBreakdown(allPeriodTxs);
 
     state = state.copyWith(
       netWorth:          currentNetWorth,
@@ -218,33 +223,27 @@ class InsightsNotifier extends StateNotifier<InsightsState> {
         .toList();
   }
 
-  // ── Helper: filtro per periodo ────────────────────────────────────────────
+  // ── Helper: range date per periodo ───────────────────────────────────────
 
-  List<TransactionSummary> _filterByPeriod(
-      List<TransactionSummary> transactions, InsightsPeriod period) {
+  (DateTime start, DateTime end) _periodRange(InsightsPeriod period) {
     final now        = DateTime.now();
     final startOfDay = FyneDateUtils.startOfDay(now);
-    late final DateTime start, end;
 
-    switch (period) {
-      case InsightsPeriod.day:
-        start = startOfDay;
-        end   = start.add(const Duration(days: 1));
-      case InsightsPeriod.week:
-        start = FyneDateUtils.getStartOfWeek(startOfDay);
-        end   = FyneDateUtils.getEndOfWeek(startOfDay);
-      case InsightsPeriod.month:
-        start = DateTime(now.year, now.month, 1);
-        end   = DateTime(now.year, now.month + 1, 1);
-      case InsightsPeriod.year:
-        start = DateTime(now.year, 1, 1);
-        end   = DateTime(now.year + 1, 1, 1);
-    }
-
-    return transactions
-        .where((tx) =>
-            !tx.bookingDate.isBefore(start) && tx.bookingDate.isBefore(end))
-        .toList();
+    return switch (period) {
+      InsightsPeriod.day  => (startOfDay, startOfDay.add(const Duration(days: 1))),
+      InsightsPeriod.week => (
+          FyneDateUtils.getStartOfWeek(startOfDay),
+          FyneDateUtils.getEndOfWeek(startOfDay),
+        ),
+      InsightsPeriod.month => (
+          DateTime(now.year, now.month, 1),
+          DateTime(now.year, now.month + 1, 1),
+        ),
+      InsightsPeriod.year => (
+          DateTime(now.year, 1, 1),
+          DateTime(now.year + 1, 1, 1),
+        ),
+    };
   }
 
   // ── Helper: storia patrimoniale (7 giorni) ────────────────────────────────

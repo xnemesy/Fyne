@@ -6,21 +6,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import '../providers/storage_provider.dart';
 
-/**
- * Service to handle Client-Side Encryption (Zero-Knowledge v2.2 - Signal Level).
- * Implements Root Key derivation via Argon2id (mobile-friendly), 
- * Scoped Key expansion via HKDF with vault salt and schema versioning,
- * and Authenticated Encryption via AES-GCM with structured AAD.
- * 
- * DESIGN: No sensitive key material is persisted on disk beyond the RSA keys.
- */
+/// Service to handle Client-Side Encryption (Zero-Knowledge v2.2 - Signal Level).
+/// Implements Root Key derivation via Argon2id (mobile-friendly),
+/// Scoped Key expansion via HKDF with vault salt and schema versioning,
+/// and Authenticated Encryption via AES-GCM with structured AAD.
+///
+/// DESIGN: No sensitive key material is persisted on disk beyond the RSA keys.
 enum EncryptionScope {
   database,
   apiToken,
   backup,
   integrity;
 
-  String contextTag(int version) => 'fyne:v$version:scope:${this.name}';
+  String contextTag(int version) => 'fyne:v$version:scope:$name';
 }
 
 class CryptoService {
@@ -177,7 +175,7 @@ class CryptoService {
     // Ensure we have a vault salt
     String? vaultSalt = await _storage.read(key: _vaultSaltIdentifier);
     if (vaultSalt == null) {
-      vaultSalt = base64.encode((await SecretKeyData.random(length: 16)).bytes);
+      vaultSalt = base64.encode(SecretKeyData.random(length: 16).bytes);
       await _storage.write(key: _vaultSaltIdentifier, value: vaultSalt);
     }
 
@@ -274,7 +272,7 @@ class CryptoService {
 
 /// Encapsulated Session to manage key lifecycle and caching.
 class _VaultSession {
-  SecretKey _rootKey;
+  final SecretKey _rootKey;
   // Cache key is "version:scope_index"
   final Map<String, SecretKey> _scopedCache = {};
 

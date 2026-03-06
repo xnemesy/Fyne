@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/home_state_provider.dart';
 import '../../providers/budget_provider.dart';
 
@@ -73,11 +74,11 @@ class HomeCompassWidget extends ConsumerWidget {
 
   Widget _buildCompassBlock(BuildContext context, double allowance) {
     // Color logic based on allowance status
-    Color allowanceColor = const Color(0xFF4A6741); // Default Green
+    Color allowanceColor = FyneColors.forest; // Default Green
     if (allowance <= 0) {
-      allowanceColor = const Color(0xFFA0665F); // Terra Cotta for Critical
+      allowanceColor = FyneColors.rust; // Critical
     } else if (allowance < 10) {
-      allowanceColor = const Color(0xFFB8884D); // Amber for Attention
+      allowanceColor = FyneColors.amber; // Attention
     }
 
     return Column(
@@ -107,7 +108,7 @@ class HomeCompassWidget extends ConsumerWidget {
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.symmetric(vertical: 24),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F4F2), // Matched to spec
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(2), // Matched to spec (radius 2px)
           ),
           child: Column(

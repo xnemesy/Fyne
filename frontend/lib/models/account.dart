@@ -73,6 +73,9 @@ class Account {
   @ignore
   String? decryptedBalance;
 
+  @ignore
+  bool get isCorrupted => decryptedName == null;
+
   Account({
     required this.id,
     required this.encryptedName,

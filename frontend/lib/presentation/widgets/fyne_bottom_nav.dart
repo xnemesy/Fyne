@@ -22,7 +22,7 @@ class FyneBottomNav extends ConsumerWidget {
         color: isDark ? FyneColors.ink : FyneColors.paper,
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0xFF3A3A3A) : FyneColors.paperDark,
+            color: isDark ? FyneColors.dividerDark : FyneColors.paperDark,
             width: 1,
           ),
         ),
@@ -157,7 +157,7 @@ class _AddButton extends StatelessWidget {
           ),
           child: Icon(
             Icons.add,
-            color: isDark ? FyneColors.ink : Colors.white,
+            color: isDark ? FyneColors.ink : FyneColors.paper,
             size: 32,
           ),
         ),

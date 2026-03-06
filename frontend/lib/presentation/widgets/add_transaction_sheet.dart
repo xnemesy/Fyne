@@ -75,7 +75,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFFFBFBF9),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (_) => CategoryPickerSheet(
         selectedId: _selectedCategory?.id,
         onSelect: (category) {
@@ -318,9 +318,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       builder: (context, child) {
                         return Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: Theme.of(context).brightness == Brightness.light 
-                              ? const ColorScheme.light(primary: Color(0xFF4A6741), onPrimary: Colors.white)
-                              : const ColorScheme.dark(primary: Color(0xFF8FA68B), onPrimary: Color(0xFF1A1A1A)),
+                            colorScheme: Theme.of(context).brightness == Brightness.light
+                              ? const ColorScheme.light(primary: FyneColors.forest, onPrimary: FyneColors.paper)
+                              : const ColorScheme.dark(primary: FyneColors.forestLight, onPrimary: FyneColors.ink),
                           ),
                           child: child!,
                         );
@@ -350,7 +350,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                               Text("Data Transazione",
                                   style: GoogleFonts.inter(
                                       fontSize: 11,
-                                      color: const Color(0xFF7A7A7A))),
+                                      color: FyneColors.inkLight)),
                               const SizedBox(height: 2),
                               Text(
                                 DateFormat('dd MMMM yyyy', 'it_IT')
@@ -365,7 +365,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                           ),
                         ),
                         const Icon(Icons.edit_calendar_outlined,
-                            color: Color(0xFFAAAAAA), size: 20),
+                            color: FyneColors.inkLighter, size: 20),
                       ],
                     ),
                   ),
@@ -393,7 +393,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                               Text("Categoria",
                                   style: GoogleFonts.inter(
                                       fontSize: 11,
-                                      color: const Color(0xFF7A7A7A))),
+                                      color: FyneColors.inkLight)),
                               const SizedBox(height: 2),
                               Text(
                                 _selectedCategory?.name ??
@@ -410,7 +410,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                           ),
                         ),
                         const Icon(Icons.chevron_right,
-                            color: Color(0xFFAAAAAA)),
+                            color: FyneColors.inkLighter),
                       ],
                     ),
                   ),
@@ -422,7 +422,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4A6741).withValues(alpha: 0.1),
+                      color: FyneColors.forest.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -450,7 +450,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey)),
+                        color: FyneColors.inkLight)),
                 const SizedBox(height: 12),
                 accounts.when(
                   data: (list) => SingleChildScrollView(
@@ -501,7 +501,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   child: ElevatedButton(
                     onPressed: _isSaving ? null : _saveTransaction,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4A6741),
+                      backgroundColor: FyneColors.forest,
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)),

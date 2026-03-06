@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/transaction.dart';
 
 class FinancialInsightCard extends StatelessWidget {
@@ -45,10 +46,10 @@ class FinancialInsightCard extends StatelessWidget {
                   letterSpacing: 1.5,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white.withValues(alpha:0.4),
+                  color: FyneColors.paper.withValues(alpha:0.4),
                 ),
               ),
-              Icon(LucideIcons.sparkles, color: Colors.white.withValues(alpha:0.4), size: 14),
+              Icon(LucideIcons.sparkles, color: FyneColors.paper.withValues(alpha:0.4), size: 14),
             ],
           ),
           const SizedBox(height: 20),
@@ -64,7 +65,7 @@ class FinancialInsightCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha:0.05),
+              color: FyneColors.paper.withValues(alpha:0.05),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -76,7 +77,7 @@ class FinancialInsightCard extends StatelessWidget {
                       Text(
                         isNegative ? "Scostamento rispetto al saldo ideale" : "Differenza del mese",
                         style: GoogleFonts.inter(
-                          color: Colors.white.withValues(alpha:0.4),
+                          color: FyneColors.paper.withValues(alpha:0.4),
                           fontSize: 11,
                         ),
                       ),
@@ -84,7 +85,7 @@ class FinancialInsightCard extends StatelessWidget {
                       Text(
                         "${(incomings - outgoings).toStringAsFixed(2)} €",
                         style: GoogleFonts.lora(
-                          color: Colors.white,
+                          color: FyneColors.paper,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -95,13 +96,13 @@ class FinancialInsightCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.1),
+                    color: FyneColors.paper.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     "$savingRate%",
                     style: GoogleFonts.inter(
-                      color: isNegative ? const Color(0xFFD63031) : const Color(0xFF4A6741),
+                      color: isNegative ? Theme.of(context).colorScheme.error : FyneColors.forest,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -116,7 +117,7 @@ class FinancialInsightCard extends StatelessWidget {
               ? "Questo mese le uscite superano le entrate. Controlla i tuoi budget per rientrare nei limiti."
               : "Ottimo lavoro! Stai risparmiando il $savingRate% delle tue entrate. Continua così.",
             style: GoogleFonts.inter(
-              color: Colors.white.withValues(alpha:0.4),
+              color: FyneColors.paper.withValues(alpha:0.4),
               fontSize: 12,
               height: 1.4,
             ),
@@ -130,9 +131,9 @@ class FinancialInsightCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: GoogleFonts.inter(letterSpacing: 1, fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withValues(alpha:0.4))),
+        Text(label.toUpperCase(), style: GoogleFonts.inter(letterSpacing: 1, fontSize: 10, fontWeight: FontWeight.bold, color: FyneColors.paper.withValues(alpha:0.4))),
         const SizedBox(height: 4),
-        Text("${amount.toStringAsFixed(2)} €", style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text("${amount.toStringAsFixed(2)} €", style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold, color: FyneColors.paper)),
       ],
     );
   }

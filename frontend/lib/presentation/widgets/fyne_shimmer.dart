@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../core/theme/fyne_theme.dart';
 
 class FyneShimmer extends StatelessWidget {
   final double width;
@@ -18,13 +19,13 @@ class FyneShimmer extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Shimmer.fromColors(
-      baseColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-      highlightColor: isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.02),
+      baseColor: isDark ? FyneColors.paper.withValues(alpha: 0.1) : FyneColors.ink.withValues(alpha: 0.05),
+      highlightColor: isDark ? FyneColors.paper.withValues(alpha: 0.24) : FyneColors.ink.withValues(alpha: 0.02),
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: FyneColors.paper,
           borderRadius: borderRadius ?? BorderRadius.circular(8),
         ),
       ),
@@ -96,6 +97,99 @@ class FyneAccountShimmer extends StatelessWidget {
           ),
           const FyneShimmer(width: 64, height: 16),
         ],
+      ),
+    );
+  }
+}
+
+/// Placeholder shimmer per una riga budget in BudgetsScreen.
+/// Struttura: nome categoria + importo | barra progress | quota spesa.
+class FyneBudgetShimmer extends StatelessWidget {
+  const FyneBudgetShimmer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: List.generate(3, (_) => Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    FyneShimmer(width: width * 0.30, height: 16),
+                    FyneShimmer(width: width * 0.20, height: 16),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                FyneShimmer(
+                  width: double.infinity,
+                  height: 8,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                const SizedBox(height: 8),
+                FyneShimmer(width: width * 0.25, height: 12),
+              ],
+            ),
+          ),
+        )),
+      ),
+    );
+  }
+}
+
+/// Placeholder shimmer per una riga spesa programmata in ScheduledScreen.
+/// Morfologicamente identico a `_buildScheduledItem`: icona | testo | importo.
+class FyneScheduledShimmer extends StatelessWidget {
+  const FyneScheduledShimmer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: List.generate(4, (_) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                const FyneShimmer(
+                  width: 44,
+                  height: 44,
+                  borderRadius: BorderRadius.all(Radius.circular(14)),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FyneShimmer(width: width * 0.35, height: 14),
+                      const SizedBox(height: 6),
+                      FyneShimmer(width: width * 0.25, height: 12),
+                    ],
+                  ),
+                ),
+                const FyneShimmer(width: 56, height: 18),
+              ],
+            ),
+          ),
+        )),
       ),
     );
   }

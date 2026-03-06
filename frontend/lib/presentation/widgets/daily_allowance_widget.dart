@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../providers/budget_provider.dart';
 import 'package:intl/intl.dart';
+import '../../core/theme/fyne_theme.dart';
+import '../../providers/budget_provider.dart';
 
 class DailyAllowanceWidget extends ConsumerWidget {
   const DailyAllowanceWidget({super.key});
@@ -17,12 +18,12 @@ class DailyAllowanceWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBFBF9), // Paper White
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: const Color(0xFF4A6741).withValues(alpha:0.1)),
+        border: Border.all(color: FyneColors.forest.withValues(alpha:0.1)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A6741).withValues(alpha:0.03),
+            color: FyneColors.forest.withValues(alpha:0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -72,7 +73,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: (allowance > 0 ? const Color(0xFF4A6741) : const Color(0xFFFF3B30)).withValues(alpha:0.08),
+                color: (allowance > 0 ? FyneColors.forest : FyneColors.danger).withValues(alpha:0.08),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -81,7 +82,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
-                  color: allowance > 0 ? const Color(0xFF4A6741) : const Color(0xFFFF3B30),
+                  color: allowance > 0 ? FyneColors.forest : FyneColors.danger,
                 ),
               ),
             ),
@@ -102,7 +103,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                 child: Container(
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4A6741),
+                    color: FyneColors.forest,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

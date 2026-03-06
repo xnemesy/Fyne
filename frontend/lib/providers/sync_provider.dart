@@ -32,13 +32,14 @@ class SyncNotifier extends Notifier<SyncState> {
     // Legge le dipendenze PRIMA di qualsiasi await per evitare il Riverpod async-gap
     final accountNotifier   = ref.read(accountsProvider.notifier);
     final syncService       = ref.read(syncServiceProvider);
+    final isarFuture        = ref.read(isarProvider.future);
 
     try {
       state = state.copyWith(isSyncing: true, error: null);
 
       await accountNotifier.syncPendingCreates();
 
-      final isar = await ref.read(isarProvider.future);
+      final isar = await isarFuture;
       await syncService.performSync(isar);
 
       // Guard: dopo gli await il Notifier potrebbe essere stato disposto

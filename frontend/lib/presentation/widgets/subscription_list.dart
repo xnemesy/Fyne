@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../models/transaction.dart';
 
 class SubscriptionList extends StatelessWidget {
@@ -65,7 +66,7 @@ class SubscriptionList extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(LucideIcons.refreshCw, size: 14, color: Color(0xFF4A6741)),
+                        const Icon(LucideIcons.refreshCw, size: 14, color: FyneColors.forest),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(

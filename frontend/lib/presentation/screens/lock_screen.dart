@@ -339,7 +339,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: _kForest,
               disabledBackgroundColor: _kSurface,
-              foregroundColor: Colors.white,
+              foregroundColor: _kPaper,
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
@@ -351,7 +351,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2),
+                        color: _kPaper, strokeWidth: 2),
                   )
                 : Text(
                     'SBLOCCA VAULT',

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/budget_provider.dart';
 import '../../presentation/widgets/budget_card.dart';
 import '../../presentation/widgets/add_budget_sheet.dart';
 import '../../presentation/widgets/daily_allowance_card.dart';
+import '../../presentation/widgets/fyne_shimmer.dart';
 
 class BudgetsScreen extends ConsumerWidget {
   const BudgetsScreen({super.key});
@@ -16,7 +18,7 @@ class BudgetsScreen extends ConsumerWidget {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.read(budgetsProvider.notifier).refresh(),
-          color: const Color(0xFF4A6741),
+          color: FyneColors.forest,
           child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
@@ -28,7 +30,7 @@ class BudgetsScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(LucideIcons.box, size: 28, color: Color(0xFF4A6741)),
+                          const Icon(LucideIcons.box, size: 28, color: FyneColors.forest),
                           _headerAction(context, LucideIcons.plus, () {
                             showModalBottomSheet(
                               context: context,
@@ -92,10 +94,10 @@ class BudgetsScreen extends ConsumerWidget {
                                       padding: const EdgeInsets.only(right: 20),
                                       margin: const EdgeInsets.only(bottom: 16),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFF3B30),
+                                        color: FyneColors.danger,
                                         borderRadius: BorderRadius.circular(24),
                                       ),
-                                      child: const Icon(LucideIcons.trash2, color: Colors.white),
+                                      child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
                                     ),
                                     confirmDismiss: (direction) async {
                                       return await showDialog(
@@ -105,7 +107,7 @@ class BudgetsScreen extends ConsumerWidget {
                                           content: const Text("Vuoi eliminare questo budget?"),
                                           actions: [
                                             TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-                                            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30)))),
+                                            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger))),
                                           ],
                                         ),
                                       );
@@ -120,8 +122,11 @@ class BudgetsScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                    loading: () => const SliverFillRemaining(
-                      child: Center(child: CircularProgressIndicator(color: Color(0xFF4A6741))),
+                    loading: () => const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: FyneBudgetShimmer(),
+                      ),
                     ),
                     error: (err, __) => SliverToBoxAdapter(
                       child: Center(child: Text("Errore: $err")),
@@ -144,10 +149,10 @@ class BudgetsScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isPrimary ? const Color(0xFF4A6741) : const Color(0xFFE9E9EB),
+          color: isPrimary ? FyneColors.forest : Theme.of(context).colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isPrimary ? Colors.white : Theme.of(context).colorScheme.onSurface, size: 18),
+        child: Icon(icon, color: isPrimary ? FyneColors.paper : Theme.of(context).colorScheme.onSurface, size: 18),
       ),
     );
   }
@@ -161,10 +166,10 @@ class BudgetsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A6741).withValues(alpha: 0.05),
+                color: FyneColors.forest.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(LucideIcons.box, size: 40, color: Color(0xFF4A6741)),
+              child: const Icon(LucideIcons.box, size: 40, color: FyneColors.forest),
             ),
             const SizedBox(height: 24),
             Text(

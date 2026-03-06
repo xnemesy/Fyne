@@ -13,6 +13,7 @@ import '../widgets/dashboard/account_carousel.dart';
 import '../widgets/dashboard/balance_chart.dart';
 import '../../providers/sync_provider.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../providers/master_key_provider.dart';
@@ -132,9 +133,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     // SafeArea top: sì — protegge la notch iOS.
     // SafeArea bottom: no — gestiamo noi il padding con SliverPadding finale.
-    return SafeArea(
-      bottom: false,
-      child: CustomScrollView(
+    return RefreshIndicator(
+      color: FyneColors.forest,
+      onRefresh: () async {
+        HapticFeedback.lightImpact();
+        ref.read(accountOverviewProvider.notifier).refresh();
+        ref.read(syncProvider.notifier).sync();
+      },
+      child: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           // ── Intestazione con saluto e pulsante sync ──────────────────────
@@ -204,6 +212,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -286,7 +295,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   backgroundColor: FyneColors.ink,
                   title: Text('Storage & RAM Debug',
                       style: GoogleFonts.inter(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
+                          color: FyneColors.paper, fontWeight: FontWeight.bold)),
                   content: SingleChildScrollView(
                     child: Text(
                       'RAM Status:\n'
@@ -303,7 +312,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       '- fyne_rsa_private_key: ${rsa != null ? '✅ FOUND' : '❌ MISSING'}\n\n'
                       'All Storage Keys:\n${allKeys.keys.join(', ')}',
                       style: GoogleFonts.sourceCodePro(
-                          fontSize: 12, color: Colors.white70),
+                          fontSize: 12, color: FyneColors.paper.withValues(alpha: 0.7)),
                     ),
                   ),
                   actions: [
@@ -347,10 +356,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Patrimonio Totale',
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: FyneColors.paper.withValues(alpha: 0.7),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -359,16 +368,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: FyneColors.paper.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.shield, color: Colors.white, size: 14),
+                    const Icon(Icons.shield, color: FyneColors.paper, size: 14),
                     const SizedBox(width: 6),
                     Text(
                       '${state.accounts.length} Conti',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: FyneColors.paper, fontSize: 12),
                     ),
                   ],
                 ),
@@ -379,7 +388,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Text(
             _formatCurrency(state.totalBalance),
             style: const TextStyle(
-              color: Colors.white,
+              color: FyneColors.paper,
               fontSize: 36,
               fontWeight: FontWeight.bold,
               letterSpacing: -1,

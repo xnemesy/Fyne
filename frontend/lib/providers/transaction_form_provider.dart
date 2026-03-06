@@ -182,6 +182,10 @@ class TransactionFormNotifier extends Notifier<TransactionFormState> {
       return;
     }
 
+    // Cattura i notifier prima di qualsiasi await (anti async-gap)
+    final txNotifier      = ref.read(transactionsProvider.notifier);
+    final accountNotifier = ref.read(accountsProvider.notifier);
+
     state = state.copyWith(isSaving: true, clearError: true);
 
     try {
@@ -202,7 +206,7 @@ class TransactionFormNotifier extends Notifier<TransactionFormState> {
       );
 
       // Delega la cifratura al TransactionRepository (AES-256-GCM + HMAC)
-      await ref.read(transactionsProvider.notifier).addTransaction(
+      await txNotifier.addTransaction(
             txShell,
             rawAmount: state.signedAmount.toStringAsFixed(2),
             rawDesc: state.rawDescription.isEmpty ? null : state.rawDescription,
@@ -212,8 +216,7 @@ class TransactionFormNotifier extends Notifier<TransactionFormState> {
           );
 
       // Aggiorna saldo conto atomicamente (decifra → ±delta → ri-cifra su Isar)
-      await ref
-          .read(accountsProvider.notifier)
+      await accountNotifier
           .applyTransactionDelta(state.selectedAccount!.id, state.signedAmount);
 
       debugPrint(

@@ -89,13 +89,13 @@ class SettingsScreen extends ConsumerWidget {
                       child: TextButton(
                         onPressed: () => ref.read(authProvider.notifier).signOut(),
                         style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF3B30).withValues(alpha: 0.1),
+                          backgroundColor: FyneColors.danger.withValues(alpha: 0.1),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: Text(
                           "ESCI DALL'ACCOUNT",
-                          style: GoogleFonts.inter(color: const Color(0xFFFF3B30), fontWeight: FontWeight.bold, letterSpacing: 1),
+                          style: GoogleFonts.inter(color: FyneColors.danger, fontWeight: FontWeight.bold, letterSpacing: 1),
                         ),
                       ),
                     ),
@@ -188,7 +188,7 @@ class SettingsScreen extends ConsumerWidget {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
+              BoxShadow(color: FyneColors.ink.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
             ],
           ),
           child: Column(

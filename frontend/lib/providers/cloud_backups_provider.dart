@@ -19,12 +19,11 @@ class CloudBackups extends AsyncNotifier<List<Map<String, dynamic>>> {
   }
 
   Future<void> uploadCurrentBackup() async {
-    final isar = await ref.read(isarProvider.future);
     final masterKey = ref.read(masterKeyProvider);
     if (masterKey == null) throw Exception("Master Key non trovata");
-
     final backupService = ref.read(backupServiceProvider);
     final cloudService = ref.read(cloudBackupServiceProvider);
+    final isar = await ref.read(isarProvider.future);
 
     // 1. Esporta localmente
     final localPath = await backupService.exportEncryptedBackup(

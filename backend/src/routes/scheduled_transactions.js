@@ -10,12 +10,14 @@ const db = require('../utils/db');
 router.get('/', verifyToken, async (req, res) => {
     try {
         // Ensure table exists (quick fix for prototype, ideally in migration)
+        // ZK contract: amount is stored encrypted (AES-GCM+HMAC ciphertext, base64).
+        // currency is retained as plaintext metadata (3-char ISO code, reveals no amount).
         await db.query(`
             CREATE TABLE IF NOT EXISTS scheduled_transactions (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 user_id VARCHAR(128) REFERENCES users(uid) ON DELETE CASCADE,
                 encrypted_description TEXT NOT NULL,
-                amount NUMERIC(15, 2) NOT NULL,
+                encrypted_amount TEXT NOT NULL,
                 currency VARCHAR(3) NOT NULL,
                 frequency VARCHAR(20) NOT NULL,
                 next_occurrence TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -38,15 +40,19 @@ router.get('/', verifyToken, async (req, res) => {
  * @desc Create a new scheduled transaction
  */
 router.post('/', verifyToken, async (req, res) => {
-    const { encrypted_description, amount, currency, frequency, next_occurrence } = req.body;
+    const { encrypted_description, encrypted_amount, currency, frequency, next_occurrence } = req.body;
+
+    if (!encrypted_amount) {
+        return res.status(400).json({ error: 'encrypted_amount is required (ZK contract: amount must be client-side encrypted)' });
+    }
 
     try {
         const result = await db.query(
-            `INSERT INTO scheduled_transactions 
-            (user_id, encrypted_description, amount, currency, frequency, next_occurrence)
+            `INSERT INTO scheduled_transactions
+            (user_id, encrypted_description, encrypted_amount, currency, frequency, next_occurrence)
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING id`,
-            [req.user.uid, encrypted_description, amount, currency, frequency, next_occurrence]
+            [req.user.uid, encrypted_description, encrypted_amount, currency, frequency, next_occurrence]
         );
         res.json({ id: result.rows[0].id, message: 'Scheduled transaction created' });
     } catch (error) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/budget_provider.dart';
 
 class DailyAllowanceCard extends ConsumerWidget {
@@ -17,11 +18,11 @@ class DailyAllowanceCard extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF4A6741), // Primary Green
+        color: const FyneColors.forest, // Primary Green
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A6741).withValues(alpha: 0.3),
+            color: const FyneColors.forest.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -35,10 +36,10 @@ class DailyAllowanceCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: FyneColors.paper.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(LucideIcons.calendarCheck, size: 20, color: Colors.white),
+                child: const Icon(LucideIcons.calendarCheck, size: 20, color: FyneColors.paper),
               ),
               const SizedBox(width: 12),
               Text(
@@ -47,7 +48,7 @@ class DailyAllowanceCard extends ConsumerWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: FyneColors.paper.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -58,7 +59,7 @@ class DailyAllowanceCard extends ConsumerWidget {
             style: GoogleFonts.lora(
               fontSize: dailyAllowance <= 0 ? 28 : 36,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: FyneColors.paper,
               height: 1.0,
             ),
           ),
@@ -68,7 +69,7 @@ class DailyAllowanceCard extends ConsumerWidget {
               "Spazio disponibile oggi: 0 €",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: FyneColors.paper.withValues(alpha: 0.9),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -79,7 +80,7 @@ class DailyAllowanceCard extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.4,
-              color: Colors.white.withValues(alpha: 0.8),
+              color: FyneColors.paper.withValues(alpha: 0.8),
               fontWeight: FontWeight.w400,
             ),
           ),

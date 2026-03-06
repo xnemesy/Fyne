@@ -181,8 +181,8 @@ class AccountNotifier extends AsyncNotifier<List<Account>> {
   }
 
   Future<void> applyTransactionDelta(String accountId, double delta) async {
-    final isar = await ref.read(isarProvider.future);
     final crypto = ref.read(cryptoServiceProvider);
+    final isar = await ref.read(isarProvider.future);
 
     await isar.writeTxn(() async {
       final account =

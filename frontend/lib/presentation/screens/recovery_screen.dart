@@ -142,7 +142,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.4),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: FyneColors.paper,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -192,7 +192,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                   onPressed: _isRecovering ? null : _recover,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: FyneColors.forest,
-                    foregroundColor: Colors.white,
+                    foregroundColor: FyneColors.paper,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     elevation: 0,
@@ -200,7 +200,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                   child: _isRecovering
                       ? const SizedBox(
                           height: 20, width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(color: FyneColors.paper, strokeWidth: 2),
                         )
                       : Text(
                           'Ripristina Vault',

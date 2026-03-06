@@ -187,7 +187,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onPressed: _isLoading ? null : _handleAnonymousStart,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: FyneColors.forest,
-                    foregroundColor: Colors.white,
+                    foregroundColor: FyneColors.paper,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -198,7 +198,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ? const SizedBox(
                         height: 20, width: 20,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white,
+                          strokeWidth: 2, color: FyneColors.paper,
                         ),
                       )
                     : Text(
@@ -307,7 +307,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: _isLoading ? null : _handleEmailSubmit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: FyneColors.forest,
-                      foregroundColor: Colors.white,
+                      foregroundColor: FyneColors.paper,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

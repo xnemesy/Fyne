@@ -10,6 +10,7 @@ import 'isar_provider.dart';
 import 'master_key_provider.dart';
 import 'auth_provider.dart';
 import 'package:flutter/foundation.dart';
+import '../core/utils/crypto_log.dart';
 
 /// Stato completo dell'overview finanziaria
 class AccountOverviewState {
@@ -60,6 +61,9 @@ class AccountSummary {
   final String currency;
   final AccountType type;
   final String group;
+  /// true se la decifratura AES-GCM è fallita per questo account.
+  /// L'UI mostra un placeholder "Dato protetto o non disponibile".
+  final bool isCorrupted;
 
   AccountSummary({
     required this.id,
@@ -68,6 +72,7 @@ class AccountSummary {
     required this.currency,
     required this.type,
     required this.group,
+    this.isCorrupted = false,
   });
 }
 
@@ -109,21 +114,23 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
+      // Cattura tutte le dipendenze ref PRIMA di qualsiasi await (anti async-gap)
+      final masterKey = ref.read(masterKeyProvider);
+      final authStatus = ref.read(authProvider).status;
+      final cryptoService = ref.read(cryptoServiceProvider);
+      final masterKeyNotifier = ref.read(masterKeyProvider.notifier);
       final isar = await ref.read(isarProvider.future);
       if (!mounted) return;
-      final masterKey = ref.read(masterKeyProvider);
 
       if (masterKey == null) {
         // P0 FIX: If vault is locked but user is authenticated, attempt auto-unlock
-        if (ref.read(authProvider).status == AuthStatus.authenticated ||
-            ref.read(authProvider).status == AuthStatus.locked) {
+        if (authStatus == AuthStatus.authenticated ||
+            authStatus == AuthStatus.locked) {
           debugPrint(
               "🔐 [OVERVIEW] MasterKey NULL but status is Authenticated/Locked. Attempting background recovery...");
-          // This will trigger _checkInitialState or similar in AuthProvider which populates masterKey
-          // Wait a bit and retry once
           await Future.delayed(const Duration(milliseconds: 300));
           if (!mounted) return;
-          final masterKeyRetry = ref.read(masterKeyProvider);
+          final masterKeyRetry = masterKeyNotifier.state;
           if (masterKeyRetry == null) {
             debugPrint(
                 "🔐 [OVERVIEW] Background recovery failed. Showing empty state.");
@@ -140,9 +147,6 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
 
       // 1. Carica tutti gli account cifrati non marcati come cancellati
       final encryptedAccounts = await isar.accounts.where().isDeletedEqualTo(false).findAll();
-
-      // 2. Decifra in parallelo
-      final cryptoService = ref.read(cryptoServiceProvider);
       final accountSummaries = <AccountSummary>[];
       double totalBal = 0.0;
 
@@ -170,8 +174,17 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
 
           totalBal += balance;
         } catch (e) {
-          // Log ma continua con gli altri account
-          debugPrint('⚠️ Errore decifratura account ${acc.id}: $e');
+          // Registra il fallimento crittografico e inserisce un placeholder visibile in UI
+          CryptoLog.record(component: 'account_overview', entityId: acc.id, error: e);
+          accountSummaries.add(AccountSummary(
+            id: acc.id,
+            name: 'Conto non accessibile',
+            balance: 0.0,
+            currency: acc.currency,
+            type: acc.type,
+            group: acc.group,
+            isCorrupted: true,
+          ));
         }
       }
 
@@ -201,7 +214,8 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
             expenses += amount.abs();
           }
         } catch (e) {
-          debugPrint('⚠️ Errore decifratura transazione ${tx.uuid}: $e');
+          // Registra il fallimento crittografico della transazione mensile
+          CryptoLog.record(component: 'account_overview_tx', entityId: tx.uuid, error: e);
         }
       }
 
@@ -227,15 +241,15 @@ class AccountOverviewNotifier extends StateNotifier<AccountOverviewState> {
   /// Aggiorna il balance di un singolo account
   Future<void> updateAccountBalance(String accountId, double newBalance) async {
     try {
-      final isar = await ref.read(isarProvider.future);
       final masterKey = ref.read(masterKeyProvider);
       if (masterKey == null) return;
+      final cryptoService = ref.read(cryptoServiceProvider);
+
+      final isar = await ref.read(isarProvider.future);
 
       final account =
           await isar.accounts.where().idEqualTo(accountId).findFirst();
       if (account == null) return;
-
-      final cryptoService = ref.read(cryptoServiceProvider);
       final encryptedBalance = await cryptoService.encrypt(
         newBalance.toString(),
         scope: EncryptionScope.database,

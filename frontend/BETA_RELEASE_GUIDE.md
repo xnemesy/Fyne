@@ -1,4 +1,5 @@
-# Fyne Beta Release Guide (1.0.0-beta.1)
+# Fyne Beta Release Guide
+_Ultima verifica QA: 2026-03-06_
 
 Questa guida dettaglia i passi necessari per distribuire la prima versione beta di Fyne su TestFlight (iOS) e Play Console (Android).
 
@@ -21,11 +22,16 @@ Per generare un APK/AAB firmato per Android:
 
 ## 2. Hardening Checkpoint
 
+> **⚠️ ATTENZIONE — BUILD ATTUALE NON COMPILABILE**
+> `flutter analyze` riporta **31 errori** che impediscono la generazione della build. Vedere `tasks/todo.md` sezione "Regressioni" per la lista completa. Questi errori devono essere risolti **prima** di procedere con qualsiasi distribuzione.
+
 Prima di caricare la build, conferma che:
-- [x] Versioning in `pubspec.yaml` è `1.0.0-beta.1+1`.
-- [x] Checksum validation è attiva nel `BackupService`.
-- [x] Analytics & Crashlytics inizializzati in modalità privacy-first (no PII).
-- [x] Autenticazione biometrica ha il fallback a PIN attivato.
+
+- [ ] **`flutter analyze` → 0 errori.** _(Attuale: 31 errori — BLOCCANTE)_
+- [x] Versioning in `pubspec.yaml` aggiornato. _(Attuale: `1.1.0+12` — DA AGGIORNARE per release candidate)_
+- [x] Checksum validation attiva nel `BackupService`. _(Verificato: SHA-256 su payload prima dell'import)_
+- [x] Analytics & Crashlytics inizializzati in modalità privacy-first (no PII). _(Verificato: `AnalyticsService` non logga importi/descrizioni)_
+- [x] Autenticazione biometrica configurata. _(Nota: il codice usa `biometricOnly: true` — il fallback a PIN di sistema è **disabilitato** intenzionalmente. L'utente senza biometria resta sulla LockScreen.)_
 
 ## 3. Distribuzione iOS (TestFlight)
 

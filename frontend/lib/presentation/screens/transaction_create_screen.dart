@@ -225,7 +225,7 @@ class _TransactionCreateScreenState
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _kForest,
                   disabledBackgroundColor: _kSurfaceHigh,
-                  foregroundColor: Colors.white,
+                  foregroundColor: _kPaper,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
@@ -237,7 +237,7 @@ class _TransactionCreateScreenState
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2),
+                            color: _kPaper, strokeWidth: 2),
                       )
                     : Text(
                         'SALVA TRANSAZIONE',
@@ -338,7 +338,7 @@ class _ToggleChip extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
-            color: active ? Colors.white : _kInkLight,
+            color: active ? _kPaper : _kInkLight,
           ),
         ),
       ),
@@ -511,7 +511,7 @@ class _CategoryGrid extends ConsumerWidget {
                   Icon(
                     _categoryIcons[name] ?? LucideIcons.tag,
                     size: 22,
-                    color: isSelected ? Colors.white : _kForestLight,
+                    color: isSelected ? _kPaper : _kForestLight,
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -520,7 +520,7 @@ class _CategoryGrid extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : _kInkLight,
+                      color: isSelected ? _kPaper : _kInkLight,
                       letterSpacing: 0.2,
                     ),
                     maxLines: 2,

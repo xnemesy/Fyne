@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/daily_budget_provider.dart';
 
 class DailyIndicator extends ConsumerWidget {
@@ -19,7 +20,7 @@ class DailyIndicator extends ConsumerWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: FyneColors.ink.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -44,13 +45,13 @@ class DailyIndicator extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD63031).withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     "BUDGET ESAURITO",
                     style: GoogleFonts.inter(
-                      color: const Color(0xFFD63031),
+                      color: Theme.of(context).colorScheme.error,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
@@ -68,7 +69,7 @@ class DailyIndicator extends ConsumerWidget {
                 style: GoogleFonts.lora(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: info.isExhausted ? const Color(0xFFD63031) : Theme.of(context).colorScheme.onSurface,
+                  color: info.isExhausted ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(width: 8),
@@ -89,7 +90,7 @@ class DailyIndicator extends ConsumerWidget {
               value: info.isExhausted ? 1.0 : (info.dailyAllowance / (info.dailyAverageNeeded * 1.5)).clamp(0.0, 1.0),
               // Track color: semi-trasparente, leggibile in dark e light mode
               backgroundColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-              color: info.isExhausted ? const Color(0xFFD63031) : const Color(0xFF4A6741),
+              color: info.isExhausted ? Theme.of(context).colorScheme.error : FyneColors.forest,
               minHeight: 6,
             ),
           ),

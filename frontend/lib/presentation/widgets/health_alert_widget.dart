@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/transaction_provider.dart';
 
 class HealthAlertWidget extends ConsumerWidget {
@@ -30,19 +31,19 @@ class HealthAlertWidget extends ConsumerWidget {
           margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFFFBFBF9),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+            border: Border.all(color: FyneColors.amber.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
+                  color: FyneColors.amber.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.flame, color: Colors.orange, size: 20),
+                child: const Icon(LucideIcons.flame, color: FyneColors.amber, size: 20),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -54,7 +55,7 @@ class HealthAlertWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.orange.shade900,
+                        color: FyneColors.amber,
                       ),
                     ),
                     const SizedBox(height: 4),

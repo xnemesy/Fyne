@@ -321,6 +321,42 @@ class TransactionRepository {
         .fold<double>(0.0, (double sum, s) => sum + s.amount.abs());
   }
 
+  /// Restituisce tutte le transazioni decifrate in un range di date.
+  /// Usa `decryptPageInIsolate` per non bloccare il main thread (60fps).
+  Future<List<TransactionSummary>> getDecryptedTransactionsInRange(
+    DateTime start,
+    DateTime end,
+  ) async {
+    final encrypted = await _isar.transactionModels
+        .where()
+        .isDeletedEqualTo(false)
+        .filter()
+        .bookingDateBetween(start, end)
+        .findAll();
+    if (encrypted.isEmpty) return [];
+    return decryptPageInIsolate(encrypted);
+  }
+
+  /// Calcola la spesa del periodo per categoryUuid.
+  /// Restituisce `Map<categoryUuid, importo_assoluto>`.
+  Future<Map<String, double>> getSpentByCategoriesInRange(
+    DateTime start,
+    DateTime end,
+  ) async {
+    final summaries = await getDecryptedTransactionsInRange(start, end);
+    final Map<String, double> result = {};
+    for (final s in summaries.where((s) => s.amount < 0)) {
+      if (s.categoryUuid != null) {
+        result.update(
+          s.categoryUuid!,
+          (v) => v + s.amount.abs(),
+          ifAbsent: () => s.amount.abs(),
+        );
+      }
+    }
+    return result;
+  }
+
   /// Elimina definitivamente i record orphan cifrati con chiavi precedenti.
   /// Vengono chiamati automaticamente dopo ogni pagina di decifratura fallita.
   Future<void> purgeOrphansByUuids(List<String> uuids) async {

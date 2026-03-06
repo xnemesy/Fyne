@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/fyne_theme.dart';
 import '../../providers/budget_provider.dart';
 import '../../services/api_service.dart';
 import '../../models/budget.dart';
@@ -34,9 +35,9 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
         right: 32,
         top: 32,
       ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFBFBF9),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
         ),
@@ -62,7 +63,7 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(LucideIcons.x, color: Color(0xFF1A1A1A), size: 20),
+                  icon: const Icon(LucideIcons.x, color: FyneColors.ink, size: 20),
                 ),
               ],
             ),
@@ -88,14 +89,14 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _saveBudget,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A6741),
-                  foregroundColor: Colors.white,
+                  backgroundColor: FyneColors.forest,
+                  foregroundColor: FyneColors.paper,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: _isSaving 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                child: _isSaving
+                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: FyneColors.paper, strokeWidth: 2))
                     : Text("AGGIORNA BUDGET", style: GoogleFonts.inter(fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 13)),
               ),
             ),
@@ -104,21 +105,21 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
               width: double.infinity,
               child: TextButton.icon(
                 onPressed: _isSaving ? null : _deleteBudget,
-                icon: const Icon(LucideIcons.trash2, size: 18, color: Color(0xFFFF3B30)),
+                icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.danger),
                 label: Text(
                   "ELIMINA BUDGET",
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
                     fontSize: 13,
-                    color: const Color(0xFFFF3B30),
+                    color: const FyneColors.danger,
                   ),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: const Color(0xFFFF3B30).withValues(alpha: 0.2)),
+                    side: BorderSide(color: const FyneColors.danger.withValues(alpha: 0.2)),
                   ),
                 ),
               ),
@@ -139,7 +140,7 @@ class _EditBudgetSheetState extends ConsumerState<EditBudgetSheet> {
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
           TextButton(
             onPressed: () => Navigator.pop(context, true), 
-            child: const Text("ELIMINA", style: TextStyle(color: Color(0xFFFF3B30))),
+            child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger)),
           ),
         ],
       ),
