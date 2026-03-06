@@ -1,5 +1,5 @@
 # Fyne Beta Release Guide
-_Ultima verifica QA: 2026-03-06_
+_Ultima verifica QA: 2026-03-06 — Stato: ✅ PRONTO PER DISTRIBUZIONE_
 
 Questa guida dettaglia i passi necessari per distribuire la prima versione beta di Fyne su TestFlight (iOS) e Play Console (Android).
 
@@ -24,11 +24,13 @@ Per generare un APK/AAB firmato per Android:
 
 Prima di caricare la build, conferma che:
 
-- [x] **`flutter analyze` → 0 errori.** _(Verificato: 0 errori — OK)_
-- [x] Versioning in `pubspec.yaml` aggiornato. _(Attuale: `1.0.0-beta.1+1`)_
-- [x] Checksum validation attiva nel `BackupService`. _(Verificato: SHA-256 su payload prima dell'import)_
-- [x] Analytics & Crashlytics inizializzati in modalità privacy-first (no PII). _(Verificato: `AnalyticsService` non logga importi/descrizioni)_
-- [x] Autenticazione biometrica configurata. _(Nota: il codice usa `biometricOnly: true` — il fallback a PIN di sistema è **disabilitato** intenzionalmente. L'utente senza biometria resta sulla LockScreen.)_
+- [x] **`flutter analyze` → 0 errori.** _(Verificato: 0 errori in `lib/`. 75 info in file di test — non bloccanti.)_
+- [x] **Versioning in `pubspec.yaml` aggiornato.** _(Versione corrente: `1.0.0-beta.1+1`)_
+- [x] **Checksum validation attiva nel `BackupService`.** _(Verificato: SHA-256 su payload prima dell'import)_
+- [x] **Analytics & Crashlytics inizializzati in modalità privacy-first (no PII).** _(Verificato: `AnalyticsService` non logga importi/descrizioni)_
+- [x] **Autenticazione biometrica configurata.** _(Nota: il codice usa `biometricOnly: true` — il fallback a PIN di sistema è **disabilitato** intenzionalmente. L'utente senza biometria resta sulla LockScreen.)_
+- [x] **Design System coerente.** _(Verificato: 0 occorrenze `const FyneColors.X` o `FyneColors.danger` in `lib/`)_
+- [x] **Async-gap violations risolte.** _(Verificato: 0 occorrenze `ref.read()` dopo `await` nei provider)_
 
 ## 3. Distribuzione iOS (TestFlight)
 
@@ -54,4 +56,20 @@ Accedi alle console per monitorare:
 - **Firebase Analytics**: Verifica il tasso di successo degli export (`export_success`).
 
 ---
+
+## 6. Warnings Pre-Approvati (Non Bloccanti)
+
+I seguenti warning sono noti, pre-approvati e **non vanno modificati** a meno di lavorare esplicitamente su quelle feature:
+
+| File | Warning |
+|------|---------|
+| `scheduled_provider.dart:89` | `_mockScheduled` unused element |
+| `transaction_provider.dart:116` | `invalid_use_of_internal_member` (copyWithPrevious) |
+| `vault_integrity_service.dart:20` | `count` unused local variable |
+| `fcm_service.dart:15,23,90,91` | 4 variabili locali inutilizzate |
+| `bank_selection_screen.dart:7` | Unused import `fyne_theme.dart` |
+| `categorization_rules_screen.dart:7` | Unused import `fyne_theme.dart` |
+
+---
+
 **Privacy Note**: Ricorda che Fyne non invia mai dati finanziari o PII alle console di monitoraggio. I log sono puramente tecnici e aggregati.
