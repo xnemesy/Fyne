@@ -115,7 +115,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
                         decoration: BoxDecoration(
-                          color: FyneColors.danger,
+                          color: FyneColors.rust,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
@@ -135,7 +135,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: Text("ELIMINA", style: GoogleFonts.inter(color: FyneColors.danger, fontWeight: FontWeight.bold)),
+                                child: Text("ELIMINA", style: GoogleFonts.inter(color: FyneColors.rust, fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),

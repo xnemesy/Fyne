@@ -94,7 +94,7 @@ class BudgetsScreen extends ConsumerWidget {
                                       padding: const EdgeInsets.only(right: 20),
                                       margin: const EdgeInsets.only(bottom: 16),
                                       decoration: BoxDecoration(
-                                        color: FyneColors.danger,
+                                        color: FyneColors.rust,
                                         borderRadius: BorderRadius.circular(24),
                                       ),
                                       child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
@@ -107,7 +107,7 @@ class BudgetsScreen extends ConsumerWidget {
                                           content: const Text("Vuoi eliminare questo budget?"),
                                           actions: [
                                             TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-                                            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger))),
+                                            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: FyneColors.rust))),
                                           ],
                                         ),
                                       );

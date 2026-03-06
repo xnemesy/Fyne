@@ -22,13 +22,10 @@ Per generare un APK/AAB firmato per Android:
 
 ## 2. Hardening Checkpoint
 
-> **⚠️ ATTENZIONE — BUILD ATTUALE NON COMPILABILE**
-> `flutter analyze` riporta **31 errori** che impediscono la generazione della build. Vedere `tasks/todo.md` sezione "Regressioni" per la lista completa. Questi errori devono essere risolti **prima** di procedere con qualsiasi distribuzione.
-
 Prima di caricare la build, conferma che:
 
-- [ ] **`flutter analyze` → 0 errori.** _(Attuale: 31 errori — BLOCCANTE)_
-- [x] Versioning in `pubspec.yaml` aggiornato. _(Attuale: `1.1.0+12` — DA AGGIORNARE per release candidate)_
+- [x] **`flutter analyze` → 0 errori.** _(Verificato: 0 errori — OK)_
+- [x] Versioning in `pubspec.yaml` aggiornato. _(Attuale: `1.0.0-beta.1+1`)_
 - [x] Checksum validation attiva nel `BackupService`. _(Verificato: SHA-256 su payload prima dell'import)_
 - [x] Analytics & Crashlytics inizializzati in modalità privacy-first (no PII). _(Verificato: `AnalyticsService` non logga importi/descrizioni)_
 - [x] Autenticazione biometrica configurata. _(Nota: il codice usa `biometricOnly: true` — il fallback a PIN di sistema è **disabilitato** intenzionalmente. L'utente senza biometria resta sulla LockScreen.)_

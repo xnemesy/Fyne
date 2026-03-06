@@ -88,7 +88,7 @@ class CompactCashFlowChart extends StatelessWidget {
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
-                    color: const FyneColors.forest,
+                    color: FyneColors.forest,
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
@@ -98,8 +98,8 @@ class CompactCashFlowChart extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const FyneColors.forest.withValues(alpha: 0.15),
-                          const FyneColors.forest.withValues(alpha: 0.0),
+                          FyneColors.forest.withValues(alpha: 0.15),
+                          FyneColors.forest.withValues(alpha: 0.0),
                         ],
                       ),
                     ),

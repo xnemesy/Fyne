@@ -143,7 +143,7 @@ class BudgetCard extends StatelessWidget {
                  padding: const EdgeInsets.all(12),
                  decoration: BoxDecoration(
                    // Amber tint: leggibile in dark (sfondo scuro+trasparente) e light
-                   color: const FyneColors.amber.withValues(alpha:0.15),
+                   color: FyneColors.amber.withValues(alpha:0.15),
                    borderRadius: BorderRadius.circular(12),
                  ),
                  child: Row(
@@ -153,7 +153,7 @@ class BudgetCard extends StatelessWidget {
                      Expanded(
                        child: Text(
                          "Attenzione: a questo ritmo sforerai di ${(projectedSpend - effectiveBudget.limitAmount).toStringAsFixed(0)}€",
-                         style: GoogleFonts.inter(fontSize: 12, color: const FyneColors.amber, fontWeight: FontWeight.w500),
+                         style: GoogleFonts.inter(fontSize: 12, color: FyneColors.amber, fontWeight: FontWeight.w500),
                        ),
                      ),
                    ],

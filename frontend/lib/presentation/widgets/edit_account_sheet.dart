@@ -155,21 +155,21 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
               width: double.infinity,
               child: TextButton.icon(
                 onPressed: _isSaving ? null : _deleteAccount,
-                icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.danger),
+                icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.rust),
                 label: Text(
                   "ELIMINA CONTO",
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
                     fontSize: 13,
-                    color: const FyneColors.danger,
+                    color: FyneColors.rust,
                   ),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: const FyneColors.danger.withValues(alpha: 0.2)),
+                    side: BorderSide(color: FyneColors.rust.withValues(alpha: 0.2)),
                   ),
                 ),
               ),
@@ -221,7 +221,7 @@ class _EditAccountSheetState extends ConsumerState<EditAccountSheet> {
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
           TextButton(
             onPressed: () => Navigator.pop(context, true), 
-            child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger)),
+            child: const Text("ELIMINA", style: TextStyle(color: FyneColors.rust)),
           ),
         ],
       ),

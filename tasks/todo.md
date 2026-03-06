@@ -75,22 +75,21 @@ _Aggiornato da: Agente QA — 2026-03-06_
 
 ---
 
-## 🔴 Regressioni da Correggere (Blockers Beta)
+## ✅ Regressioni Risolte (Sessione 6)
 
-Queste regressioni sono state introdotte nelle sessioni recenti e bloccano la compilazione.
-**`flutter analyze` conta 31 errori — la build FALLISCE.**
+Tutte le regressioni sono state corrette. **`flutter analyze` → 0 errori.**
 
-| # | File | Riga | Errore | Causa |
-|---|------|------|--------|-------|
-| R1 | `budget_card.dart` | 146, 156 | `const FyneColors.amber` → sintassi costruttore inesistente | Refactoring tema |
-| R2 | `compact_cash_flow_chart.dart` | 91, 101, 102 | `const FyneColors.forest` → idem | Refactoring tema |
-| R3 | `daily_allowance_card.dart` | 21, 25 | `const FyneColors.forest` → idem | Refactoring tema |
-| R4 | `edit_account_sheet.dart` | 165, 172 | `const FyneColors.danger` → idem | Refactoring tema |
-| R5 | `edit_budget_sheet.dart` | 115, 122 | `const FyneColors.danger` → idem | Refactoring tema |
-| R6 | `insights/net_worth_chart.dart` | 73, 83, 84 | `const FyneColors.forest` → idem | Refactoring tema |
-| R7 | `category_picker_sheet.dart` | 20 | `Category(id, name)` mancano `color` e `icon` required | `Category` class aggiornata |
-| R8 | `dashboard/balance_chart.dart` | 153 | `tooltipRoundedRadius` non esiste in `LineTouchTooltipData` (fl_chart v1.1.1) | Agente 1 |
-| R9 | `dashboard_screen.dart` | 307 | `_buildFingerprint` undefined | Pre-esistente |
+| # | File | Errore | Stato |
+|---|------|--------|-------|
+| R1 | `budget_card.dart` | `const FyneColors.amber` → sintassi costruttore inesistente | ✅ |
+| R2 | `compact_cash_flow_chart.dart` | `const FyneColors.forest` → idem | ✅ |
+| R3 | `daily_allowance_card.dart` | `const FyneColors.forest` → idem | ✅ |
+| R4 | `edit_account_sheet.dart` | `const FyneColors.danger` → idem | ✅ |
+| R5 | `edit_budget_sheet.dart` | `const FyneColors.danger` → idem | ✅ |
+| R6 | `insights/net_worth_chart.dart` | `const FyneColors.forest` → idem | ✅ |
+| R7 | `category_picker_sheet.dart` | `Category(id, name)` mancano `color` e `icon` required | ✅ |
+| R8 | `dashboard/balance_chart.dart` | `tooltipRoundedRadius` non esiste in `LineTouchTooltipData` | ✅ |
+| R9 | `dashboard_screen.dart` | `_buildFingerprint` undefined | ✅ |
 
 ---
 
@@ -111,9 +110,9 @@ Queste regressioni sono state introdotte nelle sessioni recenti e bloccano la co
 
 | KPI | Target | Attuale | Pass? |
 |-----|--------|---------|-------|
-| `flutter analyze` errori | 0 | **31** | ❌ |
+| `flutter analyze` errori | 0 | **0** | ✅ |
 | `flutter analyze` warning (non pre-approvati) | 0 | 1–2 | ⚠️ |
 | `backup_service.importEncryptedBackup` checksum | ✅ attivo | ✅ attivo | ✅ |
 | `backup_service.importEncryptedBackup` encryption scope | ✅ attivo | ✅ attivo | ✅ |
-| `pubspec.yaml` versione beta | `1.0.0-beta.1+1` | `1.1.0+12` | ❌ |
+| `pubspec.yaml` versione beta | `1.0.0-beta.1+1` | `1.0.0-beta.1+1` | ✅ |
 

@@ -17,7 +17,12 @@ class CategoryPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final service = CategorizationService();
     final categories = service.supportedCategories
-        .map((name) => Category(id: service.getCategoryId(name), name: name))
+        .map((name) => Category(
+              id: service.getCategoryId(name),
+              name: name,
+              icon: 'default',
+              color: '#4A6741',
+            ))
         .toList();
 
     return SafeArea(

@@ -150,7 +150,6 @@ class BalanceChart extends ConsumerWidget {
           touchTooltipData: LineTouchTooltipData(
             getTooltipColor: (spot) =>
                 Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.88),
-            tooltipRoundedRadius: 10,
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 return LineTooltipItem(

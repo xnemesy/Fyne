@@ -18,11 +18,11 @@ class DailyAllowanceCard extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const FyneColors.forest, // Primary Green
+        color: FyneColors.forest, // Primary Green
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const FyneColors.forest.withValues(alpha: 0.3),
+            color: FyneColors.forest.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

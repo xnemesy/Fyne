@@ -73,7 +73,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: (allowance > 0 ? FyneColors.forest : FyneColors.danger).withValues(alpha:0.08),
+                color: (allowance > 0 ? FyneColors.forest : FyneColors.rust).withValues(alpha:0.08),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -82,7 +82,7 @@ class DailyAllowanceWidget extends ConsumerWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
-                  color: allowance > 0 ? FyneColors.forest : FyneColors.danger,
+                  color: allowance > 0 ? FyneColors.forest : FyneColors.rust,
                 ),
               ),
             ),

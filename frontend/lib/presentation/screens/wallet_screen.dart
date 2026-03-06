@@ -288,7 +288,7 @@ class WalletScreen extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: FyneColors.danger,
+          color: FyneColors.rust,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(LucideIcons.trash2, color: FyneColors.paper),
@@ -301,7 +301,7 @@ class WalletScreen extends ConsumerWidget {
             content: const Text("Sei sicuro di voler eliminare questo conto? Questa azione non può essere annullata."),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULLA")),
-              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: FyneColors.danger))),
+              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("ELIMINA", style: TextStyle(color: FyneColors.rust))),
             ],
           ),
         );
@@ -355,7 +355,7 @@ class WalletScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 15, 
               fontWeight: FontWeight.bold, 
-              color: bal >= 0 ? FyneColors.income : FyneColors.danger
+              color: bal >= 0 ? FyneColors.income : FyneColors.rust
             ),
           ),
         ),

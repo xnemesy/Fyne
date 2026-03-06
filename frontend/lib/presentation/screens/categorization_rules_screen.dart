@@ -74,7 +74,7 @@ class CategorizationRulesScreen extends ConsumerWidget {
         title: Text(rule.pattern, style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
         subtitle: Text("Categoria: ${rule.categoryName}", style: GoogleFonts.inter(fontSize: 12)),
         trailing: IconButton(
-          icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.danger),
+          icon: const Icon(LucideIcons.trash2, size: 18, color: FyneColors.rust),
           onPressed: () => ref.read(categorizationRulesProvider.notifier).deleteRule(rule.id),
         ),
       ),

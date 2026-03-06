@@ -70,7 +70,7 @@ class TransactionDetailScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(LucideIcons.shieldAlert,
-                size: 48, color: FyneColors.danger),
+                size: 48, color: FyneColors.rust),
             const SizedBox(height: 16),
             Text(message,
                 style: GoogleFonts.lora(
@@ -109,7 +109,7 @@ class _TransactionDetailContent extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.trash2, color: FyneColors.danger),
+            icon: const Icon(LucideIcons.trash2, color: FyneColors.rust),
             onPressed: () => _deleteTransaction(context, ref),
           ),
         ],
@@ -126,7 +126,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: (isExpense
-                              ? FyneColors.danger
+                              ? FyneColors.rust
                               : FyneColors.income)
                           .withValues(alpha: 0.1),
                       shape: BoxShape.circle,
@@ -136,7 +136,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                           ? LucideIcons.arrowUpRight
                           : LucideIcons.arrowDownLeft,
                       size: 40,
-                      color: isExpense ? FyneColors.danger : FyneColors.income,
+                      color: isExpense ? FyneColors.rust : FyneColors.income,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -261,7 +261,7 @@ class _TransactionDetailContent extends ConsumerWidget {
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: const Text("ELIMINA",
-                  style: TextStyle(color: FyneColors.danger))),
+                  style: TextStyle(color: FyneColors.rust))),
         ],
       ),
     );
