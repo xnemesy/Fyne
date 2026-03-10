@@ -8,7 +8,7 @@ class PlatformSecurityService {
   /// This prevents screenshots, screen recording, and shows a blank/blurred 
   /// screen in the task switcher.
   Future<void> setSecureScreen(bool secure) async {
-    if (defaultTargetPlatform != TargetPlatform.android) return;
+    if (defaultTargetPlatform != TargetPlatform.android || kDebugMode) return;
     
     try {
       await _channel.invokeMethod('setSecureScreen', {'secure': secure});

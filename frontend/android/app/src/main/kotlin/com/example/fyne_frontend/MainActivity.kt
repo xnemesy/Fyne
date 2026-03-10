@@ -11,7 +11,10 @@ class MainActivity: FlutterFragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Enforce FLAG_SECURE as early as possible to prevent screenshots of initial load
-        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        // Disable on DEBUG to allow QA recording
+        if (!BuildConfig.DEBUG) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
         super.onCreate(savedInstanceState)
     }
 
@@ -20,7 +23,7 @@ class MainActivity: FlutterFragmentActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "setSecureScreen") {
                 val secure = call.argument<Boolean>("secure") ?: false
-                if (secure) {
+                if (secure && !BuildConfig.DEBUG) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 } else {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)

@@ -83,9 +83,10 @@ class AuthNotifier extends StateNotifier<AuthState>
     if (appState == AppLifecycleState.paused) {
       if (kDebugMode) {
         debugPrint(
-            "[Auth] App entered background (PAUSED). Wiping sensitive RAM.");
+            "[Auth] App entered background (PAUSED). Debug mode: skipping RAM wipe.");
+      } else {
+        _lockVault();
       }
-      _lockVault();
     } else if (appState == AppLifecycleState.inactive) {
       if (kDebugMode) {
         debugPrint(

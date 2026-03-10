@@ -11,7 +11,7 @@ class PrivacyBlurOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final privacy = ref.watch(privacyProvider);
-    final isHidden = privacy.isSettingsEnabled && (privacy.isBlurred || privacy.isAppInBackground);
+    final isHidden = !kDebugMode && privacy.isSettingsEnabled && (privacy.isBlurred || privacy.isAppInBackground);
 
     return Stack(
       children: [
