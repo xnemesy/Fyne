@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/sync_service.dart';
@@ -23,10 +25,18 @@ class SyncState {
 }
 
 class SyncNotifier extends Notifier<SyncState> {
+  Timer? _syncDebounce;
+
   @override
   SyncState build() => SyncState();
 
-  Future<void> sync() async {
+  /// Debounced entry point — chiamate consecutive entro 500 ms vengono collassate.
+  void sync() {
+    _syncDebounce?.cancel();
+    _syncDebounce = Timer(const Duration(milliseconds: 500), _doSync);
+  }
+
+  Future<void> _doSync() async {
     if (state.isSyncing) return;
 
     // Legge le dipendenze PRIMA di qualsiasi await per evitare il Riverpod async-gap

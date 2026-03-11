@@ -125,9 +125,12 @@ class AccountSyncRepository {
     }
   }
 
-  Future<void> promoteTempIdToServerId(String tempId, String serverId) async {
+  Future<void> promoteTempIdToServerId(
+    String tempId,
+    String serverId, {
+    required Isar isar,
+  }) async {
     if (tempId == serverId) return;
-    final isar = await _ref.read(isarProvider.future);
 
     await isar.writeTxn(() async {
       final existing = await isar.accounts.where().idEqualTo(tempId).findFirst();
@@ -178,6 +181,7 @@ class AccountSyncRepository {
 
   /// Upload del blob cifrato su Firestore.
   /// Riceve [isar] già risolto da [syncPendingCreates] per evitare _ref.read() post-await.
+  /// Usa l'UUID reale (senza prefisso tmp_) come doc ID su Firestore e promuove l'ID locale.
   Future<void> _syncSingleAccount(Account account, {required Isar isar}) async {
     final uid = _auth.currentUser?.uid;
 
@@ -186,45 +190,37 @@ class AccountSyncRepository {
       return;
     }
 
-    try {
-      debugPrint('🔐 [ACCOUNT_SYNC] Upload Firestore start id=${account.id}');
+    // Il remote ID è l'UUID reale: rimuove il prefisso tmp_ se presente
+    final realId = account.id.startsWith('tmp_') ? account.id.substring(4) : account.id;
 
-      // Payload cifrato: i blob partono già come AES-GCM+HMAC da CryptoService
+    try {
+      debugPrint('🔐 [ACCOUNT_SYNC] Upload Firestore start id=${account.id} → remoteId=$realId');
+
+      // Payload con ID reale e syncStatus=synced (il record è in Firestore → è synced)
+      final payload = account.toJson()
+        ..['id'] = realId
+        ..['sync_status'] = AccountSyncStatus.synced.name
+        ..['remote_error'] = null;
+
       await _firestore
           .collection('users')
           .doc(uid)
           .collection('accounts')
-          .doc(account.id)
-          .set(account.toJson());
+          .doc(realId)
+          .set(payload);
 
-      debugPrint('🔐 [ACCOUNT_SYNC] ✅ Firestore upload OK id=${account.id}');
+      debugPrint('🔐 [ACCOUNT_SYNC] ✅ Firestore upload OK remoteId=$realId');
 
-      // Aggiorna syncStatus su Isar
-      await isar.writeTxn(() async {
-        final existing = await isar.accounts.where().idEqualTo(account.id).findFirst();
-        if (existing == null) return;
-        final synced = Account(
-          id: existing.id,
-          encryptedName: existing.encryptedName,
-          encryptedBalance: existing.encryptedBalance,
-          currency: existing.currency,
-          type: existing.type,
-          providerId: existing.providerId,
-          group: existing.group,
-          updatedAt: DateTime.now(),
-          isDeleted: existing.isDeleted,
-          encryptionVersion: existing.encryptionVersion,
-          syncStatus: AccountSyncStatus.synced,
-          remoteError: null,
-        )..isarId = existing.isarId;
-        await isar.accounts.put(synced);
-      });
+      // Promuove il tmp_ ID al remote ID in Isar (aggiorna anche le transazioni collegate)
+      // isar è già risolto prima di qualsiasi await: nessun ref.read() post-await
+      await promoteTempIdToServerId(account.id, realId, isar: isar);
     } catch (e) {
       debugPrint('🔐 [ACCOUNT_SYNC] ❌ Firestore upload FAILED id=${account.id} error=$e');
+      // Cerca per l'ID originale (la promozione non è avvenuta in caso di errore al set)
       await isar.writeTxn(() async {
         final existing = await isar.accounts.where().idEqualTo(account.id).findFirst();
         if (existing == null) return;
-        final failed = Account(
+        await isar.accounts.put(Account(
           id: existing.id,
           encryptedName: existing.encryptedName,
           encryptedBalance: existing.encryptedBalance,
@@ -232,13 +228,12 @@ class AccountSyncRepository {
           type: existing.type,
           providerId: existing.providerId,
           group: existing.group,
-          updatedAt: DateTime.now(),
+          updatedAt: existing.updatedAt,
           isDeleted: existing.isDeleted,
           encryptionVersion: existing.encryptionVersion,
           syncStatus: AccountSyncStatus.failedCreate,
           remoteError: e.toString(),
-        )..isarId = existing.isarId;
-        await isar.accounts.put(failed);
+        )..isarId = existing.isarId);
       });
     }
   }

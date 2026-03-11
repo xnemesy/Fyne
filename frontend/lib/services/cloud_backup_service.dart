@@ -20,7 +20,7 @@ class CloudBackupService {
     if (!await file.exists()) throw Exception("File di backup non trovato");
 
     final fileName = p.basename(localPath);
-    final storagePath = 'backups/${user.uid}/$fileName';
+    final storagePath = 'users/${user.uid}/backups/$fileName';
     final ref = _storage.ref().child(storagePath);
 
     debugPrint("[CloudBackup] Inizio upload di $fileName...");
@@ -79,12 +79,27 @@ class CloudBackupService {
 
   /// Scarica un backup da Cloud Storage in un file locale temporaneo.
   Future<String> downloadBackup(String storagePath, String localPath) async {
-    final ref = _storage.ref().child(storagePath);
-    final file = File(localPath);
+    final user = _auth.currentUser;
+    if (user == null) throw Exception("Utente non autenticato");
 
+    final file = File(localPath);
     if (await file.exists()) await file.delete();
 
-    await ref.writeToFile(file);
+    // Normalizza il path legacy (backups/{uid}/...) al path corretto (users/{uid}/backups/...)
+    final normalizedPath = storagePath.startsWith('backups/')
+        ? 'users/${user.uid}/backups/${p.basename(storagePath)}'
+        : storagePath;
+
+    try {
+      await _storage.ref().child(normalizedPath).writeToFile(file);
+    } on FirebaseException catch (e) {
+      if (e.code == 'object-not-found') {
+        debugPrint("[CloudBackup] File non trovato al path '$normalizedPath'. Verificare che il backup esista su Storage.");
+        throw Exception("Backup non trovato su Cloud Storage (path: $normalizedPath)");
+      }
+      rethrow;
+    }
+
     return file.path;
   }
 
@@ -93,8 +108,8 @@ class CloudBackupService {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final storagePath = 'backups/${user.uid}/$fileName';
-    
+    final storagePath = 'users/${user.uid}/backups/$fileName';
+
     // Elimina da Storage
     try {
       await _storage.ref().child(storagePath).delete();

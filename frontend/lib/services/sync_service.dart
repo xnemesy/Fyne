@@ -10,6 +10,8 @@ import '../models/budget.dart';
 import '../models/categorization_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'crypto_service.dart';
+import '../data/repositories/account_sync_repository.dart';
+import '../providers/account_sync_provider.dart';
 
 class SyncService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -19,7 +21,9 @@ class SyncService {
   /// Fix Bug 3: CryptoService iniettato per validare i blob prima di put()
   final CryptoService _crypto;
 
-  SyncService(this._storage, this._crypto);
+  final AccountSyncRepository _accountSyncRepo;
+
+  SyncService(this._storage, this._crypto, this._accountSyncRepo);
 
   static const String _lastSyncKey = 'fyne_last_sync_timestamp';
 
@@ -37,10 +41,13 @@ class SyncService {
     final currentSyncStartTime = DateTime.now();
 
     try {
+      // 0. PUSH pending: promuovi gli account tmp_ PRIMA del pull per evitare conflitti di merge
+      await _accountSyncRepo.syncPendingCreates();
+
       // 1. PULL: scarica le modifiche remote e valida i blob
       await _pullRemoteChanges(isar, user.uid, lastSyncAt);
 
-      // 2. PUSH: invia le modifiche locali
+      // 2. PUSH: invia le modifiche locali (account già sincronizzati)
       await _pushLocalChanges(isar, user.uid, lastSyncAt);
 
       // 3. Aggiorna timestamp ultimo sync
@@ -175,9 +182,31 @@ class SyncService {
             .where()
             .idEqualTo(remoteModel.id)
             .findFirst();
+        // Merge strategy: non sovrascrivere un account locale in attesa di push.
+        // L'account locale è la source of truth finché non è confermato su Firestore.
+        if (localModel != null &&
+            localModel.syncStatus != AccountSyncStatus.synced) {
+          debugPrint(
+              "[Sync] ⚠️ Skip remote overwrite — account locale pending: ${remoteModel.id}");
+          break;
+        }
         if (localModel == null ||
             remoteUpdatedAt.isAfter(localModel.updatedAt)) {
-          await isar.accounts.put(remoteModel);
+          // Forza syncStatus=synced: se è su Firestore, è sempre considerato synced
+          await isar.accounts.put(Account(
+            id: remoteModel.id,
+            encryptedName: remoteModel.encryptedName,
+            encryptedBalance: remoteModel.encryptedBalance,
+            currency: remoteModel.currency,
+            type: remoteModel.type,
+            providerId: remoteModel.providerId,
+            group: remoteModel.group,
+            updatedAt: remoteModel.updatedAt,
+            isDeleted: remoteModel.isDeleted,
+            encryptionVersion: remoteModel.encryptionVersion,
+            syncStatus: AccountSyncStatus.synced,
+            remoteError: null,
+          ));
         }
 
       case 'budgets':
@@ -231,10 +260,11 @@ class SyncService {
       }
     }
 
-    // 2. Accounts
+    // 2. Accounts — salta i pendingCreate/failedCreate già gestiti da syncPendingCreates()
     final localAccounts =
         await isar.accounts.where().updatedAtGreaterThan(lastSyncAt).findAll();
     for (final acc in localAccounts) {
+      if (acc.syncStatus != AccountSyncStatus.synced) continue;
       try {
         debugPrint("[Sync] ⬆️ Upload accounts/${acc.id}");
         await _firestore
@@ -311,9 +341,9 @@ class SyncService {
   }
 }
 
-/// Fix Bug 3: SyncService ora riceve CryptoService come dipendenza
 final syncServiceProvider = Provider((ref) {
   final storage = ref.watch(secureStorageProvider);
   final crypto = ref.watch(cryptoServiceProvider);
-  return SyncService(storage, crypto);
+  final accountSyncRepo = ref.watch(accountSyncRepositoryProvider);
+  return SyncService(storage, crypto, accountSyncRepo);
 });
